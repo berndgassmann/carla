@@ -17,6 +17,8 @@
  * Added V2X sensors for cooperative awareness message and custom user-defined messages to support vehicle-to-vehicle communication
  * Added named tuples for BasicAgent.py's detection result to allow for type-hints and better semantics.
  * Cleaned up the client/server build and respective naming
+ * Introduced geom::AngularVelocity, geom::Velocity,geom::Acceleration, geom::Quaternion types
+ * Fixed geom::Rotation::RotateVector() rotation directions of pitch and roll
 
 ## CARLA 0.9.15
 

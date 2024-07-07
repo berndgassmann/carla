@@ -8,12 +8,13 @@
 
 #include "carla/AtomicSharedPtr.h"
 #include "carla/Logging.h"
+#include "carla/streaming/detail/Message.h"
 #include "carla/streaming/detail/StreamStateBase.h"
-#include "carla/streaming/detail/tcp/Message.h"
 
+#include <atomic>
 #include <mutex>
 #include <vector>
-#include <atomic>
+#include <set>
 
 namespace carla {
 namespace streaming {
@@ -24,13 +25,9 @@ namespace detail {
   /// @todo Lacking some optimization.
   class MultiStreamState final : public StreamStateBase {
   public:
-
     using StreamStateBase::StreamStateBase;
 
-    MultiStreamState(const token_type &token) :
-      StreamStateBase(token),
-      _session(nullptr)
-      {};
+    MultiStreamState(const token_type &token) : StreamStateBase(token), _session(nullptr){};
 
     template <typename... Buffers>
     void Write(Buffers... buffers) {
@@ -38,8 +35,8 @@ namespace detail {
       auto session = _session.load();
       if (session != nullptr) {
         auto message = Session::MakeMessage(buffers...);
-        session->Write(std::move(message));
-        log_debug("sensor ", session->get_stream_id()," data sent");
+        session->WriteMessage(std::move(message));
+        log_debug("sensor ", session->get_stream_id(), " data sent");
         // Return here, _session is only valid if we have a
         // single session.
         return;
@@ -51,9 +48,9 @@ namespace detail {
         auto message = Session::MakeMessage(buffers...);
         for (auto &s : _sessions) {
           if (s != nullptr) {
-            s->Write(message);
-            log_debug("sensor ", s->get_stream_id()," data sent ");
-         }
+            s->WriteMessage(message);
+            log_debug("sensor ", s->get_stream_id(), " data sent ");
+          }
         }
       }
     }
@@ -141,6 +138,6 @@ namespace detail {
     bool _enabled_for_ros {false};
   };
 
-} // namespace detail
-} // namespace streaming
-} // namespace carla
+}  // namespace detail
+}  // namespace streaming
+}  // namespace carla

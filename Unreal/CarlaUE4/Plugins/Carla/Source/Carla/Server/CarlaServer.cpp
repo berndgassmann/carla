@@ -1061,7 +1061,7 @@ BIND_SYNC(is_sensor_enabled_for_ros) << [this](carla::streaming::detail::stream_
         CarlaActor->SetWalkerState(
             Transform,
             cr::WalkerControl(
-              Transform.GetForwardVector(), Speed, false));
+              Transform.GetForwardVector(), Speed, false, float(Episode->GetElapsedGameTime())));
     if (Response != ECarlaServerResponse::Success)
     {
       return RespondError(
