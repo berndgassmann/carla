@@ -158,7 +158,6 @@ def main():
     all_id = []
     client = carla.Client(args.host, args.port)
     client.set_timeout(10.0)
-    synchronous_master = False
     random.seed(args.seed if args.seed is not None else int(time.time()))
 
     try:
@@ -178,11 +177,8 @@ def main():
         if not args.asynch:
             traffic_manager.set_synchronous_mode(True)
             if not settings.synchronous_mode:
-                synchronous_master = True
                 settings.synchronous_mode = True
                 settings.fixed_delta_seconds = 0.05
-            else:
-                synchronous_master = False
         else:
             print("You are currently in asynchronous mode. If this is a traffic simulation, \
             you could experience some issues. If it's not working correctly, switch to synchronous \
@@ -244,7 +240,7 @@ def main():
             batch.append(SpawnActor(blueprint, transform)
                 .then(SetAutopilot(FutureActor, True, traffic_manager.get_port())))
 
-        for response in client.apply_batch_sync(batch, synchronous_master):
+        for response in client.apply_batch_sync(batch, do_tick=True):
             if response.error:
                 logging.error(response.error)
             else:
@@ -293,7 +289,7 @@ def main():
                 print("Walker has no speed")
                 walker_speed.append(0.0)
             batch.append(SpawnActor(walker_bp, spawn_point))
-        results = client.apply_batch_sync(batch, True)
+        results = client.apply_batch_sync(batch, do_tick=True)
         walker_speed2 = []
         for i in range(len(results)):
             if results[i].error:
@@ -307,7 +303,7 @@ def main():
         walker_controller_bp = world.get_blueprint_library().find('controller.ai.walker')
         for i in range(len(walkers_list)):
             batch.append(SpawnActor(walker_controller_bp, carla.Transform(), walkers_list[i]["id"]))
-        results = client.apply_batch_sync(batch, True)
+        results = client.apply_batch_sync(batch, do_tick=True)
         for i in range(len(results)):
             if results[i].error:
                 logging.error(results[i].error)
@@ -320,7 +316,7 @@ def main():
         all_actors = world.get_actors(all_id)
 
         # wait for a tick to ensure client receives the last transform of the walkers we have just created
-        if args.asynch or not synchronous_master:
+        if args.asynch:
             world.wait_for_tick()
         else:
             world.tick()
@@ -342,14 +338,14 @@ def main():
         traffic_manager.global_percentage_speed_difference(30.0)
 
         while True:
-            if not args.asynch and synchronous_master:
+            if not args.asynch:
                 world.tick()
             else:
                 world.wait_for_tick()
 
     finally:
 
-        if not args.asynch and synchronous_master:
+        if not args.asynch:
             settings = world.get_settings()
             settings.synchronous_mode = False
             settings.no_rendering_mode = False

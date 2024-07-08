@@ -272,11 +272,6 @@ file(GLOB libcarla_carla_trafficmanager_sources
 set(libcarla_sources "${libcarla_sources};${libcarla_carla_trafficmanager_sources}")
 install(FILES ${libcarla_carla_trafficmanager_sources} DESTINATION include/carla/trafficmanager)
 
-  file(GLOB libcarla_carla_ros2_public_headers
-    "${libcarla_source_path}/carla/ros2/*.h"
-  )
-  install(FILES ${libcarla_carla_ros2_public_headers} DESTINATION include/carla/ros2)
-
 # ==============================================================================
 # Create targets for debug and release in the same build type.
 # ==============================================================================

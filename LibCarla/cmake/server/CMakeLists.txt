@@ -20,7 +20,7 @@ foreach(dir ""
 endforeach()
 
 
-
+if (LIBCARLA_USE_ROS)
   # only install the required public interface headers
   foreach(dir "" "types/" )
     file(GLOB libcarla_carla_ros2_public_headers
@@ -28,7 +28,6 @@ endforeach()
     )
     install(FILES ${libcarla_carla_ros2_public_headers} DESTINATION include/carla/ros2/${dir})
   endforeach()
-if (LIBCARLA_USE_ROS)
 
   file(GLOB subdirs RELATIVE "${libcarla_source_path}/carla/ros2/${ROS2_MW_NAME}" "${libcarla_source_path}/carla/ros2/${ROS2_MW_NAME}/*")
   foreach(typedir "msg" "srv")
@@ -97,7 +96,6 @@ if (LIBCARLA_USE_ROS)
   foreach(ros2_dir
           "/"
           "${ROS2_MW_NAME}/carla/ros2/impl/"
-          "listeners/"
           "publishers/"
           "services/"
           "subscribers/"

@@ -14,11 +14,17 @@
 #include <compiler/disable-ue4-macros.h>
 #include <carla/multigpu/router.h>
 #include <carla/streaming/Server.h>
+#include <carla/rpc/Actor.h>
+#include <carla/rpc/ActorDescription.h>
+#include <carla/rpc/AttachmentType.h>
+#include <carla/rpc/Response.h>
+#include <carla/rpc/Transform.h>
+#include <carla/rpc/RpcServerInterface.h>
 #include <compiler/enable-ue4-macros.h>
 
 class UCarlaEpisode;
 
-class FCarlaServer
+class FCarlaServer: public carla::rpc::RpcServerInterface
 {
 public:
 
@@ -36,6 +42,12 @@ public:
 
   void RunSome(uint32 Milliseconds);
 
+  void EnableSynchronousMode();
+  void DisableSynchronousMode();
+  bool IsSynchronousModeActive();
+
+  void SetROS2TopicVisibilityDefaultEnabled(bool _topic_visibility_default_enabled);
+
   void Tick();
   
   bool TickCueReceived();
@@ -47,6 +59,44 @@ public:
   std::shared_ptr<carla::multigpu::Router> GetSecondaryServer();
 
   carla::streaming::Server &GetStreamingServer();
+
+  /**
+   * Reimplemented from ROS2ServerInterfase
+  */
+  std::shared_ptr<carla::streaming::detail::Dispatcher> GetDispatcher() override {
+    return GetStreamingServer().GetDispatcher();
+  }
+
+  carla::rpc::Response<std::vector<carla::rpc::ActorDefinition> > call_get_actor_definitions() override;
+  carla::rpc::Response<carla::rpc::EpisodeSettings> call_get_episode_settings() override;
+  carla::rpc::Response<uint64_t> call_set_episode_settings(carla::rpc::EpisodeSettings const &settings) override;
+  carla::rpc::Response<carla::rpc::MapInfo> call_get_map_info() override;
+  carla::rpc::Response<std::string> call_get_map_data() override;
+  carla::rpc::Response<carla::rpc::Actor> call_spawn_actor(carla::rpc::ActorDescription Description, const carla::rpc::Transform &Transform) override;
+  carla::rpc::Response<carla::rpc::Actor> call_spawn_actor_with_parent(
+    carla::rpc::ActorDescription Description,
+    const carla::rpc::Transform &Transform,
+    carla::rpc::ActorId ParentId,
+    carla::rpc::AttachmentType InAttachmentType,
+    const std::string& socket_name) override;
+  carla::rpc::Response<bool> call_destroy_actor(carla::rpc::ActorId ActorId) override;
+  carla::rpc::Response<void> call_enable_actor_for_ros(carla::rpc::ActorId ActorId) override;
+  carla::rpc::Response<void> call_disable_actor_for_ros(carla::rpc::ActorId ActorId) override;
+  carla::rpc::Response<bool> call_is_actor_enabled_for_ros(carla::rpc::ActorId ActorId) override;
+
+  carla::rpc::Response<uint64_t> call_tick(
+    carla::rpc::synchronization_client_id_type const &client_id = carla::rpc::ALL_CLIENTS, 
+    carla::rpc::synchronization_participant_id_type const&participant_id= carla::rpc::ALL_PARTICIPANTS) override;
+  carla::rpc::Response<carla::rpc::synchronization_participant_id_type> call_register_synchronization_participant(
+    carla::rpc::synchronization_client_id_type const &client_id, 
+    carla::rpc::synchronization_participant_id_type const &participant_id_hint = carla::rpc::ALL_PARTICIPANTS) override;
+  carla::rpc::Response<bool> call_deregister_synchronization_participant(
+    carla::rpc::synchronization_client_id_type const &client_id, 
+    carla::rpc::synchronization_participant_id_type const&participant_id) override;
+  carla::rpc::Response<bool> call_update_synchronization_window(
+    carla::rpc::synchronization_client_id_type const &client_id, 
+    carla::rpc::synchronization_participant_id_type const&participant_id, 
+    carla::rpc::synchronization_target_game_time const &target_game_time = carla::rpc::NO_SYNC_TARGET_GAME_TIME) override;
 
 private:
 

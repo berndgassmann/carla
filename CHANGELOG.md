@@ -19,6 +19,10 @@
  * Cleaned up the client/server build and respective naming
  * Introduced geom::AngularVelocity, geom::Velocity,geom::Acceleration, geom::Quaternion types
  * Fixed geom::Rotation::RotateVector() rotation directions of pitch and roll
+ * ROS2Native: Integrated ROS2 native extension
+ * Introduced fine grained ServerSynchronization mechanism: each client decides for its own if it requires synchronization or not and provides its own synchronization window.
+   Be aware: some existing code using master/slave sync mechanism might need rework. See also generate_traffic.py.
+ 
 
 ## CARLA 0.9.15
 
