@@ -9,7 +9,7 @@
  * Added functions to get actor' sockets transforms
  * make PythonAPI Windows: Fixed incompatibility issue with Anaconda due `py` command.
  * Added function to get actor' sockets names
- * Fixed bug in python agents when vehicle list was empty causing a check on all vehicles (BasicAgent.py) and detected pedestrians as vehicles if no pedestrains are present (BehaviourAgent.py)
+ * Fixed bug in python agents when vehicle list was empty causing a check on all vehicles (BasicAgent.py) and detected pedestrians as vehicles if no pedestrains are present (BehaviourAgent.py) 
  * Extended debug drawing functions to allow drawing primitives on HUD layer
  * Added possibility to change gravity variable in imui sensor for the accelerometer
  * Added API function `get_telemetry_data` to the vehicle actor.
@@ -17,7 +17,12 @@
  * Added V2X sensors for cooperative awareness message and custom user-defined messages to support vehicle-to-vehicle communication
  * Added named tuples for BasicAgent.py's detection result to allow for type-hints and better semantics.
  * Cleaned up the client/server build and respective naming
+ * Introduced geom::AngularVelocity, geom::Velocity,geom::Acceleration, geom::Quaternion types
+ * Fixed geom::Rotation::RotateVector() rotation directions of pitch and roll
  * ROS2Native: Integrated ROS2 native extension
+ * Introduced fine grained ServerSynchronization mechanism: each client decides for its own if it requires synchronization or not and provides its own synchronization window.
+   Be aware: some existing code using master/slave sync mechanism might need rework. See also generate_traffic.py.
+ 
 
 ## CARLA 0.9.15
 

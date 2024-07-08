@@ -6,7 +6,7 @@
 
 #pragma once
 
-#define ALLOW_UNSAFE_GEOM_MATRIX_ACCESS 0
+#define ALLOW_UNSAFE_GEOM_MATRIX_ACCESS 1
 
 #include <array>
 

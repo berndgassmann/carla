@@ -6,6 +6,7 @@
 #pragma once
 
 #include <fastdds/dds/domain/DomainParticipant.hpp>
+#include <fastdds/dds/domain/DomainParticipantFactory.hpp>
 
 namespace carla {
 namespace ros2 {
@@ -21,6 +22,8 @@ public:
 
 private:
   eprosima::fastdds::dds::DomainParticipant* _participant{nullptr};
+  // keep also a copy of the factory that the underlying DDS is keeping their stuff up
+  std::shared_ptr<eprosima::fastdds::dds::DomainParticipantFactory> _factory;
 };
 
 }  // namespace ros2

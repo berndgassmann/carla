@@ -969,7 +969,7 @@ if ${USE_ROS2} ; then
 
     log "Build fast dds"
     FAST_DDS_LIB_REPO="https://github.com/eProsima/Fast-DDS.git"
-    FAST_DDS_LIB_BRANCH=2.11.2
+    FAST_DDS_LIB_BRANCH=2.11.3
     # dependency foonath is not a submodule
     FOONATHAN_MEMORY_VENDOR_REPO="https://github.com/eProsima/foonathan_memory_vendor.git"
     FOONATHAN_MEMORY_VENDOR_BRANCH=master

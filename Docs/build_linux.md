@@ -50,7 +50,7 @@ To avoid compatibility issues between Unreal Engine and the CARLA dependencies, 
 
 __Ubuntu 22.04__.
 ```sh
-sudo apt-get install build-essential g++-13 cmake ninja-build libvulkan1 python python3 python3-dev python3-pip libpng-dev libtiff5-dev libjpeg-dev tzdata sed curl unzip autoconf libtool rsync libxml2-dev git git-lfs
+sudo apt-get install build-essential g++-13 cmake ninja-build libvulkan1 python3 python3-dev python3-pip libpng-dev libtiff5-dev libjpeg-dev tzdata sed curl unzip autoconf libtool rsync libxml2-dev git git-lfs
 sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-13 180
 ```
 

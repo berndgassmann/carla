@@ -39,8 +39,7 @@ namespace tcp {
   public:
 
     using socket_type = boost::asio::ip::tcp::socket;
-    using callback_function_type=std::function<void(std::shared_ptr<ServerSession>)>;
-
+    using callback_function_type = std::function<void(std::shared_ptr<ServerSession>)>;
 
     explicit ServerSession(
         boost::asio::io_context &io_context,

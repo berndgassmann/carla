@@ -16,22 +16,24 @@ namespace carla {
 namespace ros2 {
 
 DdsDomainParticipantImpl::DdsDomainParticipantImpl() {
-  std::string ros_domain_id_env = std::getenv("ROS_DOMAIN_ID");
-  unsigned int ros_domain_id = 0;
-  try {
-    ros_domain_id = (unsigned int)(std::stoi(ros_domain_id_env));
-  } catch (...) {
-    ros_domain_id = 0;
+  _factory = eprosima::fastdds::dds::DomainParticipantFactory::get_shared_instance();
+  if (_factory == nullptr) {
+    carla::log_error("DdsDomainParticipantImpl(): Failed to acquire DomainParticipantFactory");
+    return;
   }
 
-  auto factory = eprosima::fastdds::dds::DomainParticipantFactory::get_instance();
-  if (factory == nullptr) {
-    carla::log_error("DdsDomainParticipantImpl(): Failed to create DomainParticipantFactory");
+  const char *ros_domain_id_env = std::getenv("ROS_DOMAIN_ID");
+  unsigned int ros_domain_id = 0;
+  if ( ros_domain_id_env != nullptr ) {
+    try {
+      ros_domain_id = (unsigned int)(std::atoi(ros_domain_id_env));
+    } catch (...) {
+      ros_domain_id = 0;
+    }
   }
   auto pqos = eprosima::fastdds::dds::PARTICIPANT_QOS_DEFAULT;
   pqos.name("carla-server");
-
-  _participant = factory->create_participant(ros_domain_id, pqos);
+  _participant = _factory->create_participant(ros_domain_id, pqos);
   if (_participant == nullptr) {
     carla::log_error("DdsDomainParticipantImpl(): Failed to create DomainParticipant");
   }
@@ -39,9 +41,9 @@ DdsDomainParticipantImpl::DdsDomainParticipantImpl() {
 
 DdsDomainParticipantImpl::~DdsDomainParticipantImpl() {
   carla::log_warning("DdsDomainParticipantImpl::Destructor()");
-  if (_participant != nullptr) {
-    eprosima::fastdds::dds::DomainParticipantFactory::get_instance()->delete_participant(_participant);
-    _participant = nullptr;
+  if ((_participant != nullptr) && (_factory != nullptr)) {
+    _factory->delete_participant(_participant);
+    _participant=nullptr;
   }
 }
 

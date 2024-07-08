@@ -283,16 +283,18 @@ namespace nav {
         carla::client::World world = _simulator.lock()->GetWorld();
 
         _traffic_lights.clear();
-        for (auto actor : *world.GetActors()) {
+        auto actors = world.GetActors();
+        for (auto const &actor : *actors) {
             // check traffic lights only
             if (actor->GetTypeId() == "traffic.traffic_light") {
                 // get the TL actor
-                SharedPtr<carla::client::TrafficLight> tl =
-                    boost::static_pointer_cast<carla::client::TrafficLight>(actor);
-                // get the waypoints where the TL affects
-                std::vector<SharedPtr<carla::client::Waypoint>> list = tl->GetStopWaypoints();
-                for (auto &way : list) {
-                    _traffic_lights.emplace_back(tl, way->GetTransform().location);
+                auto tl = boost::dynamic_pointer_cast<carla::client::TrafficLight>(actor);
+                if ( tl != nullptr ) {
+                    // get the waypoints where the TL affects
+                    std::vector<SharedPtr<carla::client::Waypoint>> list = tl->GetStopWaypoints();
+                    for (auto const &way : list) {
+                        _traffic_lights.emplace_back(tl, way->GetTransform().location);
+                    }
                 }
             }
         }
