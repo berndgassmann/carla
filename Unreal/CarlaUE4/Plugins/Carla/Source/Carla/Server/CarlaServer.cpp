@@ -37,6 +37,7 @@
 #include "Misc/FileHelper.h"
 
 #include <compiler/disable-ue4-macros.h>
+#include <carla/Exception.h>
 #include <carla/Functional.h>
 #include <carla/multigpu/router.h>
 #include <carla/Version.h>
@@ -96,7 +97,7 @@ static std::vector<T> MakeVectorFromTArray(const TArray<Other> &Array)
 // -- FCarlaServer::FPimpl -----------------------------------------------
 // =============================================================================
 
-class FCarlaServer::FPimpl
+class FCarlaServer::FPimpl: public carla::rpc::RpcServerInterface
 {
 public:
 
@@ -130,37 +131,78 @@ public:
 
   ServerSynchronization ServerSync;
 
-  carla::rpc::Response<std::vector<carla::rpc::ActorDefinition> > call_get_actor_definitions();
-  carla::rpc::Response<carla::rpc::EpisodeSettings> call_get_episode_settings();
-  carla::rpc::Response<uint64_t> call_set_episode_settings(carla::rpc::EpisodeSettings const &settings);
-  carla::rpc::Response<carla::rpc::MapInfo> call_get_map_info();
-  carla::rpc::Response<std::string> call_get_map_data();
-  carla::rpc::Response<carla::rpc::Actor> call_spawn_actor(carla::rpc::ActorDescription Description, const carla::rpc::Transform &Transform);
-  carla::rpc::Response<carla::rpc::Actor> call_spawn_actor_with_parent(
-    carla::rpc::ActorDescription Description,
-    const carla::rpc::Transform &Transform,
-    carla::rpc::ActorId ParentId,
-    carla::rpc::AttachmentType InAttachmentType,
-    const std::string& socket_name);
-  carla::rpc::Response<bool> call_destroy_actor(carla::rpc::ActorId ActorId);
+  // not used in this delegated interface
+  std::shared_ptr<carla::streaming::detail::Dispatcher> GetDispatcher() override {
+    carla::throw_exception(std::runtime_error("Internal Error: FCarlaServer::FPimpl::GetDispatcher() should never have been called"));
+    return nullptr;
+  }
 
-  carla::rpc::Response<void> call_enable_actor_for_ros(carla::streaming::detail::actor_id_type ActorId);
-  carla::rpc::Response<void> call_disable_actor_for_ros(carla::streaming::detail::actor_id_type ActorId);
-  carla::rpc::Response<bool> call_is_actor_enabled_for_ros(carla::streaming::detail::actor_id_type ActorId);
 
+  /**
+   * @brief episode related calls
+   * @{
+   */
+  carla::rpc::Response<void> call_load_new_episode(const std::string &map_name, const bool reset_settings, carla::rpc::MapLayer map_layers) override;
+  carla::rpc::Response<carla::rpc::EpisodeSettings> call_get_episode_settings() override;
+  carla::rpc::Response<uint64_t> call_set_episode_settings(carla::rpc::EpisodeSettings const &settings) override;
+  /**
+   * @}
+   */
+
+  /**
+   * @brief map related calls
+   * @{
+   */
+  carla::rpc::Response<std::vector<std::string>> call_get_available_maps() override;
+  carla::rpc::Response<std::string> call_get_map_data() override;
+  carla::rpc::Response<carla::rpc::MapInfo> call_get_map_info() override;
+  /**
+   * @}
+   */
+
+  /**
+   * @brief actor related calls
+   * @{
+   */
+  carla::rpc::Response<std::vector<carla::rpc::ActorDefinition> > call_get_actor_definitions() override;
+  carla::rpc::Response<carla::rpc::Actor> call_spawn_actor(carla::rpc::ActorDescription Description, const carla::rpc::Transform &Transform) override;
+  carla::rpc::Response<carla::rpc::Actor> call_spawn_actor_with_parent(carla::rpc::ActorDescription Description, const carla::rpc::Transform &Transform,
+                                                       carla::rpc::ActorId ParentId, carla::rpc::AttachmentType InAttachmentType,
+                                                       const std::string &socket_name) override;
+  carla::rpc::Response<bool> call_destroy_actor(carla::rpc::ActorId ActorId) override;
+  /**
+   * @}
+   */
+
+  /**
+   * @brief ros actor interaction calls
+   * @{
+   */
+  carla::rpc::Response<void> call_enable_actor_for_ros(carla::rpc::ActorId actor_id) override;
+  carla::rpc::Response<void> call_disable_actor_for_ros(carla::rpc::ActorId actor_id) override;
+  carla::rpc::Response<bool> call_is_actor_enabled_for_ros(carla::rpc::ActorId actor_id) override;
+  /**
+   * @}
+   */
+
+  /**
+   * @brief synchronization calls
+   * @{
+   */
   carla::rpc::Response<uint64_t> call_tick(
-    carla::rpc::synchronization_client_id_type const &client_id = carla::rpc::ALL_CLIENTS,
-    carla::rpc::synchronization_participant_id_type const&participant_id= carla::rpc::ALL_PARTICIPANTS);
+      carla::rpc::synchronization_client_id_type const &client_id = carla::rpc::ALL_CLIENTS,
+      carla::rpc::synchronization_participant_id_type const &participant_id = carla::rpc::ALL_PARTICIPANTS) override;
   carla::rpc::Response<carla::rpc::synchronization_participant_id_type> call_register_synchronization_participant(
-    carla::rpc::synchronization_client_id_type const &client_id,
-    carla::rpc::synchronization_participant_id_type const &participant_id_hint);
+      carla::rpc::synchronization_client_id_type const &client_id,
+      carla::rpc::synchronization_participant_id_type const &participant_id_hint = carla::rpc::ALL_PARTICIPANTS) override;
   carla::rpc::Response<bool> call_deregister_synchronization_participant(
-    carla::rpc::synchronization_client_id_type const &client_id,
-    carla::rpc::synchronization_participant_id_type const&synchronization_participant);
+      carla::rpc::synchronization_client_id_type const &client_id, carla::rpc::synchronization_participant_id_type const &participant_id) override;
   carla::rpc::Response<bool> call_update_synchronization_window(
-    carla::rpc::synchronization_client_id_type const &client_id,
-    carla::rpc::synchronization_participant_id_type const&synchronization_participant,
-    carla::rpc::synchronization_target_game_time const &target_game_time);
+      carla::rpc::synchronization_client_id_type const &client_id, carla::rpc::synchronization_participant_id_type const &participant_id,
+      carla::rpc::synchronization_target_game_time const &target_game_time = carla::rpc::NO_SYNC_TARGET_GAME_TIME) override;
+  /**
+   * @}
+   */
 
   struct CheckHandleActorInSecondaryServerResult {
     bool actor_exists;
@@ -346,45 +388,13 @@ void FCarlaServer::FPimpl::BindActions()
 
   BIND_ASYNC(get_available_maps) << [this]() -> R<std::vector<std::string>>
   {
-    const auto MapNames = UCarlaStatics::GetAllMapNames();
-    std::vector<std::string> result;
-    result.reserve(MapNames.Num());
-    for (const auto &MapName : MapNames)
-    {
-      if (MapName.Contains("/Sublevels/"))
-        continue;
-      if (MapName.Contains("/BaseMap/"))
-        continue;
-      if (MapName.Contains("/BaseLargeMap/"))
-        continue;
-      if (MapName.Contains("_Tile_"))
-        continue;
-
-      result.emplace_back(cr::FromFString(MapName));
-    }
-    return result;
+    return call_get_available_maps();
   };
 
-  BIND_SYNC(load_new_episode) << [this](const std::string &map_name, const bool reset_settings, cr::MapLayer MapLayers) -> R<void>
+  BIND_SYNC(load_new_episode) << [this](const std::string &map_name, const bool reset_settings, cr::MapLayer map_layers) -> R<void>
   {
     REQUIRE_CARLA_EPISODE();
-
-    UCarlaGameInstance* GameInstance = UCarlaStatics::GetGameInstance(Episode->GetWorld());
-    if (!GameInstance)
-    {
-      RESPOND_ERROR("unable to find CARLA game instance");
-    }
-    GameInstance->SetMapLayer(static_cast<int32>(MapLayers));
-
-    if(!Episode->LoadNewEpisode(cr::ToFString(map_name), reset_settings))
-    {
-      FString Str(TEXT("Map '"));
-      Str += cr::ToFString(map_name);
-      Str += TEXT("' not found");
-      RESPOND_ERROR_FSTRING(Str);
-    }
-
-    return R<void>::Success();
+    return call_load_new_episode(map_name, reset_settings, map_layers);
   };
 
   BIND_SYNC(load_map_layer) << [this](cr::MapLayer MapLayers) -> R<void>
@@ -2919,11 +2929,25 @@ void FCarlaServer::FPimpl::BindActions()
 
 }
 
+carla::rpc::Response<void> FCarlaServer::FPimpl::call_load_new_episode(const std::string &map_name, const bool reset_settings, carla::rpc::MapLayer map_layers)
+{
+  UCarlaGameInstance* GameInstance = UCarlaStatics::GetGameInstance(Episode->GetWorld());
+  if (!GameInstance)
+  {
+    RESPOND_ERROR("unable to find CARLA game instance");
+  }
+  GameInstance->SetMapLayer(static_cast<int32>(map_layers));
 
-carla::rpc::Response<std::vector<carla::rpc::ActorDefinition> > FCarlaServer::FPimpl::call_get_actor_definitions() {
-  return MakeVectorFromTArray<carla::rpc::ActorDefinition>(Episode->GetActorDefinitions());
+  if(!Episode->LoadNewEpisode(carla::rpc::ToFString(map_name), reset_settings))
+  {
+    FString Str(TEXT("Map '"));
+    Str += carla::rpc::ToFString(map_name);
+    Str += TEXT("' not found");
+    RESPOND_ERROR_FSTRING(Str);
+  }
+
+  return carla::rpc::Response<void>::Success();
 }
-
 
 carla::rpc::Response<carla::rpc::EpisodeSettings> FCarlaServer::FPimpl::call_get_episode_settings()
 {
@@ -2949,6 +2973,30 @@ carla::rpc::Response<uint64_t> FCarlaServer::FPimpl::call_set_episode_settings(c
   return FCarlaEngine::GetFrameCounter();
 }
 
+carla::rpc::Response<std::vector<std::string>> FCarlaServer::FPimpl::call_get_available_maps() {
+  const auto MapNames = UCarlaStatics::GetAllMapNames();
+  std::vector<std::string> result;
+  result.reserve(MapNames.Num());
+  for (const auto &MapName : MapNames)
+  {
+    if (MapName.Contains("/Sublevels/"))
+      continue;
+    if (MapName.Contains("/BaseMap/"))
+      continue;
+    if (MapName.Contains("/BaseLargeMap/"))
+      continue;
+    if (MapName.Contains("_Tile_"))
+      continue;
+
+    result.emplace_back(carla::rpc::FromFString(MapName));
+  }
+  return result;
+}
+
+carla::rpc::Response<std::string> FCarlaServer::FPimpl::call_get_map_data() {
+  return carla::rpc::FromLongFString(UOpenDrive::GetXODR(Episode->GetWorld()));
+};
+
 carla::rpc::Response<carla::rpc::MapInfo> FCarlaServer::FPimpl::call_get_map_info() {
   ACarlaGameModeBase* GameMode = UCarlaStatics::GetGameMode(Episode->GetWorld());
   const auto &SpawnPoints = Episode->GetRecommendedSpawnPoints();
@@ -2960,13 +3008,11 @@ carla::rpc::Response<carla::rpc::MapInfo> FCarlaServer::FPimpl::call_get_map_inf
     MakeVectorFromTArray<carla::geom::Transform>(SpawnPoints)};
 };
 
-carla::rpc::Response<std::string> FCarlaServer::FPimpl::call_get_map_data() {
-  return carla::rpc::FromLongFString(UOpenDrive::GetXODR(Episode->GetWorld()));
-};
-
+carla::rpc::Response<std::vector<carla::rpc::ActorDefinition> > FCarlaServer::FPimpl::call_get_actor_definitions() {
+  return MakeVectorFromTArray<carla::rpc::ActorDefinition>(Episode->GetActorDefinitions());
+}
 
 carla::rpc::Response<carla::rpc::Actor> FCarlaServer::FPimpl::call_spawn_actor(carla::rpc::ActorDescription Description, const carla::rpc::Transform &Transform) {
-
   auto Result = Episode->SpawnActorWithInfo(Transform, std::move(Description));
 
   if (Result.Key != EActorSpawnResultStatus::Success)
@@ -3368,9 +3414,29 @@ carla::streaming::Server &FCarlaServer::GetStreamingServer()
   return Pimpl->StreamingServer;
 }
 
-carla::rpc::Response<std::vector<carla::rpc::ActorDefinition> > FCarlaServer::call_get_actor_definitions()
+carla::rpc::Response<void> FCarlaServer::call_load_new_episode(const std::string &map_name, const bool reset_settings, carla::rpc::MapLayer map_layers)
 {
-  return Pimpl->call_get_actor_definitions();
+  return Pimpl->call_load_new_episode(map_name, reset_settings, map_layers);
+}
+
+carla::rpc::Response<carla::rpc::EpisodeSettings> FCarlaServer::call_get_episode_settings()
+{
+  return Pimpl->call_get_episode_settings();
+}
+
+carla::rpc::Response<uint64_t> FCarlaServer::call_set_episode_settings(carla::rpc::EpisodeSettings const &settings)
+{
+  return Pimpl->call_set_episode_settings(settings);
+}
+
+carla::rpc::Response<std::vector<std::string>> FCarlaServer::call_get_available_maps()
+{
+  return Pimpl->call_get_available_maps();
+}
+
+carla::rpc::Response<std::string> FCarlaServer::call_get_map_data()
+{
+  return Pimpl->call_get_map_data();
 }
 
 carla::rpc::Response<carla::rpc::MapInfo> FCarlaServer::call_get_map_info()
@@ -3378,10 +3444,9 @@ carla::rpc::Response<carla::rpc::MapInfo> FCarlaServer::call_get_map_info()
   return Pimpl->call_get_map_info();
 }
 
-carla::rpc::Response<std::string> FCarlaServer::call_get_map_data()
+carla::rpc::Response<std::vector<carla::rpc::ActorDefinition> > FCarlaServer::call_get_actor_definitions()
 {
-  return Pimpl->call_get_map_data();
-
+  return Pimpl->call_get_actor_definitions();
 }
 
 carla::rpc::Response<carla::rpc::Actor> FCarlaServer::call_spawn_actor(carla::rpc::ActorDescription Description, const carla::rpc::Transform &Transform)
@@ -3417,16 +3482,6 @@ carla::rpc::Response<void> FCarlaServer::call_disable_actor_for_ros(carla::strea
 carla::rpc::Response<bool> FCarlaServer::call_is_actor_enabled_for_ros(carla::streaming::detail::actor_id_type ActorId)
 {
   return Pimpl->call_is_actor_enabled_for_ros(ActorId);
-}
-
-carla::rpc::Response<carla::rpc::EpisodeSettings> FCarlaServer::call_get_episode_settings()
-{
-  return Pimpl->call_get_episode_settings();
-}
-
-carla::rpc::Response<uint64_t> FCarlaServer::call_set_episode_settings(carla::rpc::EpisodeSettings const &settings)
-{
-  return Pimpl->call_set_episode_settings(settings);
 }
 
 carla::rpc::Response<uint64_t> FCarlaServer::call_tick(

@@ -330,13 +330,12 @@ FCarlaActor* UActorDispatcher::RegisterActor(
     auto ROS2 = carla::ros2::ROS2::GetInstance();
     if (ROS2->IsEnabled())
     {
-      std::string const EnabledForRosString = TCHAR_TO_UTF8(*Description.GetAttribute("enabled_for_ros").Value);
       bool EnabledForRos = false;
-      if ( (EnabledForRosString == "") && (ROS2->VisibilityDefaultMode() == carla::ros2::ROS2::TopicVisibilityDefaultMode::eOn )) {
+      if ( (Description.GetAttribute("enabled_for_ros").Value.Equals(TEXT(""))) && (ROS2->VisibilityDefaultMode() == carla::ros2::ROS2::TopicVisibilityDefaultMode::eOn )) {
           EnabledForRos = true;
       }
       else {
-        EnabledForRos = static_cast<bool>(std::atoi(EnabledForRosString.c_str()));
+        EnabledForRos = Description.GetAttribute("enabled_for_ros").Value.ToBool();
       }
 
       carla::ros2::types::ActorNameDefinition ActorNameDefinition( 

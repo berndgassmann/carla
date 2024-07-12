@@ -36,17 +36,13 @@ using namespace eprosima::fastcdr::exception;
 
 carla_msgs::srv::SpawnObject_Request::SpawnObject_Request()
 {
-    // m_type com.eprosima.idl.parser.typecode.StringTypeCode@384ad17b
-    m_type ="";
-    // m_id com.eprosima.idl.parser.typecode.StringTypeCode@61862a7f
-    m_id ="";
-    // m_attributes com.eprosima.idl.parser.typecode.SequenceTypeCode@441772e
+    // m_blueprint com.eprosima.fastdds.idl.parser.typecode.StructTypeCode@1622f1b
 
-    // m_transform com.eprosima.fastdds.idl.parser.typecode.StructTypeCode@7334aada
+    // m_transform com.eprosima.fastdds.idl.parser.typecode.StructTypeCode@72a7c7e0
 
-    // m_attach_to com.eprosima.idl.parser.typecode.PrimitiveTypeCode@1d9b7cce
+    // m_attach_to com.eprosima.idl.parser.typecode.PrimitiveTypeCode@2e4b8173
     m_attach_to = 0;
-    // m_random_pose com.eprosima.idl.parser.typecode.PrimitiveTypeCode@4d9e68d0
+    // m_random_pose com.eprosima.idl.parser.typecode.PrimitiveTypeCode@70e8f8e
     m_random_pose = false;
 
 }
@@ -56,16 +52,12 @@ carla_msgs::srv::SpawnObject_Request::~SpawnObject_Request()
 
 
 
-
-
 }
 
 carla_msgs::srv::SpawnObject_Request::SpawnObject_Request(
         const SpawnObject_Request& x)
 {
-    m_type = x.m_type;
-    m_id = x.m_id;
-    m_attributes = x.m_attributes;
+    m_blueprint = x.m_blueprint;
     m_transform = x.m_transform;
     m_attach_to = x.m_attach_to;
     m_random_pose = x.m_random_pose;
@@ -74,9 +66,7 @@ carla_msgs::srv::SpawnObject_Request::SpawnObject_Request(
 carla_msgs::srv::SpawnObject_Request::SpawnObject_Request(
         SpawnObject_Request&& x)
 {
-    m_type = std::move(x.m_type);
-    m_id = std::move(x.m_id);
-    m_attributes = std::move(x.m_attributes);
+    m_blueprint = std::move(x.m_blueprint);
     m_transform = std::move(x.m_transform);
     m_attach_to = x.m_attach_to;
     m_random_pose = x.m_random_pose;
@@ -86,9 +76,7 @@ carla_msgs::srv::SpawnObject_Request& carla_msgs::srv::SpawnObject_Request::oper
         const SpawnObject_Request& x)
 {
 
-    m_type = x.m_type;
-    m_id = x.m_id;
-    m_attributes = x.m_attributes;
+    m_blueprint = x.m_blueprint;
     m_transform = x.m_transform;
     m_attach_to = x.m_attach_to;
     m_random_pose = x.m_random_pose;
@@ -100,9 +88,7 @@ carla_msgs::srv::SpawnObject_Request& carla_msgs::srv::SpawnObject_Request::oper
         SpawnObject_Request&& x)
 {
 
-    m_type = std::move(x.m_type);
-    m_id = std::move(x.m_id);
-    m_attributes = std::move(x.m_attributes);
+    m_blueprint = std::move(x.m_blueprint);
     m_transform = std::move(x.m_transform);
     m_attach_to = x.m_attach_to;
     m_random_pose = x.m_random_pose;
@@ -114,7 +100,7 @@ bool carla_msgs::srv::SpawnObject_Request::operator ==(
         const SpawnObject_Request& x) const
 {
 
-    return (m_type == x.m_type && m_id == x.m_id && m_attributes == x.m_attributes && m_transform == x.m_transform && m_attach_to == x.m_attach_to && m_random_pose == x.m_random_pose);
+    return (m_blueprint == x.m_blueprint && m_transform == x.m_transform && m_attach_to == x.m_attach_to && m_random_pose == x.m_random_pose);
 }
 
 bool carla_msgs::srv::SpawnObject_Request::operator !=(
@@ -129,17 +115,7 @@ size_t carla_msgs::srv::SpawnObject_Request::getMaxCdrSerializedSize(
     size_t initial_alignment = current_alignment;
 
 
-    current_alignment += 4 + eprosima::fastcdr::Cdr::alignment(current_alignment, 4) + 255 + 1;
-
-    current_alignment += 4 + eprosima::fastcdr::Cdr::alignment(current_alignment, 4) + 255 + 1;
-
-    current_alignment += 4 + eprosima::fastcdr::Cdr::alignment(current_alignment, 4);
-
-
-    for(size_t a = 0; a < 100; ++a)
-    {
-        current_alignment += diagnostic_msgs::msg::KeyValue::getMaxCdrSerializedSize(current_alignment);}
-
+    current_alignment += carla_msgs::msg::CarlaActorBlueprint::getMaxCdrSerializedSize(current_alignment);
     current_alignment += geometry_msgs::msg::Pose::getMaxCdrSerializedSize(current_alignment);
     current_alignment += 4 + eprosima::fastcdr::Cdr::alignment(current_alignment, 4);
 
@@ -159,17 +135,7 @@ size_t carla_msgs::srv::SpawnObject_Request::getCdrSerializedSize(
     size_t initial_alignment = current_alignment;
 
 
-    current_alignment += 4 + eprosima::fastcdr::Cdr::alignment(current_alignment, 4) + data.type().size() + 1;
-
-    current_alignment += 4 + eprosima::fastcdr::Cdr::alignment(current_alignment, 4) + data.id().size() + 1;
-
-    current_alignment += 4 + eprosima::fastcdr::Cdr::alignment(current_alignment, 4);
-
-
-    for(size_t a = 0; a < data.attributes().size(); ++a)
-    {
-        current_alignment += diagnostic_msgs::msg::KeyValue::getCdrSerializedSize(data.attributes().at(a), current_alignment);}
-
+    current_alignment += carla_msgs::msg::CarlaActorBlueprint::getCdrSerializedSize(data.blueprint(), current_alignment);
     current_alignment += geometry_msgs::msg::Pose::getCdrSerializedSize(data.transform(), current_alignment);
     current_alignment += 4 + eprosima::fastcdr::Cdr::alignment(current_alignment, 4);
 
@@ -185,9 +151,7 @@ void carla_msgs::srv::SpawnObject_Request::serialize(
         eprosima::fastcdr::Cdr& scdr) const
 {
 
-    scdr << m_type;
-    scdr << m_id;
-    scdr << m_attributes;
+    scdr << m_blueprint;
     scdr << m_transform;
     scdr << m_attach_to;
     scdr << m_random_pose;
@@ -198,124 +162,48 @@ void carla_msgs::srv::SpawnObject_Request::deserialize(
         eprosima::fastcdr::Cdr& dcdr)
 {
 
-    dcdr >> m_type;
-    dcdr >> m_id;
-    dcdr >> m_attributes;
+    dcdr >> m_blueprint;
     dcdr >> m_transform;
     dcdr >> m_attach_to;
     dcdr >> m_random_pose;
 }
 
 /*!
- * @brief This function copies the value in member type
- * @param _type New value to be copied in member type
+ * @brief This function copies the value in member blueprint
+ * @param _blueprint New value to be copied in member blueprint
  */
-void carla_msgs::srv::SpawnObject_Request::type(
-        const std::string& _type)
+void carla_msgs::srv::SpawnObject_Request::blueprint(
+        const carla_msgs::msg::CarlaActorBlueprint& _blueprint)
 {
-    m_type = _type;
+    m_blueprint = _blueprint;
 }
 
 /*!
- * @brief This function moves the value in member type
- * @param _type New value to be moved in member type
+ * @brief This function moves the value in member blueprint
+ * @param _blueprint New value to be moved in member blueprint
  */
-void carla_msgs::srv::SpawnObject_Request::type(
-        std::string&& _type)
+void carla_msgs::srv::SpawnObject_Request::blueprint(
+        carla_msgs::msg::CarlaActorBlueprint&& _blueprint)
 {
-    m_type = std::move(_type);
+    m_blueprint = std::move(_blueprint);
 }
 
 /*!
- * @brief This function returns a constant reference to member type
- * @return Constant reference to member type
+ * @brief This function returns a constant reference to member blueprint
+ * @return Constant reference to member blueprint
  */
-const std::string& carla_msgs::srv::SpawnObject_Request::type() const
+const carla_msgs::msg::CarlaActorBlueprint& carla_msgs::srv::SpawnObject_Request::blueprint() const
 {
-    return m_type;
+    return m_blueprint;
 }
 
 /*!
- * @brief This function returns a reference to member type
- * @return Reference to member type
+ * @brief This function returns a reference to member blueprint
+ * @return Reference to member blueprint
  */
-std::string& carla_msgs::srv::SpawnObject_Request::type()
+carla_msgs::msg::CarlaActorBlueprint& carla_msgs::srv::SpawnObject_Request::blueprint()
 {
-    return m_type;
-}
-/*!
- * @brief This function copies the value in member id
- * @param _id New value to be copied in member id
- */
-void carla_msgs::srv::SpawnObject_Request::id(
-        const std::string& _id)
-{
-    m_id = _id;
-}
-
-/*!
- * @brief This function moves the value in member id
- * @param _id New value to be moved in member id
- */
-void carla_msgs::srv::SpawnObject_Request::id(
-        std::string&& _id)
-{
-    m_id = std::move(_id);
-}
-
-/*!
- * @brief This function returns a constant reference to member id
- * @return Constant reference to member id
- */
-const std::string& carla_msgs::srv::SpawnObject_Request::id() const
-{
-    return m_id;
-}
-
-/*!
- * @brief This function returns a reference to member id
- * @return Reference to member id
- */
-std::string& carla_msgs::srv::SpawnObject_Request::id()
-{
-    return m_id;
-}
-/*!
- * @brief This function copies the value in member attributes
- * @param _attributes New value to be copied in member attributes
- */
-void carla_msgs::srv::SpawnObject_Request::attributes(
-        const std::vector<diagnostic_msgs::msg::KeyValue>& _attributes)
-{
-    m_attributes = _attributes;
-}
-
-/*!
- * @brief This function moves the value in member attributes
- * @param _attributes New value to be moved in member attributes
- */
-void carla_msgs::srv::SpawnObject_Request::attributes(
-        std::vector<diagnostic_msgs::msg::KeyValue>&& _attributes)
-{
-    m_attributes = std::move(_attributes);
-}
-
-/*!
- * @brief This function returns a constant reference to member attributes
- * @return Constant reference to member attributes
- */
-const std::vector<diagnostic_msgs::msg::KeyValue>& carla_msgs::srv::SpawnObject_Request::attributes() const
-{
-    return m_attributes;
-}
-
-/*!
- * @brief This function returns a reference to member attributes
- * @return Reference to member attributes
- */
-std::vector<diagnostic_msgs::msg::KeyValue>& carla_msgs::srv::SpawnObject_Request::attributes()
-{
-    return m_attributes;
+    return m_blueprint;
 }
 /*!
  * @brief This function copies the value in member transform
@@ -430,14 +318,14 @@ void carla_msgs::srv::SpawnObject_Request::serializeKey(
         eprosima::fastcdr::Cdr& scdr) const
 {
     (void) scdr;
-          
+        
 }
 
 carla_msgs::srv::SpawnObject_Response::SpawnObject_Response()
 {
-    // m_id com.eprosima.idl.parser.typecode.PrimitiveTypeCode@661972b0
+    // m_id com.eprosima.idl.parser.typecode.PrimitiveTypeCode@5e82df6a
     m_id = 0;
-    // m_error_string com.eprosima.idl.parser.typecode.StringTypeCode@5af3afd9
+    // m_error_string com.eprosima.idl.parser.typecode.StringTypeCode@3f197a46
     m_error_string ="";
 
 }

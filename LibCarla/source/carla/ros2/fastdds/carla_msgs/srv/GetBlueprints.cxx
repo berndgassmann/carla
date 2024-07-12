@@ -36,7 +36,7 @@ using namespace eprosima::fastcdr::exception;
 
 carla_msgs::srv::GetBlueprints_Request::GetBlueprints_Request()
 {
-    // m_filter com.eprosima.idl.parser.typecode.StringTypeCode@7bc1a03d
+    // m_filter com.eprosima.idl.parser.typecode.StringTypeCode@7c417213
     m_filter ="";
 
 }
@@ -189,7 +189,7 @@ void carla_msgs::srv::GetBlueprints_Request::serializeKey(
 
 carla_msgs::srv::GetBlueprints_Response::GetBlueprints_Response()
 {
-    // m_blueprints com.eprosima.idl.parser.typecode.SequenceTypeCode@6328d34a
+    // m_blueprints com.eprosima.idl.parser.typecode.SequenceTypeCode@5e4c8041
 
 
 }
@@ -252,8 +252,8 @@ size_t carla_msgs::srv::GetBlueprints_Response::getMaxCdrSerializedSize(
 
     for(size_t a = 0; a < 100; ++a)
     {
-        current_alignment += 4 + eprosima::fastcdr::Cdr::alignment(current_alignment, 4) + 255 + 1;
-    }
+        current_alignment += carla_msgs::msg::CarlaActorBlueprint::getMaxCdrSerializedSize(current_alignment);}
+
     return current_alignment - initial_alignment;
 }
 
@@ -270,9 +270,8 @@ size_t carla_msgs::srv::GetBlueprints_Response::getCdrSerializedSize(
 
     for(size_t a = 0; a < data.blueprints().size(); ++a)
     {
-        current_alignment += 4 + eprosima::fastcdr::Cdr::alignment(current_alignment, 4) +
-            data.blueprints().at(a).size() + 1;
-    }
+        current_alignment += carla_msgs::msg::CarlaActorBlueprint::getCdrSerializedSize(data.blueprints().at(a), current_alignment);}
+
     return current_alignment - initial_alignment;
 }
 
@@ -280,7 +279,8 @@ void carla_msgs::srv::GetBlueprints_Response::serialize(
         eprosima::fastcdr::Cdr& scdr) const
 {
 
-    scdr << m_blueprints;}
+    scdr << m_blueprints;
+}
 
 void carla_msgs::srv::GetBlueprints_Response::deserialize(
         eprosima::fastcdr::Cdr& dcdr)
@@ -293,7 +293,7 @@ void carla_msgs::srv::GetBlueprints_Response::deserialize(
  * @param _blueprints New value to be copied in member blueprints
  */
 void carla_msgs::srv::GetBlueprints_Response::blueprints(
-        const std::vector<std::string>& _blueprints)
+        const std::vector<carla_msgs::msg::CarlaActorBlueprint>& _blueprints)
 {
     m_blueprints = _blueprints;
 }
@@ -303,7 +303,7 @@ void carla_msgs::srv::GetBlueprints_Response::blueprints(
  * @param _blueprints New value to be moved in member blueprints
  */
 void carla_msgs::srv::GetBlueprints_Response::blueprints(
-        std::vector<std::string>&& _blueprints)
+        std::vector<carla_msgs::msg::CarlaActorBlueprint>&& _blueprints)
 {
     m_blueprints = std::move(_blueprints);
 }
@@ -312,7 +312,7 @@ void carla_msgs::srv::GetBlueprints_Response::blueprints(
  * @brief This function returns a constant reference to member blueprints
  * @return Constant reference to member blueprints
  */
-const std::vector<std::string>& carla_msgs::srv::GetBlueprints_Response::blueprints() const
+const std::vector<carla_msgs::msg::CarlaActorBlueprint>& carla_msgs::srv::GetBlueprints_Response::blueprints() const
 {
     return m_blueprints;
 }
@@ -321,7 +321,7 @@ const std::vector<std::string>& carla_msgs::srv::GetBlueprints_Response::bluepri
  * @brief This function returns a reference to member blueprints
  * @return Reference to member blueprints
  */
-std::vector<std::string>& carla_msgs::srv::GetBlueprints_Response::blueprints()
+std::vector<carla_msgs::msg::CarlaActorBlueprint>& carla_msgs::srv::GetBlueprints_Response::blueprints()
 {
     return m_blueprints;
 }

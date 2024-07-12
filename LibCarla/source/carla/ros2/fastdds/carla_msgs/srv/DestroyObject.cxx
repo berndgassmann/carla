@@ -36,7 +36,7 @@ using namespace eprosima::fastcdr::exception;
 
 carla_msgs::srv::DestroyObject_Request::DestroyObject_Request()
 {
-    // m_id com.eprosima.idl.parser.typecode.PrimitiveTypeCode@365c30cc
+    // m_id com.eprosima.idl.parser.typecode.PrimitiveTypeCode@32a068d1
     m_id = 0;
 
 }
@@ -182,7 +182,7 @@ void carla_msgs::srv::DestroyObject_Request::serializeKey(
 
 carla_msgs::srv::DestroyObject_Response::DestroyObject_Response()
 {
-    // m_success com.eprosima.idl.parser.typecode.PrimitiveTypeCode@1dd02175
+    // m_success com.eprosima.idl.parser.typecode.PrimitiveTypeCode@62fdb4a6
     m_success = false;
 
 }

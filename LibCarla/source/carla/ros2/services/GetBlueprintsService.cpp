@@ -37,9 +37,19 @@ carla_msgs::srv::GetBlueprints_Response GetBlueprintsService::GetBlueprints(
   auto blueprints = carla::actors::BlueprintLibrary(_carla_server.call_get_actor_definitions().Get()).Filter(filter);
   response.blueprints().reserve(blueprints->size());
   for (auto const &blueprint : *blueprints) {
-    response.blueprints().push_back(blueprint.GetId());
+    carla_msgs::msg::CarlaActorBlueprint ros_blueprint;
+    ros_blueprint.id(blueprint.GetId());
+    for (auto const &tag: blueprint.GetTags()) {
+      ros_blueprint.tags().push_back(tag);
+    }
+    for (auto const &attribute: blueprint) {
+      diagnostic_msgs::msg::KeyValue key_value;
+      key_value.key(attribute.GetId());
+      key_value.value(attribute.GetValue());
+      ros_blueprint.attributes().push_back(key_value);
+    }
+    response.blueprints().push_back(ros_blueprint);
   }
-  std::sort(response.blueprints().begin(), response.blueprints().end());
   return response;
 }
 

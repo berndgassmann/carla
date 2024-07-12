@@ -39,7 +39,9 @@
 #include "carla/ros2/publishers/VehiclePublisher.h"
 
 #include "carla/ros2/services/DestroyObjectService.h"
+#include "carla/ros2/services/GetAvailableMapsService.h"
 #include "carla/ros2/services/GetBlueprintsService.h"
+#include "carla/ros2/services/LoadMapService.h"
 #include "carla/ros2/services/SpawnObjectService.h"
 
 #include "carla/ros2/subscribers/AckermannControlSubscriber.h"
@@ -100,10 +102,10 @@ void ROS2::NotifyInitGame() {
 void ROS2::NotifyBeginEpisode() {
   log_warning("ROS2 NotifyBeginEpisode start");
 
-  auto spwan_object_service = std::make_shared<carla::ros2::SpawnObjectService>(
+  auto spawn_object_service = std::make_shared<carla::ros2::SpawnObjectService>(
       *_carla_server, carla::ros2::types::ActorNameDefinition::CreateFromRoleName("spawn_object"));
-  spwan_object_service->Init(_domain_participant_impl);
-  _services.push_back(spwan_object_service);
+  spawn_object_service->Init(_domain_participant_impl);
+  _services.push_back(spawn_object_service);
 
   auto destroy_object_service = std::make_shared<carla::ros2::DestroyObjectService>(
       *_carla_server, carla::ros2::types::ActorNameDefinition::CreateFromRoleName("destroy_object"));
@@ -114,6 +116,16 @@ void ROS2::NotifyBeginEpisode() {
       *_carla_server, carla::ros2::types::ActorNameDefinition::CreateFromRoleName("get_blueprints"));
   get_blueprints_service->Init(_domain_participant_impl);
   _services.push_back(get_blueprints_service);
+
+  auto get_available_maps_service = std::make_shared<carla::ros2::GetAvailableMapsService>(
+      *_carla_server, carla::ros2::types::ActorNameDefinition::CreateFromRoleName("get_available_maps"));
+  get_available_maps_service->Init(_domain_participant_impl);
+  _services.push_back(get_available_maps_service);
+
+  auto load_map_service = std::make_shared<carla::ros2::SpawnObjectService>(
+      *_carla_server, carla::ros2::types::ActorNameDefinition::CreateFromRoleName("load_map"));
+  load_map_service->Init(_domain_participant_impl);
+  _services.push_back(load_map_service);
 
   log_warning("ROS2 NotifyBeginEpisode end");
 }
@@ -371,7 +383,7 @@ void ROS2::ProcessDataFromUeSensor(carla::streaming::detail::stream_id_type cons
                   std::to_string(*sensor_actor_definition), " Processed.");
 
       } else {
-        log_warning("Sensor Data to ROS data: frame.(", CurrentFrame(), ") stream.",
+        log_info("Sensor Data to ROS data: frame.(", CurrentFrame(), ") stream.",
                   std::to_string(*sensor_actor_definition), std::to_string(*ue_sensor->second.publisher->_actor_name_definition), " not enabled for ROS. Dropping data.");
       }
     } else {
