@@ -159,10 +159,11 @@ void ROS2::Disable() {
 
 void ROS2::AddVehicleUe(std::shared_ptr<carla::ros2::types::VehicleActorDefinition> vehicle_actor_definition,
                         carla::ros2::types::VehicleControlCallback vehicle_control_callback,
-                        carla::ros2::types::VehicleAckermannControlCallback vehicle_ackermann_control_callback) {
+                        carla::ros2::types::VehicleAckermannControlCallback vehicle_ackermann_control_callback,
+                        carla::ros2::types::ActorSetTransformCallback vehicle_set_transform_callback) {
   log_warning("ROS2::AddVehicleUe(", std::to_string(*vehicle_actor_definition), ")");
   _world_publisher->AddVehicleUe(vehicle_actor_definition, vehicle_control_callback,
-                                 vehicle_ackermann_control_callback);
+                                 vehicle_ackermann_control_callback, vehicle_set_transform_callback);
 }
 
 void ROS2::AddWalkerUe(std::shared_ptr<carla::ros2::types::WalkerActorDefinition> walker_actor_definition,

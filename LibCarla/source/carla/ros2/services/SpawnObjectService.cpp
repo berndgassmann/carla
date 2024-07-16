@@ -48,7 +48,7 @@ carla_msgs::srv::SpawnObject_Response SpawnObjectService::SpawnObject(
     if (result.empty()) {
       log_error("ROS2:SpawnObjectService failed to retrieve random spawn point");
       response.error_string("SpawnObjectService: failed to retrieve random spawn point");
-      response.id(0);
+      response.id(-1);
       return response;
     }
     transform = *result.begin();
@@ -62,7 +62,7 @@ carla_msgs::srv::SpawnObject_Response SpawnObjectService::SpawnObject(
   if (blueprints->empty()) {
     log_error("ROS2:SpawnObjectService failed to retrieve any matching blueprint", request.blueprint().id());
     response.error_string("SpawnObjectService: failed to retrieve matching blueprint");
-    response.id(0);
+    response.id(-1);
     return response;
   } else {
     std::vector<carla::actors::ActorBlueprint> blueprint_result;
@@ -71,7 +71,7 @@ carla_msgs::srv::SpawnObject_Response SpawnObjectService::SpawnObject(
     if (blueprint_result.size() == 0) {
     log_error("ROS2:SpawnObjectService failed to retrieve random matching blueprint", request.blueprint().id());
       response.error_string("SpawnObjectService: failed to retrieve random matching blueprint");
-      response.id(0);
+      response.id(-1);
       return response;
     }
     auto blueprint = *blueprint_result.begin();
@@ -96,7 +96,7 @@ carla_msgs::srv::SpawnObject_Response SpawnObjectService::SpawnObject(
                                                           carla::rpc::AttachmentType::Rigid, "");
     }
     if (result.HasError()) {
-      response.id(0);
+      response.id(-1);
       response.error_string(result.GetError().What());
       log_warning("ROS2:SpawnObjectService spawn failed: ", result.GetError().What());
       return response;

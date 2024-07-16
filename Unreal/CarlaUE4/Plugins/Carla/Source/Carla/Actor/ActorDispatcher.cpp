@@ -285,8 +285,11 @@ void RegisterActorROS2(std::shared_ptr<carla::ros2::ROS2> ROS2, FCarlaActor* Car
     carla::ros2::types::VehicleAckermannControlCallback VehicleAckermannControlCallback = [Vehicle](carla::ros2::types::VehicleAckermannControl const &Source) -> void {
       Vehicle->ApplyVehicleAckermannControl(Source.GetVehicleAckermannControl());
     };
+    carla::ros2::types::ActorSetTransformCallback VehicleSetTransformCallback = [Vehicle](carla::ros2::types::Transform const &Transform) -> void {
+      Vehicle->SetActorTransform(Transform.GetTransform());
+    };
 
-    ROS2->AddVehicleUe(VehicleActorDefinition, VehicleControlCallback, VehicleAckermannControlCallback);
+    ROS2->AddVehicleUe(VehicleActorDefinition, VehicleControlCallback, VehicleAckermannControlCallback, VehicleSetTransformCallback);
   }
   else if ( Walker != nullptr ) {
     auto WalkerActorDefinition = std::make_shared<carla::ros2::types::WalkerActorDefinition>(

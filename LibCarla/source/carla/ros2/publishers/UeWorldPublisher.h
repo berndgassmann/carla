@@ -18,6 +18,7 @@
 #include "carla/ros2/publishers/VehiclePublisher.h"
 #include "carla/ros2/publishers/WalkerPublisher.h"
 #include "carla/ros2/subscribers/AckermannControlSubscriber.h"
+#include "carla/ros2/subscribers/ActorSetTransformSubscriber.h"
 #include "carla/ros2/subscribers/CarlaControlSubscriber.h"
 #include "carla/ros2/subscribers/CarlaSynchronizationWindowSubscriber.h"
 #include "carla/ros2/subscribers/VehicleControlSubscriber.h"
@@ -93,7 +94,8 @@ public:
 
   void AddVehicleUe(std::shared_ptr<carla::ros2::types::VehicleActorDefinition> vehicle_actor_definition,
                     carla::ros2::types::VehicleControlCallback vehicle_control_callback,
-                    carla::ros2::types::VehicleAckermannControlCallback vehicle_ackermann_control_callback);
+                    carla::ros2::types::VehicleAckermannControlCallback vehicle_ackermann_control_callback,
+                    carla::ros2::types::ActorSetTransformCallback vehicle_set_transform_callback);
   void AddWalkerUe(std::shared_ptr<carla::ros2::types::WalkerActorDefinition> walker_actor_definition,
                    carla::ros2::types::WalkerControlCallback walker_control_callback);
   void AddTrafficLightUe(
@@ -159,6 +161,7 @@ private:
     std::shared_ptr<VehiclePublisher> _vehicle_publisher;
     std::shared_ptr<VehicleControlSubscriber> _vehicle_controller;
     std::shared_ptr<AckermannControlSubscriber> _vehicle_ackermann_controller;
+    std::shared_ptr<ActorSetTransformSubscriber> _actor_set_transform_subscriber;
     std::shared_ptr<CarlaSynchronizationWindowSubscriber> _sync_subscriber;
 
     void Init(std::shared_ptr<DdsDomainParticipantImpl> domain_participant);

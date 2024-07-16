@@ -58,6 +58,7 @@ void UeWorldPublisher::ProcessMessages() {
   for (auto& vehicle : _vehicles) {
     vehicle.second._vehicle_controller->ProcessMessages();
     vehicle.second._vehicle_ackermann_controller->ProcessMessages();
+    vehicle.second._actor_set_transform_subscriber->ProcessMessages();
   }
   for (auto& walker : _walkers) {
     walker.second._walker_controller->ProcessMessages();
@@ -87,7 +88,8 @@ void UeWorldPublisher::PostTickAction() {
 void UeWorldPublisher::AddVehicleUe(
     std::shared_ptr<carla::ros2::types::VehicleActorDefinition> vehicle_actor_definition,
     carla::ros2::types::VehicleControlCallback vehicle_control_callback,
-    carla::ros2::types::VehicleAckermannControlCallback vehicle_ackermann_control_callback) {
+    carla::ros2::types::VehicleAckermannControlCallback vehicle_ackermann_control_callback,
+    carla::ros2::types::ActorSetTransformCallback vehicle_set_transform_callback) {
   if (!_initialized) {
     return;
   }
@@ -106,6 +108,9 @@ void UeWorldPublisher::AddVehicleUe(
       std::make_shared<VehicleControlSubscriber>(*vehicle_publisher, std::move(vehicle_control_callback));
   ue_vehicle._vehicle_ackermann_controller =
       std::make_shared<AckermannControlSubscriber>(*vehicle_publisher, std::move(vehicle_ackermann_control_callback));
+  ue_vehicle._actor_set_transform_subscriber =
+      std::make_shared<ActorSetTransformSubscriber>(*vehicle_publisher, std::move(vehicle_set_transform_callback));
+
   ue_vehicle._sync_subscriber= std::make_shared<CarlaSynchronizationWindowSubscriber>(*vehicle_publisher, _carla_server);
 
   auto vehicle_result = _vehicles.insert({vehicle_actor_definition->id, ue_vehicle});
@@ -121,6 +126,7 @@ void UeWorldPublisher::UeVehicle::Init(std::shared_ptr<DdsDomainParticipantImpl>
     _vehicle_publisher->Init(domain_participant);
     _vehicle_controller->Init(domain_participant);
     _vehicle_ackermann_controller->Init(domain_participant);
+    _actor_set_transform_subscriber->Init(domain_participant);
     _sync_subscriber->Init(domain_participant);
   }
 }
