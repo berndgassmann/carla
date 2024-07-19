@@ -30,15 +30,17 @@ carla_msgs::srv::LoadMap_Response LoadMapService::LoadMap(
     carla_msgs::srv::LoadMap_Request const &request) {
   carla_msgs::srv::LoadMap_Response response;
 
-  auto new_map_name = request.mapname();
   auto current_map_name = _carla_server.call_get_map_info().Get().name;
   std::string map_name_prefix = "Carla/Maps/";
-  std::string map_name_without_prefix = new_map_name;
-  std::string map_name_with_prefix = map_name_prefix + new_map_name;
+  std::string map_name_without_prefix = request.mapname();
+  if (map_name_without_prefix.starts_with(map_name_prefix)) {
+    map_name_without_prefix.erase(0, map_name_prefix.length());
+  }
+  std::string map_name_with_prefix = map_name_prefix + map_name_without_prefix;
   if( request.force_reload() || 
       (!(map_name_without_prefix == current_map_name) && !(map_name_with_prefix == current_map_name))) {
-    _carla_server.call_load_new_episode(new_map_name, request.reset_episode_settings(), static_cast<rpc::MapLayer>(request.map_layers()));
-    response.success(true);
+    auto call_response = _carla_server.call_load_new_episode(map_name_without_prefix, request.reset_episode_settings(), static_cast<rpc::MapLayer>(request.map_layers()));
+    response.success(!call_response.HasError());
   }
   else {
     response.success(false);
