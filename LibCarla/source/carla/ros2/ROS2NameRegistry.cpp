@@ -295,6 +295,9 @@ ROS2NameRegistry::TopicAndFrame ROS2NameRegistry::ExpandTopicName(TopicAndFrame 
   if (expanded_topic_and_frame._frame_id.back() != '/') {
     expanded_topic_and_frame._frame_id.push_back('/');
   }
+  if (expanded_topic_and_frame._frame_id.front() == '/') {
+    expanded_topic_and_frame._frame_id.erase(0u, 1u);
+  }
   if (expanded_topic_and_frame._topic_name.back() != '/') {
     expanded_topic_and_frame._topic_name.push_back('/');
   }
