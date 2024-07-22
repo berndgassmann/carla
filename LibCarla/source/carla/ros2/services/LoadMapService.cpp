@@ -15,7 +15,8 @@ namespace ros2 {
 LoadMapService::LoadMapService(
     carla::rpc::RpcServerInterface &carla_server,
     std::shared_ptr<carla::ros2::types::ActorNameDefinition> actor_name_definition)
-  : ServiceBase(carla_server, actor_name_definition), _impl(std::make_shared<LoadMapServiceImpl>()) {}
+  : ServiceBase(carla_server, actor_name_definition), _impl(std::make_shared<LoadMapServiceImpl>()) {
+}
 
 bool LoadMapService::Init(std::shared_ptr<DdsDomainParticipantImpl> domain_participant) {
   _impl->SetServiceCallback(std::bind(&LoadMapService::LoadMap, this, std::placeholders::_1));
@@ -37,13 +38,37 @@ carla_msgs::srv::LoadMap_Response LoadMapService::LoadMap(
     map_name_without_prefix.erase(0, map_name_prefix.length());
   }
   std::string map_name_with_prefix = map_name_prefix + map_name_without_prefix;
+  std::string error_reason;
   if( request.force_reload() || 
       (!(map_name_without_prefix == current_map_name) && !(map_name_with_prefix == current_map_name))) {
     auto call_response = _carla_server.call_load_new_episode(map_name_without_prefix, request.reset_episode_settings(), static_cast<rpc::MapLayer>(request.map_layers()));
-    response.success(!call_response.HasError());
+    if ( call_response.HasError() ) {
+      response.success(false);
+      error_reason = call_response.GetError().What();
+    }
+    else {
+      response.success(true);
+    }
   }
   else {
     response.success(false);
+    error_reason = "Map already loaded and no reload requested";
+  }
+  if (response.success()) {
+    log_warning("ROS2:LoadMapService(", request.mapname(), 
+      "): request to load new episode '", map_name_without_prefix, 
+      "' with force: ", request.force_reload()?"True":"False", 
+      ", reset_episode_settings: ", request.reset_episode_settings()?"True":"False", 
+      " and map_layers: ", request.map_layers(),
+      " succeeded");
+  }
+  else {
+    log_error("ROS2:LoadMapService(", request.mapname(), 
+      "): request to load new episode '", map_name_without_prefix, 
+      "' with force: ", request.force_reload()?"True":"False", 
+      ", reset_episode_settings: ", request.reset_episode_settings()?"True":"False", 
+      " and map_layers: ", request.map_layers(), 
+      " failed: ", error_reason);
   }
   return response;
 }

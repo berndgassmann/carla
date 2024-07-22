@@ -5,6 +5,7 @@
 #include "UeWorldPublisher.h"
 
 #include "carla/sensor/data/RawEpisodeState.h"
+#include "carla/ros2/types/EpisodeSettings.h"
 
 namespace carla {
 namespace ros2 {
@@ -254,9 +255,8 @@ void UeWorldPublisher::UpdateSensorData(
 
   carla_msgs::msg::CarlaStatus status;
   status.frame(_frame);
-  status.fixed_delta_seconds(_episode_header.delta_seconds);
-  auto episode_settings = _carla_server.call_get_episode_settings();
-  status.synchronous_mode(episode_settings.Get().synchronous_mode);
+  carla::ros2::types::EpisodeSettings carla_episode_settings(_carla_server.call_get_episode_settings().Get());
+  status.episode_settings( carla_episode_settings.episode_settings());
   status.header().stamp(_timestamp.time());
   status.header().frame_id("");
   _carla_status_publisher->UpdateCarlaStatus(status);
