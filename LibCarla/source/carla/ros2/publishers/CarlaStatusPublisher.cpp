@@ -14,7 +14,11 @@ CarlaStatusPublisher::CarlaStatusPublisher()
     _impl(std::make_shared<CarlaStatusPublisherImpl>()) {}
 
 bool CarlaStatusPublisher::Init(std::shared_ptr<DdsDomainParticipantImpl> domain_participant) {
-  return _impl->Init(domain_participant, get_topic_name(), get_topic_qos());
+  // provide the status transient local to ensure if CARLA is stuck and someone wants to query the synchronization status,
+  // then the last published state is still available and one is able to detect for what CARLA is waiting
+  auto topic_qos = get_topic_qos();
+  topic_qos.transient_local();
+  return _impl->Init(domain_participant, get_topic_name(), topic_qos);
 }
 
 bool CarlaStatusPublisher::Publish() {

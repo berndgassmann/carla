@@ -18,17 +18,16 @@ namespace types {
 */
 class Timestamp {
 public:
-  explicit Timestamp(float timestamp = 0.f) : _stamp(timestamp) {
-    float integral;
-    const float fractional = std::modf(timestamp, &integral);
+  explicit Timestamp(double timestamp = 0.) {
+    double integral;
+    const double fractional = std::modf(timestamp, &integral);
     _ros_time.sec(static_cast<int32_t>(integral));
     _ros_time.nanosec(static_cast<uint32_t>(fractional * 1e9));
+    _stamp = double(_ros_time.sec()) + 1e-9 * double(_ros_time.nanosec());
   }
 
-  explicit Timestamp(double timestamp) : Timestamp(float(timestamp)) {}
-
   explicit Timestamp(const builtin_interfaces::msg::Time& time) : _ros_time(time) {
-    _stamp = float(_ros_time.sec()) + 1e-9f * float(_ros_time.nanosec());
+    _stamp = double(_ros_time.sec()) + 1e-9 * double(_ros_time.nanosec());
   }
 
   ~Timestamp() = default;
@@ -37,7 +36,7 @@ public:
   Timestamp(Timestamp&&) = default;
   Timestamp& operator=(Timestamp&&) = default;
 
-  float Stamp() const {
+  double Stamp() const {
     return _stamp;
   }
 
@@ -49,7 +48,7 @@ public:
   }
 
 private:
-  float _stamp{0.};
+  double _stamp{0.};
   builtin_interfaces::msg::Time _ros_time;
 };
 }  // namespace types

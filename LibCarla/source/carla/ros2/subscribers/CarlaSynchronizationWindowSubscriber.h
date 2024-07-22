@@ -7,7 +7,7 @@
 #include <memory>
 #include <vector>
 
-#include "carla/ros2/subscribers/SubscriberBase.h"
+#include "carla/ros2/subscribers/SubscriberBaseSynchronizationClient.h"
 #include "carla/rpc/RpcServerInterface.h"
 #include "carla/rpc/ServerSynchronizationTypes.h"
 #include "carla_msgs/msg/CarlaSynchronizationWindowPubSubTypes.h"
@@ -19,7 +19,7 @@ using CarlaSynchronizationWindowSubscriberImpl =
     DdsSubscriberImpl<carla_msgs::msg::CarlaSynchronizationWindow,
                       carla_msgs::msg::CarlaSynchronizationWindowPubSubType>;
 
-class CarlaSynchronizationWindowSubscriber : public SubscriberBase<carla_msgs::msg::CarlaSynchronizationWindow> {
+class CarlaSynchronizationWindowSubscriber : public SubscriberBaseSynchronizationClient<carla_msgs::msg::CarlaSynchronizationWindow> {
 public:
   explicit CarlaSynchronizationWindowSubscriber(ROS2NameRecord &parent, carla::rpc::RpcServerInterface &carla_server);
   virtual ~CarlaSynchronizationWindowSubscriber();
@@ -28,15 +28,6 @@ public:
    * Implements SubscriberBase::ProcessMessages()
    */
   void ProcessMessages() override;
-  /**
-   * Implements SubscriberBase::PublisherConnected()
-   */
-  void PublisherConnected(carla::rpc::synchronization_client_id_type const &publisher) override;
-
-  /**
-   * Implements SubscriberBase::PublisherDisconnected()
-   */
-  void PublisherDisconnected(carla::rpc::synchronization_client_id_type const &publisher) override;
 
   /**
    * Implements ROS2NameRecord::Init() interface
@@ -44,12 +35,15 @@ public:
   bool Init(std::shared_ptr<DdsDomainParticipantImpl> domain_participant) override;
 
 private:
+
+  /**
+   * Implements SubscriberBaseSynchronizationClient::ThisAsSynchronizationClient() interface
+   */
+  carla::rpc::synchronization_client_id_type ThisAsSynchronizationClient() override {
+    return get_topic_name("control/synchronization_window");
+  }
+
   std::shared_ptr<CarlaSynchronizationWindowSubscriberImpl> _impl;
-  carla::rpc::RpcServerInterface &_carla_server;
-  std::map<carla::rpc::synchronization_client_id_type, carla::rpc::synchronization_participant_id_type>
-      _carla_synchronization_window_participants;
-  carla::rpc::synchronization_target_game_time _carla_synchronization_target_game_time{
-      carla::rpc::NO_SYNC_TARGET_GAME_TIME};
 };
 }  // namespace ros2
 }  // namespace carla

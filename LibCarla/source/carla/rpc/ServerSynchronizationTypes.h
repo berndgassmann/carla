@@ -11,8 +11,8 @@
 namespace carla {
 namespace rpc {
 
-using synchronization_client_id_type = void const*;
-static constexpr carla::rpc::synchronization_client_id_type ALL_CLIENTS{nullptr};
+using synchronization_client_id_type = std::string;
+static const carla::rpc::synchronization_client_id_type ALL_CLIENTS{};
 
 using synchronization_participant_id_type = uint32_t;
 static constexpr carla::rpc::synchronization_participant_id_type ALL_PARTICIPANTS{0};
@@ -20,6 +20,14 @@ static constexpr carla::rpc::synchronization_participant_id_type ALL_PARTICIPANT
 using synchronization_target_game_time = double;
 static constexpr synchronization_target_game_time NO_SYNC_TARGET_GAME_TIME{0.};
 static constexpr synchronization_target_game_time BLOCKING_TARGET_GAME_TIME{1e-6};
+
+struct synchronization_window_participant_state {
+    synchronization_client_id_type client_id;
+    synchronization_participant_id_type participant_id;
+    synchronization_target_game_time target_game_time;
+};
+
+
 
 }  // namespace rpc
 }  // namespace carla

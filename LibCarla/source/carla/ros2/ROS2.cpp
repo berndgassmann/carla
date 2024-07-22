@@ -128,26 +128,24 @@ void ROS2::NotifyBeginEpisode() {
   _services.push_back(load_map_service);
 
   auto set_epsisode_settings_service = std::make_shared<carla::ros2::SetEpisodeSettingsService>(
-      *_carla_server, carla::ros2::types::ActorNameDefinition::CreateFromRoleName("set_epsisode_settings"));
+      *_carla_server, carla::ros2::types::ActorNameDefinition::CreateFromRoleName("set_episode_settings"));
   set_epsisode_settings_service->Init(_domain_participant_impl);
   _services.push_back(set_epsisode_settings_service);
 
 }
 
 void ROS2::NotifyEndEpisode() {
-  log_warning("ROS2 NotifyEndEpisode start");
+  log_warning("ROS2 NotifyEndEpisode");
   _services.clear();
   _ue_sensors.clear();
   _name_registry->Clear();
-  log_warning("ROS2 NotifyEndEpisode done");
 }
 
 void ROS2::NotifyEndGame() {
-  log_warning("ROS2 NotifyEndGame start");
+  log_warning("ROS2 NotifyEndGame");
   NotifyEndEpisode();
   _world_publisher.reset();
   _transform_publisher.reset();
-  log_warning("ROS2 NotifyEndGame end");
 }
 
 void ROS2::Disable() {

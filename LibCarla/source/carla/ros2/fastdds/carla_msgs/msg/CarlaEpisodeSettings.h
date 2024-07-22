@@ -166,19 +166,19 @@ namespace carla_msgs {
              * @param _fixed_delta_seconds New value for member fixed_delta_seconds
              */
             eProsima_user_DllExport void fixed_delta_seconds(
-                    float _fixed_delta_seconds);
+                    double _fixed_delta_seconds);
 
             /*!
              * @brief This function returns the value of member fixed_delta_seconds
              * @return Value of member fixed_delta_seconds
              */
-            eProsima_user_DllExport float fixed_delta_seconds() const;
+            eProsima_user_DllExport double fixed_delta_seconds() const;
 
             /*!
              * @brief This function returns a reference to member fixed_delta_seconds
              * @return Reference to member fixed_delta_seconds
              */
-            eProsima_user_DllExport float& fixed_delta_seconds();
+            eProsima_user_DllExport double& fixed_delta_seconds();
 
             /*!
              * @brief This function sets a value in member substepping
@@ -204,19 +204,19 @@ namespace carla_msgs {
              * @param _max_substep_delta_time New value for member max_substep_delta_time
              */
             eProsima_user_DllExport void max_substep_delta_time(
-                    float _max_substep_delta_time);
+                    double _max_substep_delta_time);
 
             /*!
              * @brief This function returns the value of member max_substep_delta_time
              * @return Value of member max_substep_delta_time
              */
-            eProsima_user_DllExport float max_substep_delta_time() const;
+            eProsima_user_DllExport double max_substep_delta_time() const;
 
             /*!
              * @brief This function returns a reference to member max_substep_delta_time
              * @return Reference to member max_substep_delta_time
              */
-            eProsima_user_DllExport float& max_substep_delta_time();
+            eProsima_user_DllExport double& max_substep_delta_time();
 
             /*!
              * @brief This function sets a value in member max_substeps
@@ -394,9 +394,9 @@ namespace carla_msgs {
 
             bool m_synchronous_mode;
             bool m_no_rendering_mode;
-            float m_fixed_delta_seconds;
+            double m_fixed_delta_seconds;
             bool m_substepping;
-            float m_max_substep_delta_time;
+            double m_max_substep_delta_time;
             int32_t m_max_substeps;
             float m_max_culling_distance;
             bool m_deterministic_ragdolls;

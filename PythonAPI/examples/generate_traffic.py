@@ -160,6 +160,7 @@ def main():
     client.set_timeout(10.0)
     random.seed(args.seed if args.seed is not None else int(time.time()))
 
+    original_world_settings = None
     try:
         world = client.get_world()
 
@@ -173,7 +174,9 @@ def main():
         if args.seed is not None:
             traffic_manager.set_random_device_seed(args.seed)
 
-        settings = world.get_settings()
+        original_world_settings = world.get_settings()
+        print("current_world_settings {}".format(original_world_settings))
+        settings = original_world_settings
         if not args.asynch:
             traffic_manager.set_synchronous_mode(True)
             if not settings.synchronous_mode:
@@ -186,7 +189,9 @@ def main():
 
         if args.no_rendering:
             settings.no_rendering_mode = True
+        print("apply_world_settings {}".format(settings))
         world.apply_settings(settings)
+        print("settings applied")
 
         blueprints = get_actor_blueprints(world, args.filterv, args.generationv)
         if not blueprints:
@@ -346,10 +351,14 @@ def main():
     finally:
 
         if not args.asynch:
-            settings = world.get_settings()
-            settings.synchronous_mode = False
-            settings.no_rendering_mode = False
-            settings.fixed_delta_seconds = None
+            if original_world_settings:
+                settings= original_world_settings
+            else:
+                settings = world.get_settings()
+                settings.synchronous_mode = False
+                settings.no_rendering_mode = False
+                settings.fixed_delta_seconds = None
+            print("restore world_settings {}".format(settings))
             world.apply_settings(settings)
 
         print('\ndestroying %d vehicles' % len(vehicles_list))

@@ -7,7 +7,7 @@
 #include <memory>
 #include <vector>
 
-#include "carla/ros2/subscribers/SubscriberBase.h"
+#include "carla/ros2/subscribers/SubscriberBaseSynchronizationClient.h"
 #include "carla/rpc/RpcServerInterface.h"
 #include "carla_msgs/msg/CarlaControlPubSubTypes.h"
 
@@ -17,7 +17,7 @@ namespace ros2 {
 using CarlaControlSubscriberImpl =
     DdsSubscriberImpl<carla_msgs::msg::CarlaControl, carla_msgs::msg::CarlaControlPubSubType>;
 
-class CarlaControlSubscriber : public SubscriberBase<carla_msgs::msg::CarlaControl> {
+class CarlaControlSubscriber : public SubscriberBaseSynchronizationClient<carla_msgs::msg::CarlaControl> {
 public:
   explicit CarlaControlSubscriber(ROS2NameRecord &parent, carla::rpc::RpcServerInterface &carla_server);
   virtual ~CarlaControlSubscriber();
@@ -33,13 +33,14 @@ public:
   bool Init(std::shared_ptr<DdsDomainParticipantImpl> domain_participant) override;
 
 private:
-  carla::rpc::synchronization_client_id_type ThisAsSynchronizationClient() {
-    return reinterpret_cast<carla::rpc::synchronization_client_id_type>(this);
+  /**
+   * Implements SubscriberBaseSynchronizationClient::ThisAsSynchronizationClient() interface
+   */
+  carla::rpc::synchronization_client_id_type ThisAsSynchronizationClient() override {
+    return get_topic_name("control/carla_control");
   }
 
   std::shared_ptr<CarlaControlSubscriberImpl> _impl;
-  carla::rpc::RpcServerInterface &_carla_server;
-  carla::rpc::synchronization_participant_id_type _carla_control_synchronization_participant;
 };
 }  // namespace ros2
 }  // namespace carla

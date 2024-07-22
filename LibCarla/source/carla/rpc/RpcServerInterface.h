@@ -94,6 +94,7 @@ public:
   virtual Response<bool> call_update_synchronization_window(
       synchronization_client_id_type const &client_id, synchronization_participant_id_type const &participant_id,
       synchronization_target_game_time const &target_game_time = NO_SYNC_TARGET_GAME_TIME) = 0;
+  virtual carla::rpc::Response<std::pair< bool , std::vector<carla::rpc::synchronization_window_participant_state> > >  call_get_synchronization_window_status() = 0;
   /**
    * @}
    */

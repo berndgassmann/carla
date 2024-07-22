@@ -129,6 +129,8 @@ public:
   bool is_enabled_for_ros(carla::streaming::detail::actor_id_type actor_id) const override;
 
 private:
+  void UpdateAndPublishStatus();
+
   using EpisodeHeaderConst = carla::sensor::s11n::EpisodeStateSerializer::Header const;
 
   /**
@@ -152,6 +154,7 @@ private:
   carla::ros2::types::Timestamp _timestamp{};
   uint64_t _frame{0u};
   carla::sensor::s11n::EpisodeStateSerializer::Header _episode_header;
+  bool _frame_changed{false};
   bool _objects_changed{false};
   std::unordered_map<ActorId, std::shared_ptr<carla::ros2::types::Object>> _objects;
 

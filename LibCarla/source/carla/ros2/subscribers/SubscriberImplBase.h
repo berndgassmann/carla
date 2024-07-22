@@ -6,7 +6,6 @@
 
 #include <list>
 #include <mutex>
-#include "carla/rpc/ServerSynchronizationTypes.h"
 
 namespace carla {
 namespace ros2 {
@@ -48,7 +47,7 @@ public:
 
   struct MessageEntry {
     // a process local unique identification of the publisher that has sent the message
-    carla::rpc::synchronization_client_id_type publisher{nullptr};
+    std::string  publisher{};
     // the actual message
     MESSAGE_TYPE message{};
   };
@@ -56,7 +55,7 @@ public:
   /**
    * Get the list of currently alive publishers in the order of their appearance.
    */
-  std::list<carla::rpc::synchronization_client_id_type> GetConnectedPublishers() const {
+  std::list<std::string> GetConnectedPublishers() const {
     std::lock_guard<std::mutex> access_lock(_access_mutex);
     return _connected_publishers;
   }
@@ -117,31 +116,40 @@ public:
   }
 
 protected:
-  void AddMessage(carla::rpc::synchronization_client_id_type publisher, MESSAGE_TYPE &message) {
+  void AddMessage(std::string const &publisher_guid, MESSAGE_TYPE &message) {
     std::lock_guard<std::mutex> access_lock(_access_mutex);
-    _messages.push_back({publisher, message});
+    _messages.push_back({publisher_guid, message});
+    carla::log_debug("SubscriberImplBase[", _parent.get_topic_name(), "]::AddMessage(", publisher_guid,
+                      ") number of messages: ", _messages.size());
   }
 
-  void AddPublisher(carla::rpc::synchronization_client_id_type publisher) {
+  void AddPublisher(std::string const &publisher_guid) {
     {
       std::lock_guard<std::mutex> access_lock(_access_mutex);
-      _connected_publishers.push_back(publisher);
+      _connected_publishers.push_back(publisher_guid);
+      carla::log_debug("SubscriberImplBase[", _parent.get_topic_name(), "]::AddPublisher(", publisher_guid,
+                       ") number of connected publisher: ", _connected_publishers.size());
     }
-    _parent.PublisherConnected(publisher);
+    _parent.PublisherConnected(publisher_guid);
   }
 
-  void RemovePublisher(carla::rpc::synchronization_client_id_type publisher) {
-    _parent.PublisherDisconnected(publisher);
+  void RemovePublisher(std::string const &publisher_guid) {
+    _parent.PublisherDisconnected(publisher_guid);
     {
       std::lock_guard<std::mutex> access_lock(_access_mutex);
-      _connected_publishers.remove_if([publisher](carla::rpc::synchronization_client_id_type const &element) -> bool {
-        return publisher == element;
+      _connected_publishers.remove_if([publisher_guid](std::string const &element) -> bool {
+        return publisher_guid == element;
       });
+      carla::log_debug("SubscriberImplBase[", _parent.get_topic_name(), "]::RemovePublisher(", publisher_guid,
+                       ") number of connected publisher: ", _connected_publishers.size());
     }
   }
 
   void Clear() {
     std::lock_guard<std::mutex> access_lock(_access_mutex);
+    for (auto const &publisher_guid: _connected_publishers) {
+      _parent.PublisherDisconnected(publisher_guid);
+    }
     _connected_publishers.clear();
     _messages.clear();
   }
@@ -150,7 +158,7 @@ private:
   // keep the data private to ensure access_mutex is hold while accessing
   mutable std::mutex _access_mutex{};
   SubscriberBase<MESSAGE_TYPE> &_parent;
-  std::list<carla::rpc::synchronization_client_id_type> _connected_publishers;
+  std::list<std::string > _connected_publishers;
   std::list<MessageEntry> _messages;
 };
 }  // namespace ros2

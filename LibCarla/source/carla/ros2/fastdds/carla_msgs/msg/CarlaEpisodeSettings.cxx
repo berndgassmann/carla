@@ -36,9 +36,9 @@ using namespace eprosima::fastcdr::exception;
 
 carla_msgs::msg::CarlaEpisodeSettings::CarlaEpisodeSettings()
 {
-    // m_synchronous_mode com.eprosima.idl.parser.typecode.PrimitiveTypeCode@2df3b89c
+    // m_synchronous_mode com.eprosima.idl.parser.typecode.PrimitiveTypeCode@55b0dcab
     m_synchronous_mode = false;
-    // m_no_rendering_mode com.eprosima.idl.parser.typecode.PrimitiveTypeCode@23348b5d
+    // m_no_rendering_mode com.eprosima.idl.parser.typecode.PrimitiveTypeCode@38afe297
     m_no_rendering_mode = false;
     // m_fixed_delta_seconds com.eprosima.idl.parser.typecode.PrimitiveTypeCode@70325e14
     m_fixed_delta_seconds = 0.0;
@@ -170,13 +170,13 @@ size_t carla_msgs::msg::CarlaEpisodeSettings::getMaxCdrSerializedSize(
     current_alignment += 1 + eprosima::fastcdr::Cdr::alignment(current_alignment, 1);
 
 
-    current_alignment += 4 + eprosima::fastcdr::Cdr::alignment(current_alignment, 4);
+    current_alignment += 8 + eprosima::fastcdr::Cdr::alignment(current_alignment, 8);
 
 
     current_alignment += 1 + eprosima::fastcdr::Cdr::alignment(current_alignment, 1);
 
 
-    current_alignment += 4 + eprosima::fastcdr::Cdr::alignment(current_alignment, 4);
+    current_alignment += 8 + eprosima::fastcdr::Cdr::alignment(current_alignment, 8);
 
 
     current_alignment += 4 + eprosima::fastcdr::Cdr::alignment(current_alignment, 4);
@@ -215,13 +215,13 @@ size_t carla_msgs::msg::CarlaEpisodeSettings::getCdrSerializedSize(
     current_alignment += 1 + eprosima::fastcdr::Cdr::alignment(current_alignment, 1);
 
 
-    current_alignment += 4 + eprosima::fastcdr::Cdr::alignment(current_alignment, 4);
+    current_alignment += 8 + eprosima::fastcdr::Cdr::alignment(current_alignment, 8);
 
 
     current_alignment += 1 + eprosima::fastcdr::Cdr::alignment(current_alignment, 1);
 
 
-    current_alignment += 4 + eprosima::fastcdr::Cdr::alignment(current_alignment, 4);
+    current_alignment += 8 + eprosima::fastcdr::Cdr::alignment(current_alignment, 8);
 
 
     current_alignment += 4 + eprosima::fastcdr::Cdr::alignment(current_alignment, 4);
@@ -342,7 +342,7 @@ bool& carla_msgs::msg::CarlaEpisodeSettings::no_rendering_mode()
  * @param _fixed_delta_seconds New value for member fixed_delta_seconds
  */
 void carla_msgs::msg::CarlaEpisodeSettings::fixed_delta_seconds(
-        float _fixed_delta_seconds)
+        double _fixed_delta_seconds)
 {
     m_fixed_delta_seconds = _fixed_delta_seconds;
 }
@@ -351,7 +351,7 @@ void carla_msgs::msg::CarlaEpisodeSettings::fixed_delta_seconds(
  * @brief This function returns the value of member fixed_delta_seconds
  * @return Value of member fixed_delta_seconds
  */
-float carla_msgs::msg::CarlaEpisodeSettings::fixed_delta_seconds() const
+double carla_msgs::msg::CarlaEpisodeSettings::fixed_delta_seconds() const
 {
     return m_fixed_delta_seconds;
 }
@@ -360,7 +360,7 @@ float carla_msgs::msg::CarlaEpisodeSettings::fixed_delta_seconds() const
  * @brief This function returns a reference to member fixed_delta_seconds
  * @return Reference to member fixed_delta_seconds
  */
-float& carla_msgs::msg::CarlaEpisodeSettings::fixed_delta_seconds()
+double& carla_msgs::msg::CarlaEpisodeSettings::fixed_delta_seconds()
 {
     return m_fixed_delta_seconds;
 }
@@ -398,7 +398,7 @@ bool& carla_msgs::msg::CarlaEpisodeSettings::substepping()
  * @param _max_substep_delta_time New value for member max_substep_delta_time
  */
 void carla_msgs::msg::CarlaEpisodeSettings::max_substep_delta_time(
-        float _max_substep_delta_time)
+        double _max_substep_delta_time)
 {
     m_max_substep_delta_time = _max_substep_delta_time;
 }
@@ -407,7 +407,7 @@ void carla_msgs::msg::CarlaEpisodeSettings::max_substep_delta_time(
  * @brief This function returns the value of member max_substep_delta_time
  * @return Value of member max_substep_delta_time
  */
-float carla_msgs::msg::CarlaEpisodeSettings::max_substep_delta_time() const
+double carla_msgs::msg::CarlaEpisodeSettings::max_substep_delta_time() const
 {
     return m_max_substep_delta_time;
 }
@@ -416,7 +416,7 @@ float carla_msgs::msg::CarlaEpisodeSettings::max_substep_delta_time() const
  * @brief This function returns a reference to member max_substep_delta_time
  * @return Reference to member max_substep_delta_time
  */
-float& carla_msgs::msg::CarlaEpisodeSettings::max_substep_delta_time()
+double& carla_msgs::msg::CarlaEpisodeSettings::max_substep_delta_time()
 {
     return m_max_substep_delta_time;
 }

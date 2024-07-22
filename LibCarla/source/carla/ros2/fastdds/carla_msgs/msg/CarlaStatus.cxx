@@ -36,16 +36,16 @@ using namespace eprosima::fastcdr::exception;
 
 carla_msgs::msg::CarlaStatus::CarlaStatus()
 {
-    // m_header com.eprosima.fastdds.idl.parser.typecode.StructTypeCode@fba92d3
+    // m_header com.eprosima.fastdds.idl.parser.typecode.StructTypeCode@799f10e1
 
-    // m_frame com.eprosima.idl.parser.typecode.PrimitiveTypeCode@71238fc2
+    // m_episode_settings com.eprosima.fastdds.idl.parser.typecode.StructTypeCode@4c371370
+
+    // m_frame com.eprosima.idl.parser.typecode.PrimitiveTypeCode@145f66e3
     m_frame = 0;
-    // m_fixed_delta_seconds com.eprosima.idl.parser.typecode.PrimitiveTypeCode@2a54a73f
-    m_fixed_delta_seconds = 0.0;
-    // m_synchronous_mode com.eprosima.idl.parser.typecode.PrimitiveTypeCode@16a0ee18
-    m_synchronous_mode = false;
-    // m_synchronous_mode_running com.eprosima.idl.parser.typecode.PrimitiveTypeCode@3d6f0054
-    m_synchronous_mode_running = false;
+    // m_synchronous_mode_participant_states com.eprosima.idl.parser.typecode.SequenceTypeCode@3023df74
+
+    // m_game_running com.eprosima.idl.parser.typecode.PrimitiveTypeCode@313ac989
+    m_game_running = false;
 
 }
 
@@ -61,20 +61,20 @@ carla_msgs::msg::CarlaStatus::CarlaStatus(
         const CarlaStatus& x)
 {
     m_header = x.m_header;
+    m_episode_settings = x.m_episode_settings;
     m_frame = x.m_frame;
-    m_fixed_delta_seconds = x.m_fixed_delta_seconds;
-    m_synchronous_mode = x.m_synchronous_mode;
-    m_synchronous_mode_running = x.m_synchronous_mode_running;
+    m_synchronous_mode_participant_states = x.m_synchronous_mode_participant_states;
+    m_game_running = x.m_game_running;
 }
 
 carla_msgs::msg::CarlaStatus::CarlaStatus(
         CarlaStatus&& x)
 {
     m_header = std::move(x.m_header);
+    m_episode_settings = std::move(x.m_episode_settings);
     m_frame = x.m_frame;
-    m_fixed_delta_seconds = x.m_fixed_delta_seconds;
-    m_synchronous_mode = x.m_synchronous_mode;
-    m_synchronous_mode_running = x.m_synchronous_mode_running;
+    m_synchronous_mode_participant_states = std::move(x.m_synchronous_mode_participant_states);
+    m_game_running = x.m_game_running;
 }
 
 carla_msgs::msg::CarlaStatus& carla_msgs::msg::CarlaStatus::operator =(
@@ -82,10 +82,10 @@ carla_msgs::msg::CarlaStatus& carla_msgs::msg::CarlaStatus::operator =(
 {
 
     m_header = x.m_header;
+    m_episode_settings = x.m_episode_settings;
     m_frame = x.m_frame;
-    m_fixed_delta_seconds = x.m_fixed_delta_seconds;
-    m_synchronous_mode = x.m_synchronous_mode;
-    m_synchronous_mode_running = x.m_synchronous_mode_running;
+    m_synchronous_mode_participant_states = x.m_synchronous_mode_participant_states;
+    m_game_running = x.m_game_running;
 
     return *this;
 }
@@ -95,10 +95,10 @@ carla_msgs::msg::CarlaStatus& carla_msgs::msg::CarlaStatus::operator =(
 {
 
     m_header = std::move(x.m_header);
+    m_episode_settings = std::move(x.m_episode_settings);
     m_frame = x.m_frame;
-    m_fixed_delta_seconds = x.m_fixed_delta_seconds;
-    m_synchronous_mode = x.m_synchronous_mode;
-    m_synchronous_mode_running = x.m_synchronous_mode_running;
+    m_synchronous_mode_participant_states = std::move(x.m_synchronous_mode_participant_states);
+    m_game_running = x.m_game_running;
 
     return *this;
 }
@@ -107,7 +107,7 @@ bool carla_msgs::msg::CarlaStatus::operator ==(
         const CarlaStatus& x) const
 {
 
-    return (m_header == x.m_header && m_frame == x.m_frame && m_fixed_delta_seconds == x.m_fixed_delta_seconds && m_synchronous_mode == x.m_synchronous_mode && m_synchronous_mode_running == x.m_synchronous_mode_running);
+    return (m_header == x.m_header && m_episode_settings == x.m_episode_settings && m_frame == x.m_frame && m_synchronous_mode_participant_states == x.m_synchronous_mode_participant_states && m_game_running == x.m_game_running);
 }
 
 bool carla_msgs::msg::CarlaStatus::operator !=(
@@ -123,14 +123,16 @@ size_t carla_msgs::msg::CarlaStatus::getMaxCdrSerializedSize(
 
 
     current_alignment += std_msgs::msg::Header::getMaxCdrSerializedSize(current_alignment);
+    current_alignment += carla_msgs::msg::CarlaEpisodeSettings::getMaxCdrSerializedSize(current_alignment);
     current_alignment += 8 + eprosima::fastcdr::Cdr::alignment(current_alignment, 8);
 
 
     current_alignment += 4 + eprosima::fastcdr::Cdr::alignment(current_alignment, 4);
 
 
-    current_alignment += 1 + eprosima::fastcdr::Cdr::alignment(current_alignment, 1);
-
+    for(size_t a = 0; a < 100; ++a)
+    {
+        current_alignment += carla_msgs::msg::CarlaSynchronizationWindowParticipantState::getMaxCdrSerializedSize(current_alignment);}
 
     current_alignment += 1 + eprosima::fastcdr::Cdr::alignment(current_alignment, 1);
 
@@ -148,14 +150,16 @@ size_t carla_msgs::msg::CarlaStatus::getCdrSerializedSize(
 
 
     current_alignment += std_msgs::msg::Header::getCdrSerializedSize(data.header(), current_alignment);
+    current_alignment += carla_msgs::msg::CarlaEpisodeSettings::getCdrSerializedSize(data.episode_settings(), current_alignment);
     current_alignment += 8 + eprosima::fastcdr::Cdr::alignment(current_alignment, 8);
 
 
     current_alignment += 4 + eprosima::fastcdr::Cdr::alignment(current_alignment, 4);
 
 
-    current_alignment += 1 + eprosima::fastcdr::Cdr::alignment(current_alignment, 1);
-
+    for(size_t a = 0; a < data.synchronous_mode_participant_states().size(); ++a)
+    {
+        current_alignment += carla_msgs::msg::CarlaSynchronizationWindowParticipantState::getCdrSerializedSize(data.synchronous_mode_participant_states().at(a), current_alignment);}
 
     current_alignment += 1 + eprosima::fastcdr::Cdr::alignment(current_alignment, 1);
 
@@ -169,10 +173,10 @@ void carla_msgs::msg::CarlaStatus::serialize(
 {
 
     scdr << m_header;
+    scdr << m_episode_settings;
     scdr << m_frame;
-    scdr << m_fixed_delta_seconds;
-    scdr << m_synchronous_mode;
-    scdr << m_synchronous_mode_running;
+    scdr << m_synchronous_mode_participant_states;
+    scdr << m_game_running;
 
 }
 
@@ -181,10 +185,10 @@ void carla_msgs::msg::CarlaStatus::deserialize(
 {
 
     dcdr >> m_header;
+    dcdr >> m_episode_settings;
     dcdr >> m_frame;
-    dcdr >> m_fixed_delta_seconds;
-    dcdr >> m_synchronous_mode;
-    dcdr >> m_synchronous_mode_running;
+    dcdr >> m_synchronous_mode_participant_states;
+    dcdr >> m_game_running;
 }
 
 /*!
@@ -225,6 +229,43 @@ std_msgs::msg::Header& carla_msgs::msg::CarlaStatus::header()
     return m_header;
 }
 /*!
+ * @brief This function copies the value in member episode_settings
+ * @param _episode_settings New value to be copied in member episode_settings
+ */
+void carla_msgs::msg::CarlaStatus::episode_settings(
+        const carla_msgs::msg::CarlaEpisodeSettings& _episode_settings)
+{
+    m_episode_settings = _episode_settings;
+}
+
+/*!
+ * @brief This function moves the value in member episode_settings
+ * @param _episode_settings New value to be moved in member episode_settings
+ */
+void carla_msgs::msg::CarlaStatus::episode_settings(
+        carla_msgs::msg::CarlaEpisodeSettings&& _episode_settings)
+{
+    m_episode_settings = std::move(_episode_settings);
+}
+
+/*!
+ * @brief This function returns a constant reference to member episode_settings
+ * @return Constant reference to member episode_settings
+ */
+const carla_msgs::msg::CarlaEpisodeSettings& carla_msgs::msg::CarlaStatus::episode_settings() const
+{
+    return m_episode_settings;
+}
+
+/*!
+ * @brief This function returns a reference to member episode_settings
+ * @return Reference to member episode_settings
+ */
+carla_msgs::msg::CarlaEpisodeSettings& carla_msgs::msg::CarlaStatus::episode_settings()
+{
+    return m_episode_settings;
+}
+/*!
  * @brief This function sets a value in member frame
  * @param _frame New value for member frame
  */
@@ -253,87 +294,68 @@ uint64_t& carla_msgs::msg::CarlaStatus::frame()
 }
 
 /*!
- * @brief This function sets a value in member fixed_delta_seconds
- * @param _fixed_delta_seconds New value for member fixed_delta_seconds
+ * @brief This function copies the value in member synchronous_mode_participant_states
+ * @param _synchronous_mode_participant_states New value to be copied in member synchronous_mode_participant_states
  */
-void carla_msgs::msg::CarlaStatus::fixed_delta_seconds(
-        float _fixed_delta_seconds)
+void carla_msgs::msg::CarlaStatus::synchronous_mode_participant_states(
+        const std::vector<carla_msgs::msg::CarlaSynchronizationWindowParticipantState>& _synchronous_mode_participant_states)
 {
-    m_fixed_delta_seconds = _fixed_delta_seconds;
+    m_synchronous_mode_participant_states = _synchronous_mode_participant_states;
 }
 
 /*!
- * @brief This function returns the value of member fixed_delta_seconds
- * @return Value of member fixed_delta_seconds
+ * @brief This function moves the value in member synchronous_mode_participant_states
+ * @param _synchronous_mode_participant_states New value to be moved in member synchronous_mode_participant_states
  */
-float carla_msgs::msg::CarlaStatus::fixed_delta_seconds() const
+void carla_msgs::msg::CarlaStatus::synchronous_mode_participant_states(
+        std::vector<carla_msgs::msg::CarlaSynchronizationWindowParticipantState>&& _synchronous_mode_participant_states)
 {
-    return m_fixed_delta_seconds;
+    m_synchronous_mode_participant_states = std::move(_synchronous_mode_participant_states);
 }
 
 /*!
- * @brief This function returns a reference to member fixed_delta_seconds
- * @return Reference to member fixed_delta_seconds
+ * @brief This function returns a constant reference to member synchronous_mode_participant_states
+ * @return Constant reference to member synchronous_mode_participant_states
  */
-float& carla_msgs::msg::CarlaStatus::fixed_delta_seconds()
+const std::vector<carla_msgs::msg::CarlaSynchronizationWindowParticipantState>& carla_msgs::msg::CarlaStatus::synchronous_mode_participant_states() const
 {
-    return m_fixed_delta_seconds;
+    return m_synchronous_mode_participant_states;
 }
 
 /*!
- * @brief This function sets a value in member synchronous_mode
- * @param _synchronous_mode New value for member synchronous_mode
+ * @brief This function returns a reference to member synchronous_mode_participant_states
+ * @return Reference to member synchronous_mode_participant_states
  */
-void carla_msgs::msg::CarlaStatus::synchronous_mode(
-        bool _synchronous_mode)
+std::vector<carla_msgs::msg::CarlaSynchronizationWindowParticipantState>& carla_msgs::msg::CarlaStatus::synchronous_mode_participant_states()
 {
-    m_synchronous_mode = _synchronous_mode;
+    return m_synchronous_mode_participant_states;
+}
+/*!
+ * @brief This function sets a value in member game_running
+ * @param _game_running New value for member game_running
+ */
+void carla_msgs::msg::CarlaStatus::game_running(
+        bool _game_running)
+{
+    m_game_running = _game_running;
 }
 
 /*!
- * @brief This function returns the value of member synchronous_mode
- * @return Value of member synchronous_mode
+ * @brief This function returns the value of member game_running
+ * @return Value of member game_running
  */
-bool carla_msgs::msg::CarlaStatus::synchronous_mode() const
+bool carla_msgs::msg::CarlaStatus::game_running() const
 {
-    return m_synchronous_mode;
+    return m_game_running;
 }
 
 /*!
- * @brief This function returns a reference to member synchronous_mode
- * @return Reference to member synchronous_mode
+ * @brief This function returns a reference to member game_running
+ * @return Reference to member game_running
  */
-bool& carla_msgs::msg::CarlaStatus::synchronous_mode()
+bool& carla_msgs::msg::CarlaStatus::game_running()
 {
-    return m_synchronous_mode;
-}
-
-/*!
- * @brief This function sets a value in member synchronous_mode_running
- * @param _synchronous_mode_running New value for member synchronous_mode_running
- */
-void carla_msgs::msg::CarlaStatus::synchronous_mode_running(
-        bool _synchronous_mode_running)
-{
-    m_synchronous_mode_running = _synchronous_mode_running;
-}
-
-/*!
- * @brief This function returns the value of member synchronous_mode_running
- * @return Value of member synchronous_mode_running
- */
-bool carla_msgs::msg::CarlaStatus::synchronous_mode_running() const
-{
-    return m_synchronous_mode_running;
-}
-
-/*!
- * @brief This function returns a reference to member synchronous_mode_running
- * @return Reference to member synchronous_mode_running
- */
-bool& carla_msgs::msg::CarlaStatus::synchronous_mode_running()
-{
-    return m_synchronous_mode_running;
+    return m_game_running;
 }
 
 

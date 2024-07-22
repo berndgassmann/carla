@@ -9,7 +9,6 @@
 
 #include "carla/ros2/ROS2NameRecord.h"
 #include "carla/ros2/ROS2QoS.h"
-#include "carla/rpc/ServerSynchronizationTypes.h"
 
 namespace carla {
 namespace ros2 {
@@ -42,15 +41,15 @@ public:
   /**
    * A new publisher has connected to this subscriber.
    */
-  virtual void PublisherConnected(carla::rpc::synchronization_client_id_type const &publisher) {
-    (void)publisher;
+  virtual void PublisherConnected(std::string const &publisher_guid) {
+    (void)publisher_guid;
   }
 
   /**
    * A publisher has disconnected from this subscriber.
    */
-  virtual void PublisherDisconnected(carla::rpc::synchronization_client_id_type const &publisher) {
-    (void)publisher;
+  virtual void PublisherDisconnected(std::string const &publisher_guid) {
+    (void)publisher_guid;
   }
 
   /*

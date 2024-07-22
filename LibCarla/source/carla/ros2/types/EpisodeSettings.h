@@ -61,6 +61,7 @@ public:
     episode_settings.tile_stream_distance = _ros_episode_settings.tile_stream_distance();
     episode_settings.actor_active_distance = _ros_episode_settings.actor_active_distance();
     episode_settings.spectator_as_ego = _ros_episode_settings.spectator_as_ego();
+    return episode_settings;
   }
 
 private:

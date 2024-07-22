@@ -110,6 +110,24 @@ public:
     SecondaryServer = std::make_shared<carla::multigpu::Router>(SecondaryPort);
     SecondaryServer->SetCallbacks();
     BindActions();
+
+    auto const RegisterResponse = ServerSync.RegisterSynchronizationParticipant(SynchronizationClientId());
+    if ( RegisterResponse ) {
+      ServerSynchronizationParticipantId = RegisterResponse.Get();
+      UE_LOG(
+        LogCarlaServer,
+        Verbose,
+        TEXT("Server registered for sync (session_id=%s, sync_id=%d)"),
+        UTF8_TO_TCHAR(SynchronizationClientId().c_str()),
+        ServerSynchronizationParticipantId);
+    }
+    else {
+      UE_LOG(
+        LogCarlaServer,
+        Error,
+        TEXT("Server registered for sync (session_id=%s) failed)"),
+        UTF8_TO_TCHAR(SynchronizationClientId().c_str()));
+    }
   }
 
   std::shared_ptr<carla::multigpu::Router> GetSecondaryServer() {
@@ -190,8 +208,8 @@ public:
    * @{
    */
   carla::rpc::Response<uint64_t> call_tick(
-      carla::rpc::synchronization_client_id_type const &client_id = carla::rpc::ALL_CLIENTS,
-      carla::rpc::synchronization_participant_id_type const &participant_id = carla::rpc::ALL_PARTICIPANTS) override;
+      carla::rpc::synchronization_client_id_type const &client_id,
+      carla::rpc::synchronization_participant_id_type const &participant_id) override;
   carla::rpc::Response<carla::rpc::synchronization_participant_id_type> call_register_synchronization_participant(
       carla::rpc::synchronization_client_id_type const &client_id,
       carla::rpc::synchronization_participant_id_type const &participant_id_hint = carla::rpc::ALL_PARTICIPANTS) override;
@@ -200,6 +218,7 @@ public:
   carla::rpc::Response<bool> call_update_synchronization_window(
       carla::rpc::synchronization_client_id_type const &client_id, carla::rpc::synchronization_participant_id_type const &participant_id,
       carla::rpc::synchronization_target_game_time const &target_game_time = carla::rpc::NO_SYNC_TARGET_GAME_TIME) override;
+  carla::rpc::Response<std::pair< bool , std::vector<carla::rpc::synchronization_window_participant_state> > >  call_get_synchronization_window_status() override;
   /**
    * @}
    */
@@ -219,10 +238,14 @@ public:
   void OnClientConnected(std::shared_ptr<rpc::detail::server_session> server_session);
   bool IsNextGameTickAllowed();
 
-  carla::rpc::synchronization_client_id_type SynchronizationClientId() { return reinterpret_cast<carla::rpc::synchronization_client_id_type> (::rpc::this_session().id()); }
-  carla::rpc::synchronization_participant_id_type TickParticipantId() {
-    carla::rpc::synchronization_participant_id_type SynchronizationParticipantId{0u};
-    auto TickParticipantIdIter = TickSynchronizationParticipantMap.find(SynchronizationClientId());
+  void EnableSynchronousMode();
+  void DisableSynchronousMode();
+  void NotifyEndEpisode();
+
+  carla::rpc::synchronization_client_id_type SynchronizationClientId() const { return "CarlaServer"; }
+  carla::rpc::synchronization_participant_id_type TickParticipantId(::rpc::session_id_t RpcSessionId = ::rpc::this_session().id() ) {
+    carla::rpc::synchronization_participant_id_type SynchronizationParticipantId = ServerSynchronizationParticipantId;
+    auto TickParticipantIdIter = TickSynchronizationParticipantMap.find(RpcSessionId);
     if ( TickParticipantIdIter!=TickSynchronizationParticipantMap.end()) {
       SynchronizationParticipantId = TickParticipantIdIter->second;
     }
@@ -230,13 +253,15 @@ public:
   }
 
   double GetTickDeltaSeconds() {
-    double FixedDeltaSeconds = 1/20.f;
+    double FixedDeltaSeconds = 1./20.;
     if ((Episode != nullptr) && Episode->GetSettings().FixedDeltaSeconds.IsSet()) {
       FixedDeltaSeconds = Episode->GetSettings().FixedDeltaSeconds.GetValue();
     }
     return FixedDeltaSeconds;
   }
-  std::map<carla::rpc::synchronization_client_id_type, carla::rpc::synchronization_participant_id_type> TickSynchronizationParticipantMap;
+  
+  carla::rpc::synchronization_participant_id_type ServerSynchronizationParticipantId{0};
+  std::map<::rpc::session_id_t, carla::rpc::synchronization_participant_id_type> TickSynchronizationParticipantMap;
 
 private:
   void BindActions();
@@ -381,6 +406,13 @@ void FCarlaServer::FPimpl::BindActions()
   BIND_SYNC(tick_cue) << [this]() -> R<uint64_t>
   {
     TRACE_CPUPROFILER_EVENT_SCOPE(TickCueReceived);
+    UE_LOG(
+      LogCarlaServer,
+      Verbose,
+      TEXT("Tick received (session_id=%s, sync_id=%d, rpc_sid=%li)"),
+      UTF8_TO_TCHAR(SynchronizationClientId().c_str()),
+      TickParticipantId(),
+      ::rpc::this_session().id());
     return call_tick(SynchronizationClientId(), TickParticipantId());
   };
 
@@ -3187,6 +3219,10 @@ carla::rpc::Response<bool> FCarlaServer::FPimpl::call_update_synchronization_win
   return ServerSync.UpdateSynchronizationWindow(client_id, participant_id, target_game_time);
 }
 
+carla::rpc::Response<std::pair< bool , std::vector<carla::rpc::synchronization_window_participant_state> > > FCarlaServer::FPimpl::call_get_synchronization_window_status() {
+  return ServerSync.GetSynchronizationWindowParticipantStates();
+}
+
 FCarlaServer::FPimpl::CheckHandleActorInSecondaryServerResult FCarlaServer::FPimpl::CheckHandleSensorInSecondaryServer(carla::streaming::detail::stream_id_type stream_id) {
   FCarlaActor* CarlaActor = Episode->FindCarlaActorByStreamId(stream_id);
   if ( CarlaActor == nullptr ) 
@@ -3248,17 +3284,45 @@ FCarlaServer::FPimpl::CheckHandleActorInSecondaryServerResult FCarlaServer::FPim
 }
 
 void FCarlaServer::FPimpl::OnClientConnected(std::shared_ptr<rpc::detail::server_session> server_session) {
-  auto const ClientId = reinterpret_cast<carla::rpc::synchronization_client_id_type>(SynchronizationClientId());
-  auto const RegisterResponse = ServerSync.RegisterSynchronizationParticipant(ClientId);
+  auto const rpc_sid = reinterpret_cast<::rpc::session_id_t>(server_session.get());
+  auto const RegisterResponse = ServerSync.RegisterSynchronizationParticipant(SynchronizationClientId());
   if ( RegisterResponse ) {
-    TickSynchronizationParticipantMap.insert({ClientId, RegisterResponse.Get()});
+    TickSynchronizationParticipantMap.insert({rpc_sid, RegisterResponse.Get()});
+    UE_LOG(
+        LogCarlaServer,
+        Verbose,
+        TEXT("Client connected (session_id=%s, sync_id=%d, rpc_sid=%li)"),
+        UTF8_TO_TCHAR(SynchronizationClientId().c_str()),
+        RegisterResponse.Get(),
+        rpc_sid);
+  }
+  else {
+    UE_LOG(
+        LogCarlaServer,
+        Error,
+        TEXT("Client connected (session_id=%s, rpc_sid=%li) registering for sync failed."),
+        UTF8_TO_TCHAR(SynchronizationClientId().c_str()),
+        rpc_sid);
   }
 }
 
 void FCarlaServer::FPimpl::OnClientDisconnected(std::shared_ptr<rpc::detail::server_session> server_session) {
-  auto const ClientId = reinterpret_cast<carla::rpc::synchronization_client_id_type>(SynchronizationClientId());
-  ServerSync.DisconnectClient(ClientId);
-  TickSynchronizationParticipantMap.erase(ClientId);
+  auto const rpc_sid = reinterpret_cast<::rpc::session_id_t>(server_session.get());
+  UE_LOG(
+      LogCarlaServer,
+      Verbose,
+      TEXT("Client disconnected (session_id=%s, sync_id=%d, rpc_sid=%li)"),
+      UTF8_TO_TCHAR(SynchronizationClientId().c_str()),
+      TickParticipantId(),
+      rpc_sid);
+  ServerSync.DeregisterSynchronizationParticipant(SynchronizationClientId(), TickParticipantId(rpc_sid));
+  TickSynchronizationParticipantMap.erase(rpc_sid);
+  // TODO: ::rpc::this_session().id() is returning always 0 within the bound callbacks (which is not what is expected)
+  // So, we don't know which client enabled or disabled sync mode...
+  // Theoretically that client would have been identified correctly within it's enable/disable/tick call(s) and as it's data is dropped on Deregistering above
+  // all would work fine. But rpclib is not behaving as expected!
+  // Therefore, we disable synchronous mode completely for now to preserve from blocking
+  ServerSync.DisableSynchronousMode(SynchronizationClientId(), carla::rpc::ALL_PARTICIPANTS);
 }
 
 bool FCarlaServer::FPimpl::IsNextGameTickAllowed() {
@@ -3268,6 +3332,35 @@ bool FCarlaServer::FPimpl::IsNextGameTickAllowed() {
   auto const ElapsedGameTime = Episode->GetElapsedGameTime();
   auto TargetGameTime = ServerSync.GetTargetSynchronizationTime(ElapsedGameTime , GetTickDeltaSeconds());
   return TargetGameTime > ElapsedGameTime;
+}
+
+void FCarlaServer::FPimpl::EnableSynchronousMode() {
+  UE_LOG(
+    LogCarlaServer,
+    Verbose,
+    TEXT("EnableSynchronousMode (session_id=%s, sync_id=%d, rpc_sid=%li)"),
+    UTF8_TO_TCHAR(SynchronizationClientId().c_str()),
+    TickParticipantId(),
+    ::rpc::this_session().id());
+  ServerSync.EnableSynchronousMode(SynchronizationClientId(), TickParticipantId());
+}
+
+void FCarlaServer::FPimpl::DisableSynchronousMode() {
+  UE_LOG(
+    LogCarlaServer,
+    Verbose,
+    TEXT("DisableSynchronousMode (session_id=%s, sync_id=%d, rpc_sid=%li)"),
+    UTF8_TO_TCHAR(SynchronizationClientId().c_str()),
+    TickParticipantId(),
+    ::rpc::this_session().id());
+  ServerSync.DisableSynchronousMode(SynchronizationClientId(), TickParticipantId());
+}
+
+void FCarlaServer::FPimpl::NotifyEndEpisode()
+{
+  TickSynchronizationParticipantMap.clear();
+  ServerSync.DisconnectClient(SynchronizationClientId());
+  Episode = nullptr;
 }
 
 // =============================================================================
@@ -3318,7 +3411,7 @@ void FCarlaServer::NotifyBeginEpisode(UCarlaEpisode &Episode)
 void FCarlaServer::NotifyEndEpisode()
 {
   check(Pimpl != nullptr);
-  Pimpl->Episode = nullptr;
+  Pimpl->NotifyEndEpisode();
 }
 
 void FCarlaServer::AsyncRun(uint32 NumberOfWorkerThreads)
@@ -3360,15 +3453,11 @@ void FCarlaServer::RunSome(uint32 Milliseconds)
 }
 
 void FCarlaServer::EnableSynchronousMode() {
-  for ( auto ClientSynchronizationParticipant: Pimpl->TickSynchronizationParticipantMap) {
-    Pimpl->ServerSync.EnableSynchronousMode(ClientSynchronizationParticipant.first);
-  }
+  Pimpl->EnableSynchronousMode();
 }
 
 void FCarlaServer::DisableSynchronousMode() {
-  for ( auto ClientSynchronizationParticipant: Pimpl->TickSynchronizationParticipantMap) {
-    Pimpl->ServerSync.DisableSynchronousMode(ClientSynchronizationParticipant.first);
-  }
+  Pimpl->DisableSynchronousMode();
 }
 
 bool FCarlaServer::IsSynchronousModeActive() {
@@ -3381,7 +3470,7 @@ void FCarlaServer::SetROS2TopicVisibilityDefaultEnabled(bool _topic_visibility_d
 
 void FCarlaServer::Tick()
 {
-  (void)Pimpl->call_tick();
+  (void)Pimpl->call_tick(Pimpl->SynchronizationClientId(), Pimpl->ServerSynchronizationParticipantId);
 }
 
 bool FCarlaServer::TickCueReceived()
@@ -3512,3 +3601,8 @@ carla::rpc::Response<bool> FCarlaServer::call_update_synchronization_window(
 {
   return Pimpl->call_update_synchronization_window(client_id, synchronization_participant, target_game_time);
 }
+
+carla::rpc::Response<std::pair< bool , std::vector<carla::rpc::synchronization_window_participant_state> > >  FCarlaServer::call_get_synchronization_window_status() {
+  return Pimpl->call_get_synchronization_window_status();
+}
+

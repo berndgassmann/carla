@@ -64,17 +64,20 @@ void UeWorldPublisher::ProcessMessages() {
   for (auto& walker : _walkers) {
     walker.second._walker_controller->ProcessMessages();
   }
+
+  UpdateAndPublishStatus();
 }
 
 void UeWorldPublisher::PostTickAction() {
   if (!_initialized) {
     return;
   }
+
+
+  UpdateAndPublishStatus();
+
   _transform_publisher->Publish();
 
-  if (_carla_status_publisher->SubscribersConnected()) {
-    _carla_status_publisher->Publish();
-  }
   if (_carla_actor_list_publisher->SubscribersConnected()) {
     _carla_actor_list_publisher->Publish();
   }
@@ -241,25 +244,49 @@ void UeWorldPublisher::RemoveActor(ActorId actor) {
   _traffic_signs.erase(actor);
 }
 
+void UeWorldPublisher::UpdateAndPublishStatus() {
+  auto const synchronization_window_status = _carla_server.call_get_synchronization_window_status();
+  if (_frame_changed || synchronization_window_status.Get().first) {
+    _frame_changed = false;
+    carla_msgs::msg::CarlaStatus status;
+    status.frame(_frame);
+    carla::ros2::types::EpisodeSettings carla_episode_settings(_carla_server.call_get_episode_settings().Get());
+    status.episode_settings( carla_episode_settings.episode_settings());
+    status.header().stamp(_timestamp.time());
+    status.header().frame_id("");
+    status.synchronous_mode_participant_states().reserve(synchronization_window_status.Get().second.size());
+    double synchronization_target_game_time_min = std::numeric_limits<double>::max();
+    for ( auto const &synchronization_window_participant_state: synchronization_window_status.Get().second) {
+      carla_msgs::msg::CarlaSynchronizationWindowParticipantState participant_state;
+      participant_state.client_id(synchronization_window_participant_state.client_id);
+      participant_state.participant_id(synchronization_window_participant_state.participant_id);
+      carla::ros2::types::Timestamp target_game_time(synchronization_window_participant_state.target_game_time);
+      participant_state.target_game_time(target_game_time.Stamp());
+      status.synchronous_mode_participant_states().push_back(participant_state);
+      synchronization_target_game_time_min = std::min(synchronization_target_game_time_min, target_game_time.Stamp());
+    }
+    
+    status.game_running(synchronization_target_game_time_min > _timestamp.Stamp());
+    _carla_status_publisher->UpdateCarlaStatus(status);
+
+    if (_carla_status_publisher->SubscribersConnected()) {
+      _carla_status_publisher->Publish();
+    }
+  }
+}
+
 void UeWorldPublisher::UpdateSensorData(
     std::shared_ptr<carla::sensor::s11n::SensorHeaderSerializer::Header const> sensor_header,
     carla::SharedBufferView buffer_view) {
   if (!_initialized) {
     return;
   }
+  _frame_changed = true;
   _frame = sensor_header->frame;
   _timestamp = carla::ros2::types::Timestamp(sensor_header->timestamp);
   _clock_publisher->UpdateData(_timestamp.time());
 
   _episode_header = *header_view(buffer_view);
-
-  carla_msgs::msg::CarlaStatus status;
-  status.frame(_frame);
-  carla::ros2::types::EpisodeSettings carla_episode_settings(_carla_server.call_get_episode_settings().Get());
-  status.episode_settings( carla_episode_settings.episode_settings());
-  status.header().stamp(_timestamp.time());
-  status.header().frame_id("");
-  _carla_status_publisher->UpdateCarlaStatus(status);
 
   if (_episode_header.simulation_state & carla::sensor::s11n::EpisodeStateSerializer::MapChange) {
     _map_publisher->UpdateData(_carla_server.call_get_map_data().Get());

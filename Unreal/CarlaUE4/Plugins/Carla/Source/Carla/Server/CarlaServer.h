@@ -131,6 +131,7 @@ public:
   carla::rpc::Response<bool> call_update_synchronization_window(
       carla::rpc::synchronization_client_id_type const &client_id, carla::rpc::synchronization_participant_id_type const &participant_id,
       carla::rpc::synchronization_target_game_time const &target_game_time = carla::rpc::NO_SYNC_TARGET_GAME_TIME) override;
+  carla::rpc::Response<std::pair< bool , std::vector<carla::rpc::synchronization_window_participant_state> > >  call_get_synchronization_window_status() override;
   /**
    * @}
    */

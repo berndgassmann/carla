@@ -31,7 +31,7 @@ public:
     
     std::lock_guard<std::mutex> SyncLock(SynchronizationMutex);
 
-    UE_LOG(LogCarla, Log, TEXT("ServerSynchronization::RegisterSynchronizationParticipant[%u:%u] hint"), ClientId, ParticipantIdHint);
+    UE_LOG(LogCarla, Verbose, TEXT("ServerSynchronization::RegisterSynchronizationParticipant[%s:%u] hint"), UTF8_TO_TCHAR(ClientId.c_str()), ParticipantIdHint);
     auto MaxIdIter = ParticipantIdMaxMap.find(ClientId);
     if ( MaxIdIter==ParticipantIdMaxMap.end()) {
       auto InsertResult = ParticipantIdMaxMap.insert( {ClientId, carla::rpc::ALL_PARTICIPANTS});
@@ -45,15 +45,16 @@ public:
     auto InsertResultIter = SynchronizationWindowMap.insert( { ClientId, {ParticipantId, carla::rpc::NO_SYNC_TARGET_GAME_TIME}});
     if ( InsertResultIter == SynchronizationWindowMap.end() ) {
       // collision
-      UE_LOG(LogCarla, Error, TEXT("ServerSynchronization::RegisterSynchronizationParticipant[%u:%u] failed unexpectedly because of id clash"), ClientId, ParticipantId);
+      UE_LOG(LogCarla, Error, TEXT("ServerSynchronization::RegisterSynchronizationParticipant[%s:%u] failed unexpectedly because of id clash"), UTF8_TO_TCHAR(ClientId.c_str()), ParticipantId);
       LogSynchronizationMap("Register failed");
       return carla::rpc::ResponseError("ServerSynchronization::RegisterSynchronizationParticipant failed unexpectedly because of id clash\n");
     }
     if (ParticipantId > MaxIdIter->second) {
       MaxIdIter->second = ParticipantId;
     }
-    UE_LOG(LogCarla, Log, TEXT("ServerSynchronization::RegisterSynchronizationParticipant[%u:%u]"), ClientId, ParticipantId);
+    UE_LOG(LogCarla, Verbose, TEXT("ServerSynchronization::RegisterSynchronizationParticipant[%s:%u]"), UTF8_TO_TCHAR(ClientId.c_str()), ParticipantId);
     LogSynchronizationMap("Register end");
+    SyncStateChanged=true;
     return ParticipantId;
   }
 
@@ -61,7 +62,7 @@ public:
     carla::rpc::synchronization_participant_id_type const &ParticipantId) {
 
     std::lock_guard<std::mutex> SyncLock(SynchronizationMutex);
-    UE_LOG(LogCarla, Log, TEXT("ServerSynchronization::DeregisterSynchronizationParticipant[%u:%u]"), ClientId, ParticipantId);
+    UE_LOG(LogCarla, Verbose, TEXT("ServerSynchronization::DeregisterSynchronizationParticipant[%s:%u]"), UTF8_TO_TCHAR(ClientId.c_str()), ParticipantId);
     LogSynchronizationMap("Deregister start");
     auto const SynchronizationParticipantEqualRange = SynchronizationWindowMap.equal_range(ClientId);
     for (auto SynchronizationWindowIter=SynchronizationParticipantEqualRange.first; 
@@ -75,6 +76,7 @@ public:
         }
     }
     LogSynchronizationMap("Deregister end");
+    SyncStateChanged=true;
     return true;
   }
 
@@ -85,45 +87,46 @@ public:
     LogSynchronizationMap("Disconnect client start");
     auto ErasedEntries = SynchronizationWindowMap.erase(ClientId);
     if ( ErasedEntries > 0u ) {
-      UE_LOG(LogCarla, Log, TEXT("ServerSynchronization::DisconnectClient[%u:ALL]"), ClientId);
+      UE_LOG(LogCarla, Verbose, TEXT("ServerSynchronization::DisconnectClient[%s:ALL]"), UTF8_TO_TCHAR(ClientId.c_str()));
     }
     else {
-      // try erase ClientId==0 because RPC client-id from time to time is 0 (BUG?), but not on disconnect
-      UE_LOG(LogCarla, Log, TEXT("ServerSynchronization::DisconnectClient[%u:ALL] client id not found"), ClientId);
+      UE_LOG(LogCarla, Warning, TEXT("ServerSynchronization::DisconnectClient[%s:ALL] client id not found"), UTF8_TO_TCHAR(ClientId.c_str()));
       LogSynchronizationMap("Disconnect client not found");
-      ErasedEntries = SynchronizationWindowMap.erase(0u);
-      if ( ErasedEntries > 0u ) {
-        UE_LOG(LogCarla, Warning, TEXT("ServerSynchronization::DisconnectClient[0u:ALL] because ClientId=%u not found"), ClientId);
-      }
-      else {
-        UE_LOG(LogCarla, Warning, TEXT("ServerSynchronization::DisconnectClient[] failed because neither ClientId=%u, nor ClientId=0u found"), ClientId);
-      }
     }
+    SyncStateChanged=true;
     LogSynchronizationMap("Disconnect client end");
   }
 
-  void EnableSynchronousMode(carla::rpc::synchronization_client_id_type const &ClientId) {
+  void EnableSynchronousMode(carla::rpc::synchronization_client_id_type const &ClientId, 
+                    carla::rpc::synchronization_participant_id_type const &ParticipantId = carla::rpc::ALL_PARTICIPANTS) {
 
     std::lock_guard<std::mutex> SyncLock(SynchronizationMutex);
     
     for(auto &SynchronizationWindow: SynchronizationWindowMap) {
-      if ( (ClientId == SynchronizationWindow.first) && (SynchronizationWindow.second.TargetGameTime <= carla::rpc::NO_SYNC_TARGET_GAME_TIME))  {
+      if ( (ClientId == SynchronizationWindow.first) && 
+           (( ParticipantId == carla::rpc::ALL_PARTICIPANTS ) || ( SynchronizationWindow.second.ParticipantId == ParticipantId )) &&
+          (SynchronizationWindow.second.TargetGameTime <= carla::rpc::NO_SYNC_TARGET_GAME_TIME))  {
         SynchronizationWindow.second.TargetGameTime = carla::rpc::BLOCKING_TARGET_GAME_TIME;
+        SyncStateChanged=true;
       }
     }
-    UE_LOG(LogCarla, Log, TEXT("ServerSynchronization::EnableSynchronousMode[%u:ALL]"), ClientId);
+    UE_LOG(LogCarla, Verbose, TEXT("ServerSynchronization::EnableSynchronousMode[%s:%d]"), UTF8_TO_TCHAR(ClientId.c_str()), ParticipantId);
   }
 
-  void DisableSynchronousMode(carla::rpc::synchronization_client_id_type const &ClientId) {
+  void DisableSynchronousMode(carla::rpc::synchronization_client_id_type const &ClientId, 
+                              carla::rpc::synchronization_participant_id_type const &ParticipantId = carla::rpc::ALL_PARTICIPANTS) {
 
     std::lock_guard<std::mutex> SyncLock(SynchronizationMutex);
     
     for(auto &SynchronizationWindow: SynchronizationWindowMap) {
-      if ( (ClientId == SynchronizationWindow.first) && (SynchronizationWindow.second.TargetGameTime > carla::rpc::NO_SYNC_TARGET_GAME_TIME))  {
+      if ( (ClientId == SynchronizationWindow.first) && 
+           (( ParticipantId == carla::rpc::ALL_PARTICIPANTS ) || ( SynchronizationWindow.second.ParticipantId == ParticipantId )) &&
+           (SynchronizationWindow.second.TargetGameTime > carla::rpc::NO_SYNC_TARGET_GAME_TIME))  {
         SynchronizationWindow.second.TargetGameTime = carla::rpc::NO_SYNC_TARGET_GAME_TIME;
+        SyncStateChanged=true;
       }
     }
-    UE_LOG(LogCarla, Log, TEXT("ServerSynchronization::DisableSynchronousMode[%u:ALL]"), ClientId);
+    UE_LOG(LogCarla, Verbose, TEXT("ServerSynchronization::DisableSynchronousMode[%s:%d]"), UTF8_TO_TCHAR(ClientId.c_str()), ParticipantId);
   }
 
   bool IsSynchronousModeActive() const {
@@ -153,7 +156,7 @@ public:
     for(auto const &SynchronizationWindow: SynchronizationWindowMap) {
       if ( (SynchronizationWindow.second.TargetGameTime > carla::rpc::NO_SYNC_TARGET_GAME_TIME) && (SynchronizationWindow.second.TargetGameTime < TargetGameTime) ) {
         if (LogOutput) {
-          UE_LOG(LogCarla, Verbose, TEXT("ServerSynchronization::GetTargetSynchronizationTime[%u:%u] = %f"), SynchronizationWindow.first, SynchronizationWindow.second.ParticipantId, SynchronizationWindow.second.TargetGameTime);
+          UE_LOG(LogCarla, Verbose, TEXT("ServerSynchronization::GetTargetSynchronizationTime[%s:%u] = %f"), UTF8_TO_TCHAR(SynchronizationWindow.first.c_str()), SynchronizationWindow.second.ParticipantId, SynchronizationWindow.second.TargetGameTime);
         }
         TargetGameTime = SynchronizationWindow.second.TargetGameTime;
       }
@@ -180,11 +183,11 @@ public:
           if (SynchronizationWindowIter->second.ParticipantId == ParticipantId ) {
             ParticipantFound=true;
             SynchronizationWindowIter->second.TargetGameTime = TargetGameTime;
-            UE_LOG(LogCarla, Verbose, TEXT("ServerSynchronization::UpdateSynchronizationWindow[%u:%u] = %f"), ClientId, ParticipantId, TargetGameTime);
+            UE_LOG(LogCarla, Verbose, TEXT("ServerSynchronization::UpdateSynchronizationWindow[%s:%u] = %f"), UTF8_TO_TCHAR(ClientId.c_str()), ParticipantId, TargetGameTime);
           }
       }
       if ( !ParticipantFound ) {
-        UE_LOG(LogCarla, Error, TEXT("ServerSynchronization::UpdateSynchronizationWindow[%u:%u] = %f failed."), ClientId, ParticipantId, TargetGameTime);
+        UE_LOG(LogCarla, Error, TEXT("ServerSynchronization::UpdateSynchronizationWindow[%s:%u] = %f failed."), UTF8_TO_TCHAR(ClientId.c_str()), ParticipantId, TargetGameTime);
         LogSynchronizationMap("Update failed");
         return carla::rpc::ResponseError("ServerSynchronization::UpdateSynchronizationWindow did not find requested SynchronizationParticipant\n");
       }
@@ -193,17 +196,37 @@ public:
       for (auto &SynchronizationWindow: SynchronizationWindowMap) {
         if (SynchronizationWindow.second.TargetGameTime > carla::rpc::NO_SYNC_TARGET_GAME_TIME) {
           SynchronizationWindow.second.TargetGameTime = TargetGameTime;
-          UE_LOG(LogCarla, Verbose, TEXT("ServerSynchronization::UpdateSynchronizationWindow[%u:%u] = %f FORCE"), SynchronizationWindow.first, SynchronizationWindow.second.ParticipantId, TargetGameTime);
+          UE_LOG(LogCarla, Verbose, TEXT("ServerSynchronization::UpdateSynchronizationWindow[%s:%u] = %f FORCE"), UTF8_TO_TCHAR(SynchronizationWindow.first.c_str()), SynchronizationWindow.second.ParticipantId, TargetGameTime);
         }
       }
     }
+    SyncStateChanged=true;
     return true;
   }
 
   void LogSynchronizationMap(std::string const &Reason) {
     for (auto &SynchronizationWindow: SynchronizationWindowMap) {
-      UE_LOG(LogCarla, Verbose, TEXT("ServerSynchronization::LogSynchronizationMap[%u:%u] = %f (%s)"), SynchronizationWindow.first, SynchronizationWindow.second.ParticipantId, SynchronizationWindow.second.TargetGameTime, *FString(Reason.c_str()));
+      UE_LOG(LogCarla, Verbose, TEXT("ServerSynchronization::LogSynchronizationMap[%s:%u] = %f (%s)"), UTF8_TO_TCHAR(SynchronizationWindow.first.c_str()), SynchronizationWindow.second.ParticipantId, SynchronizationWindow.second.TargetGameTime, *FString(Reason.c_str()));
     }
+  }
+
+  /**
+   * @brief Get the synchronization window participant states and a flag if they have changed since last call.
+  */
+  std::pair<bool, std::vector<carla::rpc::synchronization_window_participant_state> > GetSynchronizationWindowParticipantStates() {
+    std::vector<carla::rpc::synchronization_window_participant_state> SynchronizationWindowParticipantStates;
+    SynchronizationWindowParticipantStates.reserve(SynchronizationWindowMap.size());
+    for (auto &SynchronizationWindow: SynchronizationWindowMap) {
+      carla::rpc::synchronization_window_participant_state ParticipantState {
+        .client_id = SynchronizationWindow.first,
+        .participant_id = SynchronizationWindow.second.ParticipantId,
+        .target_game_time = SynchronizationWindow.second.TargetGameTime
+      };
+      SynchronizationWindowParticipantStates.push_back(ParticipantState);
+    }
+    auto ResultChanged = SyncStateChanged;
+    SyncStateChanged = false;
+    return std::make_pair(ResultChanged, SynchronizationWindowParticipantStates);
   }
 
 private:
@@ -216,5 +239,6 @@ private:
 
   std::map<carla::rpc::synchronization_client_id_type, carla::rpc::synchronization_participant_id_type> ParticipantIdMaxMap;
   std::multimap<carla::rpc::synchronization_client_id_type, SynchonizationWindow> SynchronizationWindowMap;
+  bool SyncStateChanged {false};
 
 };

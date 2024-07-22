@@ -6,6 +6,7 @@
 
 #include <memory>
 #include <set>
+#include <sstream>
 
 #include <fastdds/dds/domain/DomainParticipant.hpp>
 #include <fastdds/dds/subscriber/DataReader.hpp>
@@ -62,25 +63,25 @@ public:
 
   void on_subscription_matched(eprosima::fastdds::dds::DataReader* reader,
                                const eprosima::fastdds::dds::SubscriptionMatchedStatus& info) override {
-    carla::rpc::synchronization_client_id_type const client_id = GetClientId(info.last_publication_handle);
+    auto const publisher_guid = GetPublisherGuid(info.last_publication_handle);
     bool had_connected_publisher = HasPublishersConnected();
 
     if (info.current_count_change < 0) {
-      RemovePublisher(client_id);
-      carla::log_debug("DdsSubscriberImpl[", _topic->get_name(), "]::on_subscription_matched(", client_id,
+      RemovePublisher(publisher_guid);
+      carla::log_debug("DdsSubscriberImpl[", _topic->get_name(), "]::on_subscription_matched(", publisher_guid,
                        ") publisher disconnected. Connected publisher remaining: ", NumberPublishersConnected());
     } else {
-      AddPublisher(client_id);
-      carla::log_debug("DdsSubscriberImpl[", _topic->get_name(), "]::on_subscription_matched(", client_id,
+      AddPublisher(publisher_guid);
+      carla::log_debug("DdsSubscriberImpl[", _topic->get_name(), "]::on_subscription_matched(", publisher_guid,
                        ") publisher connected. Connected publisher: ", NumberPublishersConnected());
     }
 
     if (info.current_count != NumberPublishersConnected()) {
-      carla::log_error("DdsSubscriberImpl[", _topic->get_name(), "]::on_subscription_matched(", client_id,
+      carla::log_error("DdsSubscriberImpl[", _topic->get_name(), "]::on_subscription_matched(", publisher_guid,
                        "): current_count=", info.current_count,
                        ", but publisher list not yet empty. Connected publisher: ", NumberPublishersConnected());
     }
-    carla::log_debug("DdsSubscriberImpl[", _topic->get_name(), "]::on_subscription_matched(", client_id,
+    carla::log_debug("DdsSubscriberImpl[", _topic->get_name(), "]::on_subscription_matched(", publisher_guid,
                      "): interface has"
                      " total_count=",
                      info.total_count, " total_count_change=", info.total_count_change,
@@ -93,10 +94,10 @@ public:
     eprosima::fastdds::dds::SampleInfo info;
     MESSAGE_TYPE message;
     auto rcode = reader->take_next_sample(&message, &info);
-    carla::rpc::synchronization_client_id_type const client_id = GetClientId(info.publication_handle);
+    auto const publisher_guid = GetPublisherGuid(info.publication_handle);
     if (rcode == eprosima::fastrtps::types::ReturnCode_t::ReturnCodeValue::RETCODE_OK) {
-      AddMessage(client_id, message);
-      carla::log_debug("DdsSubscriberImpl[", _topic->get_name(), "]::on_data_available(): from client ", client_id,
+      AddMessage(publisher_guid, message);
+      carla::log_debug("DdsSubscriberImpl[", _topic->get_name(), "]::on_data_available(): from client ", publisher_guid,
                        "and handle: ", info.publication_handle);
     } else {
       carla::log_error("DdsSubscriberImpl[", _topic->get_name(), "]::on_data_available(): Error ",
@@ -144,10 +145,17 @@ public:
     return true;
   }
 
-  carla::rpc::synchronization_client_id_type GetClientId(
+  std::string GetPublisherGuid(
       eprosima::fastdds::dds::InstanceHandle_t const& instance_handle) {
-    auto insert_result = _instance_handles.insert(instance_handle);
-    return reinterpret_cast<carla::rpc::synchronization_client_id_type const>(&(*insert_result.first));
+    auto insert_result = _instance_handles.insert({instance_handle, ""});
+    if ( insert_result.second ) {
+      // only perform the conversion from GUID to string once when inserted first time
+      eprosima::fastrtps::rtps::GUID_t guid(insert_result.first->first);
+      std::stringstream namestream;
+      namestream << guid;
+      insert_result.first->second = namestream.str();
+    }
+    return insert_result.first->second;
   }
 
   eprosima::fastdds::dds::DomainParticipant* _participant{nullptr};
@@ -156,7 +164,7 @@ public:
   eprosima::fastdds::dds::DataReader* _datareader{nullptr};
   eprosima::fastdds::dds::TypeSupport _type{new MESSAGE_PUB_TYPE()};
 
-  std::set<eprosima::fastdds::dds::InstanceHandle_t> _instance_handles;
+  std::map<eprosima::fastdds::dds::InstanceHandle_t, std::string> _instance_handles;
 };
 }  // namespace ros2
 }  // namespace carla
