@@ -10,7 +10,7 @@
 #include "carla/ros2/types/Speed.h"
 #include "carla/ros2/types/Timestamp.h"
 #include "carla/ros2/types/Twist.h"
-#include "geometry_msgs/msg/Accel.h"
+#include "geometry_msgs/msg/AccelWithCovariance.h"
 
 namespace carla {
 namespace ros2 {
@@ -62,11 +62,28 @@ public:
   }
 
   /**
-   * The resulting ROS geometry_msgs::msg::twist
+   * The resulting ROS geometry_msgs::msg::AccelWithCovariance
+   */
+  geometry_msgs::msg::AccelWithCovariance accel_with_covariance() const {
+    geometry_msgs::msg::AccelWithCovariance _ros_accel_with_covariance;
+    _ros_accel_with_covariance.accel(_ros_accel);
+    return _ros_accel_with_covariance;
+  }
+
+  /**
+   * The resulting ROS geometry_msgs::msg::Twist
    */
   geometry_msgs::msg::Twist twist() const {
     carla::ros2::types::Twist ros_twist(_last_speed, _last_angular_velocity);
     return ros_twist.twist();
+  }
+
+  /**
+   * The resulting ROS geometry_msgs::msg::TwistWithCovariance
+   */
+  geometry_msgs::msg::TwistWithCovariance twist_with_covariance() const {
+    carla::ros2::types::Twist ros_twist(_last_speed, _last_angular_velocity);
+    return ros_twist.twist_with_covariance();
   }
 
   carla::ros2::types::Speed const& Speed() const {

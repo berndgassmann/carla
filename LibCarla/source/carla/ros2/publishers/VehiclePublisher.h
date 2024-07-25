@@ -5,6 +5,7 @@
 #pragma once
 
 #include "carla/ros2/publishers/ObjectPublisher.h"
+#include "carla/ros2/publishers/ObjectWithCovariancePublisher.h"
 #include "carla/ros2/publishers/PublisherBaseTransform.h"
 #include "carla/ros2/types/Object.h"
 #include "carla/ros2/types/Transform.h"
@@ -26,7 +27,8 @@ class VehiclePublisher : public PublisherBaseTransform {
 public:
   VehiclePublisher(std::shared_ptr<carla::ros2::types::VehicleActorDefinition> vehicle_actor_definition,
                    std::shared_ptr<TransformPublisher> transform_publisher,
-                   std::shared_ptr<ObjectsPublisher> objects_publisher);
+                   std::shared_ptr<ObjectsPublisher> objects_publisher,
+                   std::shared_ptr<ObjectsWithCovariancePublisher> objects_with_covariance_publisher);
   virtual ~VehiclePublisher() = default;
 
   /**
@@ -51,6 +53,7 @@ private:
   bool _vehicle_info_published{false};
   std::shared_ptr<VehicleStatusPublisherImpl> _vehicle_status;
   std::shared_ptr<ObjectPublisher> _vehicle_object_publisher;
+  std::shared_ptr<ObjectWithCovariancePublisher> _vehicle_object_with_covariance_publisher;
 };
 }  // namespace ros2
 }  // namespace carla

@@ -27,11 +27,12 @@ bool ObjectsPublisher::SubscribersConnected() const {
   return _impl->SubscribersConnected();
 }
 
+void ObjectsPublisher::UpdateHeader(const builtin_interfaces::msg::Time &stamp) {
+  _impl->SetMessageHeader(stamp, "map");
+}
+
 void ObjectsPublisher::AddObject(std::shared_ptr<carla::ros2::types::Object> &object) {
   derived_object_msgs::msg::Object ros_object = object->object();
-  if (_impl->Message().objects().empty()) {
-    _impl->SetMessageHeader(ros_object.header().stamp(), "map");
-  }
   _impl->Message().objects().emplace_back(ros_object);
 }
 

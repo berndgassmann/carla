@@ -9,8 +9,8 @@
 #include "carla/ros2/publishers/CarlaStatusPublisher.h"
 #include "carla/ros2/publishers/ClockPublisher.h"
 #include "carla/ros2/publishers/MapPublisher.h"
-#include "carla/ros2/publishers/ObjectPublisher.h"
 #include "carla/ros2/publishers/ObjectsPublisher.h"
+#include "carla/ros2/publishers/ObjectsWithCovariancePublisher.h"
 #include "carla/ros2/publishers/TrafficLightPublisher.h"
 #include "carla/ros2/publishers/TrafficLightsPublisher.h"
 #include "carla/ros2/publishers/TrafficSignPublisher.h"
@@ -155,7 +155,8 @@ private:
   uint64_t _frame{0u};
   carla::sensor::s11n::EpisodeStateSerializer::Header _episode_header;
   bool _frame_changed{false};
-  bool _objects_changed{false};
+  // ensure to send out at least one message with empty object list
+  bool _objects_changed{true};
   std::unordered_map<ActorId, std::shared_ptr<carla::ros2::types::Object>> _objects;
 
   struct UeVehicle {
@@ -210,6 +211,7 @@ private:
   std::shared_ptr<ClockPublisher> _clock_publisher;
   std::shared_ptr<MapPublisher> _map_publisher;
   std::shared_ptr<ObjectsPublisher> _objects_publisher;
+  std::shared_ptr<ObjectsWithCovariancePublisher> _objects_with_covariance_publisher;
   std::shared_ptr<TrafficLightsPublisher> _traffic_lights_publisher;
   // subscriber
   std::shared_ptr<CarlaControlSubscriber> _carla_control_subscriber;

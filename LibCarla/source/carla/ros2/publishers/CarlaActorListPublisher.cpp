@@ -14,7 +14,9 @@ CarlaActorListPublisher::CarlaActorListPublisher()
     _impl(std::make_shared<CarlaActorListPublisherImpl>()) {}
 
 bool CarlaActorListPublisher::Init(std::shared_ptr<DdsDomainParticipantImpl> domain_participant) {
-  return _impl->Init(domain_participant, get_topic_name(), get_topic_qos());
+  auto topic_qos = get_topic_qos();
+  topic_qos.transient_local();
+  return _impl->Init(domain_participant, get_topic_name(), topic_qos);
 }
 
 bool CarlaActorListPublisher::Publish() {

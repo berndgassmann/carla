@@ -7,7 +7,7 @@
 #include "carla/geom/Vector3D.h"
 #include "carla/ros2/types/AngularVelocity.h"
 #include "carla/ros2/types/Speed.h"
-#include "geometry_msgs/msg/Twist.h"
+#include "geometry_msgs/msg/TwistWithCovariance.h"
 
 namespace carla {
 namespace ros2 {
@@ -43,6 +43,15 @@ public:
    */
   geometry_msgs::msg::Twist twist() const {
     return _ros_twist;
+  }
+
+  /**
+   * The resulting ROS geometry_msgs::msg::twist
+   */
+  geometry_msgs::msg::TwistWithCovariance twist_with_covariance() const {
+    geometry_msgs::msg::TwistWithCovariance _ros_twist_with_covariance;
+    _ros_twist_with_covariance.twist(_ros_twist);
+    return _ros_twist_with_covariance;
   }
 
 private:

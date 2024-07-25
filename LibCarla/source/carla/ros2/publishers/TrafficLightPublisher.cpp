@@ -12,12 +12,14 @@ namespace ros2 {
 TrafficLightPublisher::TrafficLightPublisher(
     std::shared_ptr<carla::ros2::types::TrafficLightActorDefinition> traffic_light_actor_definition,
     std::shared_ptr<ObjectsPublisher> objects_publisher,
+    std::shared_ptr<ObjectsWithCovariancePublisher> objects_with_covariance_publisher,
     std::shared_ptr<TrafficLightsPublisher> traffic_lights_publisher)
   : PublisherBaseSensor(
         std::static_pointer_cast<carla::ros2::types::ActorNameDefinition>(traffic_light_actor_definition)),
     _traffic_light_info(std::make_shared<TrafficLightInfoPublisherImpl>()),
     _traffic_light_status(std::make_shared<TrafficLightStatusPublisherImpl>()),
     _traffic_light_object_publisher(std::make_shared<ObjectPublisher>(*this, objects_publisher)),
+    _traffic_light_object_with_covariance_publisher(std::make_shared<ObjectWithCovariancePublisher>(*this, objects_with_covariance_publisher)),
     _traffic_lights_publisher(traffic_lights_publisher) {
   // prefill some traffic_light info data
   _traffic_light_info->Message().id(traffic_light_actor_definition->id);
@@ -30,7 +32,8 @@ bool TrafficLightPublisher::Init(std::shared_ptr<DdsDomainParticipantImpl> domai
                                    PublisherBase::get_topic_qos()) &&
          _traffic_light_status->Init(domain_participant, get_topic_name("traffic_light_status"),
                                      PublisherBase::get_topic_qos()) &&
-         _traffic_light_object_publisher->Init(domain_participant);
+         _traffic_light_object_publisher->Init(domain_participant) &&
+         _traffic_light_object_with_covariance_publisher->Init(domain_participant);
 }
 
 bool TrafficLightPublisher::Publish() {
@@ -40,12 +43,13 @@ bool TrafficLightPublisher::Publish() {
   bool success = _traffic_light_info_published;
   success &= _traffic_light_status->Publish();
   success &= _traffic_light_object_publisher->Publish();
+  success &= _traffic_light_object_with_covariance_publisher->Publish();
   return success;
 }
 
 bool TrafficLightPublisher::SubscribersConnected() const {
   return _traffic_light_info->SubscribersConnected() || _traffic_light_status->SubscribersConnected() ||
-         _traffic_light_object_publisher->SubscribersConnected();
+         _traffic_light_object_publisher->SubscribersConnected() || _traffic_light_object_with_covariance_publisher->SubscribersConnected();
 }
 
 void TrafficLightPublisher::UpdateTrafficLight(std::shared_ptr<carla::ros2::types::Object> &object,
@@ -64,6 +68,7 @@ void TrafficLightPublisher::UpdateTrafficLight(std::shared_ptr<carla::ros2::type
   }
 
   _traffic_light_object_publisher->UpdateObject(object);
+  _traffic_light_object_with_covariance_publisher->UpdateObject(object);
   _traffic_lights_publisher->UpdateTrafficLightStatus(_traffic_light_status->Message());
 }
 

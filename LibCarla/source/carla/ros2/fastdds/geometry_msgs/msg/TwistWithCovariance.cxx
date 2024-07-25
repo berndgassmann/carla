@@ -34,23 +34,19 @@ using namespace eprosima::fastcdr::exception;
 
 #include <utility>
 
-#define geometry_msgs_msg_TwistWithCovariance_max_cdr_typesize 336ULL;
-#define geometry_msgs_msg_Vector3_max_cdr_typesize 24ULL;
-#define geometry_msgs_msg_Twist_max_cdr_typesize 48ULL;
-#define geometry_msgs_msg_TwistWithCovariance_max_key_cdr_typesize 0ULL;
-#define geometry_msgs_msg_Vector3_max_key_cdr_typesize 0ULL;
-#define geometry_msgs_msg_Twist_max_key_cdr_typesize 0ULL;
 
 geometry_msgs::msg::TwistWithCovariance::TwistWithCovariance()
 {
-    // geometry_msgs::msg::Twist m_twist
+    // m_twist com.eprosima.fastdds.idl.parser.typecode.StructTypeCode@10163d6
 
-    // geometry_msgs::msg::geometry_msgs__TwistWithCovariance__double_array_36 m_covariance
+    // m_covariance com.eprosima.idl.parser.typecode.AliasTypeCode@2dde1bff
     memset(&m_covariance, 0, (36) * 8);
+
 }
 
 geometry_msgs::msg::TwistWithCovariance::~TwistWithCovariance()
 {
+
 }
 
 geometry_msgs::msg::TwistWithCovariance::TwistWithCovariance(
@@ -61,7 +57,7 @@ geometry_msgs::msg::TwistWithCovariance::TwistWithCovariance(
 }
 
 geometry_msgs::msg::TwistWithCovariance::TwistWithCovariance(
-        TwistWithCovariance&& x) noexcept
+        TwistWithCovariance&& x)
 {
     m_twist = std::move(x.m_twist);
     m_covariance = std::move(x.m_covariance);
@@ -70,6 +66,7 @@ geometry_msgs::msg::TwistWithCovariance::TwistWithCovariance(
 geometry_msgs::msg::TwistWithCovariance& geometry_msgs::msg::TwistWithCovariance::operator =(
         const TwistWithCovariance& x)
 {
+
     m_twist = x.m_twist;
     m_covariance = x.m_covariance;
 
@@ -77,8 +74,9 @@ geometry_msgs::msg::TwistWithCovariance& geometry_msgs::msg::TwistWithCovariance
 }
 
 geometry_msgs::msg::TwistWithCovariance& geometry_msgs::msg::TwistWithCovariance::operator =(
-        TwistWithCovariance&& x) noexcept
+        TwistWithCovariance&& x)
 {
+
     m_twist = std::move(x.m_twist);
     m_covariance = std::move(x.m_covariance);
 
@@ -88,6 +86,7 @@ geometry_msgs::msg::TwistWithCovariance& geometry_msgs::msg::TwistWithCovariance
 bool geometry_msgs::msg::TwistWithCovariance::operator ==(
         const TwistWithCovariance& x) const
 {
+
     return (m_twist == x.m_twist && m_covariance == x.m_covariance);
 }
 
@@ -100,17 +99,31 @@ bool geometry_msgs::msg::TwistWithCovariance::operator !=(
 size_t geometry_msgs::msg::TwistWithCovariance::getMaxCdrSerializedSize(
         size_t current_alignment)
 {
-    static_cast<void>(current_alignment);
-    return geometry_msgs_msg_TwistWithCovariance_max_cdr_typesize;
+    size_t initial_alignment = current_alignment;
+
+
+    current_alignment += geometry_msgs::msg::Twist::getMaxCdrSerializedSize(current_alignment);
+    current_alignment += ((36) * 8) + eprosima::fastcdr::Cdr::alignment(current_alignment, 8);
+
+
+
+    return current_alignment - initial_alignment;
 }
 
 size_t geometry_msgs::msg::TwistWithCovariance::getCdrSerializedSize(
         const geometry_msgs::msg::TwistWithCovariance& data,
         size_t current_alignment)
 {
+    (void)data;
     size_t initial_alignment = current_alignment;
+
+
     current_alignment += geometry_msgs::msg::Twist::getCdrSerializedSize(data.twist(), current_alignment);
-    current_alignment += ((36) * 8) + eprosima::fastcdr::Cdr::alignment(current_alignment, 8);
+    if ((36) > 0)
+    {
+        current_alignment += ((36) * 8) + eprosima::fastcdr::Cdr::alignment(current_alignment, 8);
+    }
+
 
     return current_alignment - initial_alignment;
 }
@@ -118,15 +131,20 @@ size_t geometry_msgs::msg::TwistWithCovariance::getCdrSerializedSize(
 void geometry_msgs::msg::TwistWithCovariance::serialize(
         eprosima::fastcdr::Cdr& scdr) const
 {
+
     scdr << m_twist;
     scdr << m_covariance;
+
+
 }
 
 void geometry_msgs::msg::TwistWithCovariance::deserialize(
         eprosima::fastcdr::Cdr& dcdr)
 {
+
     dcdr >> m_twist;
     dcdr >> m_covariance;
+
 }
 
 /*!
@@ -166,13 +184,12 @@ geometry_msgs::msg::Twist& geometry_msgs::msg::TwistWithCovariance::twist()
 {
     return m_twist;
 }
-
 /*!
  * @brief This function copies the value in member covariance
  * @param _covariance New value to be copied in member covariance
  */
 void geometry_msgs::msg::TwistWithCovariance::covariance(
-        const geometry_msgs::msg::geometry_msgs__TwistWithCovariance__double_array_36& _covariance)
+        const geometry_msgs::msg::double_twist_36& _covariance)
 {
     m_covariance = _covariance;
 }
@@ -182,7 +199,7 @@ void geometry_msgs::msg::TwistWithCovariance::covariance(
  * @param _covariance New value to be moved in member covariance
  */
 void geometry_msgs::msg::TwistWithCovariance::covariance(
-        geometry_msgs::msg::geometry_msgs__TwistWithCovariance__double_array_36&& _covariance)
+        geometry_msgs::msg::double_twist_36&& _covariance)
 {
     m_covariance = std::move(_covariance);
 }
@@ -191,7 +208,7 @@ void geometry_msgs::msg::TwistWithCovariance::covariance(
  * @brief This function returns a constant reference to member covariance
  * @return Constant reference to member covariance
  */
-const geometry_msgs::msg::geometry_msgs__TwistWithCovariance__double_array_36& geometry_msgs::msg::TwistWithCovariance::covariance() const
+const geometry_msgs::msg::double_twist_36& geometry_msgs::msg::TwistWithCovariance::covariance() const
 {
     return m_covariance;
 }
@@ -200,7 +217,7 @@ const geometry_msgs::msg::geometry_msgs__TwistWithCovariance__double_array_36& g
  * @brief This function returns a reference to member covariance
  * @return Reference to member covariance
  */
-geometry_msgs::msg::geometry_msgs__TwistWithCovariance__double_array_36& geometry_msgs::msg::TwistWithCovariance::covariance()
+geometry_msgs::msg::double_twist_36& geometry_msgs::msg::TwistWithCovariance::covariance()
 {
     return m_covariance;
 }
@@ -208,8 +225,11 @@ geometry_msgs::msg::geometry_msgs__TwistWithCovariance__double_array_36& geometr
 size_t geometry_msgs::msg::TwistWithCovariance::getKeyMaxCdrSerializedSize(
         size_t current_alignment)
 {
-    static_cast<void>(current_alignment);
-    return geometry_msgs_msg_TwistWithCovariance_max_key_cdr_typesize;
+    size_t current_align = current_alignment;
+
+
+
+    return current_align;
 }
 
 bool geometry_msgs::msg::TwistWithCovariance::isKeyDefined()
@@ -221,4 +241,7 @@ void geometry_msgs::msg::TwistWithCovariance::serializeKey(
         eprosima::fastcdr::Cdr& scdr) const
 {
     (void) scdr;
+      
 }
+
+

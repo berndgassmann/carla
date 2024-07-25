@@ -36,9 +36,9 @@ using namespace eprosima::fastcdr::exception;
 
 geometry_msgs::msg::Accel::Accel()
 {
-    // m_linear com.eprosima.fastdds.idl.parser.typecode.StructTypeCode@8ad6665
+    // m_linear com.eprosima.fastdds.idl.parser.typecode.StructTypeCode@7d0b7e3c
 
-    // m_angular com.eprosima.fastdds.idl.parser.typecode.StructTypeCode@8ad6665
+    // m_angular com.eprosima.fastdds.idl.parser.typecode.StructTypeCode@7d0b7e3c
 
 
 }

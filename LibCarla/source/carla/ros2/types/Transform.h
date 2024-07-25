@@ -7,7 +7,7 @@
 #include "carla/geom/Transform.h"
 #include "carla/ros2/types/CoordinateSystemTransform.h"
 #include "carla/ros2/types/Quaternion.h"
-#include "geometry_msgs/msg/Pose.h"
+#include "geometry_msgs/msg/PoseWithCovariance.h"
 #include "geometry_msgs/msg/Transform.h"
 
 namespace carla {
@@ -77,6 +77,17 @@ public:
     ros_pose.position().z(_ros_transform.translation().z());
     ros_pose.orientation(_ros_transform.rotation());
     return ros_pose;
+  }
+
+  /**
+   * Get the geometry_msgs::msg::PoseWithCovariance that is identical with the geometry_msgs::msg::Transform
+   *
+   * Uses ROS naming convention
+   */
+  const geometry_msgs::msg::PoseWithCovariance pose_with_covariance() const {
+    geometry_msgs::msg::PoseWithCovariance ros_pose_with_covariance;
+    ros_pose_with_covariance.pose(pose());
+    return ros_pose_with_covariance;
   }
 
   /**

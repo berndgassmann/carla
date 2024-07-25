@@ -6,18 +6,18 @@
 
 #include "carla/ros2/publishers/PublisherBaseSensor.h"
 #include "carla/ros2/types/Object.h"
-#include "derived_object_msgs/msg/ObjectArrayPubSubTypes.h"
+#include "derived_object_msgs/msg/ObjectWithCovarianceArrayPubSubTypes.h"
 
 namespace carla {
 namespace ros2 {
 
-using ObjectsPublisherImpl =
-    DdsPublisherImpl<derived_object_msgs::msg::ObjectArray, derived_object_msgs::msg::ObjectArrayPubSubType>;
+using ObjectsWithCovariancePublisherImpl =
+    DdsPublisherImpl<derived_object_msgs::msg::ObjectWithCovarianceArray, derived_object_msgs::msg::ObjectWithCovarianceArrayPubSubType>;
 
-class ObjectsPublisher : public PublisherBaseSensor {
+class ObjectsWithCovariancePublisher : public PublisherBaseSensor {
 public:
-  ObjectsPublisher();
-  virtual ~ObjectsPublisher() = default;
+  ObjectsWithCovariancePublisher();
+  virtual ~ObjectsWithCovariancePublisher() = default;
 
   /**
    * Implements ROS2NameRecord::Init() interface
@@ -38,7 +38,7 @@ public:
   void AddObject(std::shared_ptr<carla::ros2::types::Object> &object);
 
 private:
-  std::shared_ptr<ObjectsPublisherImpl> _impl;
+  std::shared_ptr<ObjectsWithCovariancePublisherImpl> _impl;
 };
 }  // namespace ros2
 }  // namespace carla

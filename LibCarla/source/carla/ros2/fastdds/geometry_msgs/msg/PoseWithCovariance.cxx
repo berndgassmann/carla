@@ -34,25 +34,19 @@ using namespace eprosima::fastcdr::exception;
 
 #include <utility>
 
-#define geometry_msgs_msg_Pose_max_cdr_typesize 56ULL;
-#define geometry_msgs_msg_Point_max_cdr_typesize 24ULL;
-#define geometry_msgs_msg_PoseWithCovariance_max_cdr_typesize 344ULL;
-#define geometry_msgs_msg_Quaternion_max_cdr_typesize 32ULL;
-#define geometry_msgs_msg_Pose_max_key_cdr_typesize 0ULL;
-#define geometry_msgs_msg_Point_max_key_cdr_typesize 0ULL;
-#define geometry_msgs_msg_PoseWithCovariance_max_key_cdr_typesize 0ULL;
-#define geometry_msgs_msg_Quaternion_max_key_cdr_typesize 0ULL;
 
 geometry_msgs::msg::PoseWithCovariance::PoseWithCovariance()
 {
-    // geometry_msgs::msg::Pose m_pose
+    // m_pose com.eprosima.fastdds.idl.parser.typecode.StructTypeCode@4efc180e
 
-    // geometry_msgs::msg::geometry_msgs__PoseWithCovariance__double_array_36 m_covariance
+    // m_covariance com.eprosima.idl.parser.typecode.AliasTypeCode@bd4dc25
     memset(&m_covariance, 0, (36) * 8);
+
 }
 
 geometry_msgs::msg::PoseWithCovariance::~PoseWithCovariance()
 {
+
 }
 
 geometry_msgs::msg::PoseWithCovariance::PoseWithCovariance(
@@ -63,7 +57,7 @@ geometry_msgs::msg::PoseWithCovariance::PoseWithCovariance(
 }
 
 geometry_msgs::msg::PoseWithCovariance::PoseWithCovariance(
-        PoseWithCovariance&& x) noexcept
+        PoseWithCovariance&& x)
 {
     m_pose = std::move(x.m_pose);
     m_covariance = std::move(x.m_covariance);
@@ -72,6 +66,7 @@ geometry_msgs::msg::PoseWithCovariance::PoseWithCovariance(
 geometry_msgs::msg::PoseWithCovariance& geometry_msgs::msg::PoseWithCovariance::operator =(
         const PoseWithCovariance& x)
 {
+
     m_pose = x.m_pose;
     m_covariance = x.m_covariance;
 
@@ -79,8 +74,9 @@ geometry_msgs::msg::PoseWithCovariance& geometry_msgs::msg::PoseWithCovariance::
 }
 
 geometry_msgs::msg::PoseWithCovariance& geometry_msgs::msg::PoseWithCovariance::operator =(
-        PoseWithCovariance&& x) noexcept
+        PoseWithCovariance&& x)
 {
+
     m_pose = std::move(x.m_pose);
     m_covariance = std::move(x.m_covariance);
 
@@ -90,6 +86,7 @@ geometry_msgs::msg::PoseWithCovariance& geometry_msgs::msg::PoseWithCovariance::
 bool geometry_msgs::msg::PoseWithCovariance::operator ==(
         const PoseWithCovariance& x) const
 {
+
     return (m_pose == x.m_pose && m_covariance == x.m_covariance);
 }
 
@@ -102,17 +99,31 @@ bool geometry_msgs::msg::PoseWithCovariance::operator !=(
 size_t geometry_msgs::msg::PoseWithCovariance::getMaxCdrSerializedSize(
         size_t current_alignment)
 {
-    static_cast<void>(current_alignment);
-    return geometry_msgs_msg_PoseWithCovariance_max_cdr_typesize;
+    size_t initial_alignment = current_alignment;
+
+
+    current_alignment += geometry_msgs::msg::Pose::getMaxCdrSerializedSize(current_alignment);
+    current_alignment += ((36) * 8) + eprosima::fastcdr::Cdr::alignment(current_alignment, 8);
+
+
+
+    return current_alignment - initial_alignment;
 }
 
 size_t geometry_msgs::msg::PoseWithCovariance::getCdrSerializedSize(
         const geometry_msgs::msg::PoseWithCovariance& data,
         size_t current_alignment)
 {
+    (void)data;
     size_t initial_alignment = current_alignment;
+
+
     current_alignment += geometry_msgs::msg::Pose::getCdrSerializedSize(data.pose(), current_alignment);
-    current_alignment += ((36) * 8) + eprosima::fastcdr::Cdr::alignment(current_alignment, 8);
+    if ((36) > 0)
+    {
+        current_alignment += ((36) * 8) + eprosima::fastcdr::Cdr::alignment(current_alignment, 8);
+    }
+
 
     return current_alignment - initial_alignment;
 }
@@ -120,15 +131,20 @@ size_t geometry_msgs::msg::PoseWithCovariance::getCdrSerializedSize(
 void geometry_msgs::msg::PoseWithCovariance::serialize(
         eprosima::fastcdr::Cdr& scdr) const
 {
+
     scdr << m_pose;
     scdr << m_covariance;
+
+
 }
 
 void geometry_msgs::msg::PoseWithCovariance::deserialize(
         eprosima::fastcdr::Cdr& dcdr)
 {
+
     dcdr >> m_pose;
     dcdr >> m_covariance;
+
 }
 
 /*!
@@ -173,7 +189,7 @@ geometry_msgs::msg::Pose& geometry_msgs::msg::PoseWithCovariance::pose()
  * @param _covariance New value to be copied in member covariance
  */
 void geometry_msgs::msg::PoseWithCovariance::covariance(
-        const geometry_msgs::msg::geometry_msgs__PoseWithCovariance__double_array_36& _covariance)
+        const geometry_msgs::msg::double_pose_36& _covariance)
 {
     m_covariance = _covariance;
 }
@@ -183,7 +199,7 @@ void geometry_msgs::msg::PoseWithCovariance::covariance(
  * @param _covariance New value to be moved in member covariance
  */
 void geometry_msgs::msg::PoseWithCovariance::covariance(
-        geometry_msgs::msg::geometry_msgs__PoseWithCovariance__double_array_36&& _covariance)
+        geometry_msgs::msg::double_pose_36&& _covariance)
 {
     m_covariance = std::move(_covariance);
 }
@@ -192,7 +208,7 @@ void geometry_msgs::msg::PoseWithCovariance::covariance(
  * @brief This function returns a constant reference to member covariance
  * @return Constant reference to member covariance
  */
-const geometry_msgs::msg::geometry_msgs__PoseWithCovariance__double_array_36& geometry_msgs::msg::PoseWithCovariance::covariance() const
+const geometry_msgs::msg::double_pose_36& geometry_msgs::msg::PoseWithCovariance::covariance() const
 {
     return m_covariance;
 }
@@ -201,17 +217,19 @@ const geometry_msgs::msg::geometry_msgs__PoseWithCovariance__double_array_36& ge
  * @brief This function returns a reference to member covariance
  * @return Reference to member covariance
  */
-geometry_msgs::msg::geometry_msgs__PoseWithCovariance__double_array_36& geometry_msgs::msg::PoseWithCovariance::covariance()
+geometry_msgs::msg::double_pose_36& geometry_msgs::msg::PoseWithCovariance::covariance()
 {
     return m_covariance;
 }
 
-
 size_t geometry_msgs::msg::PoseWithCovariance::getKeyMaxCdrSerializedSize(
         size_t current_alignment)
 {
-    static_cast<void>(current_alignment);
-    return geometry_msgs_msg_PoseWithCovariance_max_key_cdr_typesize;
+    size_t current_align = current_alignment;
+
+
+
+    return current_align;
 }
 
 bool geometry_msgs::msg::PoseWithCovariance::isKeyDefined()
@@ -223,4 +241,7 @@ void geometry_msgs::msg::PoseWithCovariance::serializeKey(
         eprosima::fastcdr::Cdr& scdr) const
 {
     (void) scdr;
+      
 }
+
+

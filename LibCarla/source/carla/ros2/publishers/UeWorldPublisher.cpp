@@ -21,6 +21,7 @@ UeWorldPublisher::UeWorldPublisher(carla::rpc::RpcServerInterface& carla_server,
     _clock_publisher(std::make_shared<ClockPublisher>()),
     _map_publisher(std::make_shared<MapPublisher>()),
     _objects_publisher(std::make_shared<ObjectsPublisher>()),
+    _objects_with_covariance_publisher(std::make_shared<ObjectsWithCovariancePublisher>()),
     _traffic_lights_publisher(std::make_shared<TrafficLightsPublisher>()),
     _carla_control_subscriber(std::make_shared<CarlaControlSubscriber>(*this, _carla_server)),
     _sync_subscriber(std::make_shared<CarlaSynchronizationWindowSubscriber>(*this, _carla_server)) {
@@ -31,7 +32,7 @@ bool UeWorldPublisher::Init(std::shared_ptr<DdsDomainParticipantImpl> domain_par
   _initialized = _carla_status_publisher->Init(domain_participant) &&
                  _carla_actor_list_publisher->Init(domain_participant) && _clock_publisher->Init(domain_participant) &&
                  _map_publisher->Init(domain_participant) && _objects_publisher->Init(domain_participant) &&
-                 _traffic_lights_publisher->Init(domain_participant) &&
+                 _objects_with_covariance_publisher->Init(domain_participant) && _traffic_lights_publisher->Init(domain_participant) &&
                  _transform_publisher->Init(domain_participant) &&
                  _carla_control_subscriber->Init(domain_participant) && _sync_subscriber->Init(domain_participant);
   return _initialized;
@@ -84,6 +85,9 @@ void UeWorldPublisher::PostTickAction() {
   if (_objects_publisher->SubscribersConnected()) {
     _objects_publisher->Publish();
   }
+  if (_objects_with_covariance_publisher->SubscribersConnected()) {
+    _objects_with_covariance_publisher->Publish();
+  }
   if (_traffic_lights_publisher->SubscribersConnected()) {
     _traffic_lights_publisher->Publish();
   }
@@ -106,7 +110,7 @@ void UeWorldPublisher::AddVehicleUe(
   _objects_changed = true;
 
   auto vehicle_publisher =
-      std::make_shared<VehiclePublisher>(vehicle_actor_definition, _transform_publisher, _objects_publisher);
+      std::make_shared<VehiclePublisher>(vehicle_actor_definition, _transform_publisher, _objects_publisher, _objects_with_covariance_publisher);
   UeVehicle ue_vehicle(vehicle_publisher);
   ue_vehicle._vehicle_controller =
       std::make_shared<VehicleControlSubscriber>(*vehicle_publisher, std::move(vehicle_control_callback));
@@ -148,7 +152,7 @@ void UeWorldPublisher::AddWalkerUe(std::shared_ptr<carla::ros2::types::WalkerAct
   _objects_changed = true;
 
   auto walker_publisher =
-      std::make_shared<WalkerPublisher>(walker_actor_definition, _transform_publisher, _objects_publisher);
+      std::make_shared<WalkerPublisher>(walker_actor_definition, _transform_publisher, _objects_publisher, _objects_with_covariance_publisher);
   UeWalker ue_walker(walker_publisher);
   ue_walker._walker_controller =
       std::make_shared<WalkerControlSubscriber>(*walker_publisher, std::move(walker_control_callback));
@@ -184,7 +188,7 @@ void UeWorldPublisher::AddTrafficLightUe(
   _objects_changed = true;
 
   auto traffic_light_publisher = std::make_shared<TrafficLightPublisher>(traffic_light_actor_definition,
-                                                                         _objects_publisher, _traffic_lights_publisher);
+                                                                         _objects_publisher, _objects_with_covariance_publisher, _traffic_lights_publisher);
   UeTrafficLight ue_traffic_light(traffic_light_publisher);
   auto traffic_light_result = _traffic_lights.insert({traffic_light_actor_definition->id, ue_traffic_light});
   if (!traffic_light_result.second) {
@@ -214,7 +218,7 @@ void UeWorldPublisher::AddTrafficSignUe(
   _objects_changed = true;
 
   auto traffic_sign_publisher =
-      std::make_shared<TrafficSignPublisher>(traffic_sign_actor_definition, _objects_publisher);
+      std::make_shared<TrafficSignPublisher>(traffic_sign_actor_definition, _objects_publisher, _objects_with_covariance_publisher);
   UeTrafficSign ue_traffic_sign(traffic_sign_publisher);
   auto traffic_sign_result = _traffic_signs.insert({traffic_sign_actor_definition->id, ue_traffic_sign});
   if (!traffic_sign_result.second) {
@@ -263,7 +267,9 @@ void UeWorldPublisher::UpdateAndPublishStatus() {
       carla::ros2::types::Timestamp target_game_time(synchronization_window_participant_state.target_game_time);
       participant_state.target_game_time(target_game_time.Stamp());
       status.synchronous_mode_participant_states().push_back(participant_state);
-      synchronization_target_game_time_min = std::min(synchronization_target_game_time_min, target_game_time.Stamp());
+      if ( target_game_time.Stamp() > 0. ) {
+        synchronization_target_game_time_min = std::min(synchronization_target_game_time_min, target_game_time.Stamp());
+      }
     }
     
     status.game_running(synchronization_target_game_time_min > _timestamp.Stamp());
@@ -285,6 +291,8 @@ void UeWorldPublisher::UpdateSensorData(
   _frame = sensor_header->frame;
   _timestamp = carla::ros2::types::Timestamp(sensor_header->timestamp);
   _clock_publisher->UpdateData(_timestamp.time());
+  _objects_publisher->UpdateHeader(_timestamp.time());
+  _objects_with_covariance_publisher->UpdateHeader(_timestamp.time());
 
   _episode_header = *header_view(buffer_view);
 

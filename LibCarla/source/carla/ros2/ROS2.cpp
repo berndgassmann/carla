@@ -19,7 +19,6 @@
 #include "carla/sensor/data/SemanticLidarData.h"
 #include "carla/sensor/s11n/SensorHeaderSerializer.h"
 
-#include "carla/ros2/publishers/ObjectPublisher.h"
 #include "carla/ros2/publishers/TransformPublisher.h"
 #include "carla/ros2/publishers/UeCollisionPublisher.h"
 #include "carla/ros2/publishers/UeDVSCameraPublisher.h"

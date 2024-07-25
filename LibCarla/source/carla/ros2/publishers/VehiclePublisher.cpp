@@ -14,12 +14,14 @@ namespace ros2 {
 
 VehiclePublisher::VehiclePublisher(std::shared_ptr<carla::ros2::types::VehicleActorDefinition> vehicle_actor_definition,
                                    std::shared_ptr<TransformPublisher> transform_publisher,
-                                   std::shared_ptr<ObjectsPublisher> objects_publisher)
+                                   std::shared_ptr<ObjectsPublisher> objects_publisher,
+                                   std::shared_ptr<ObjectsWithCovariancePublisher> objects_with_covariance_publisher)
   : PublisherBaseTransform(std::static_pointer_cast<carla::ros2::types::ActorNameDefinition>(vehicle_actor_definition),
                            transform_publisher),
     _vehicle_info(std::make_shared<VehicleInfoPublisherImpl>()),
     _vehicle_status(std::make_shared<VehicleStatusPublisherImpl>()),
-    _vehicle_object_publisher(std::make_shared<ObjectPublisher>(*this, objects_publisher)) {
+    _vehicle_object_publisher(std::make_shared<ObjectPublisher>(*this, objects_publisher)),
+    _vehicle_object_with_covariance_publisher(std::make_shared<ObjectWithCovariancePublisher>(*this, objects_with_covariance_publisher)) {
   // prefill some vehicle info data
   _vehicle_info->Message().id(vehicle_actor_definition->id);
   _vehicle_info->Message().type(vehicle_actor_definition->type_id);
@@ -65,7 +67,8 @@ VehiclePublisher::VehiclePublisher(std::shared_ptr<carla::ros2::types::VehicleAc
 bool VehiclePublisher::Init(std::shared_ptr<DdsDomainParticipantImpl> domain_participant) {
   return _vehicle_info->Init(domain_participant, get_topic_name("vehicle_info"), PublisherBase::get_topic_qos()) &&
          _vehicle_status->Init(domain_participant, get_topic_name("vehicle_status"), get_topic_qos()) &&
-         _vehicle_object_publisher->Init(domain_participant);
+         _vehicle_object_publisher->Init(domain_participant) &&
+         _vehicle_object_with_covariance_publisher->Init(domain_participant);
 }
 
 bool VehiclePublisher::Publish() {
@@ -75,12 +78,14 @@ bool VehiclePublisher::Publish() {
   bool success = _vehicle_info_published;
   success &= _vehicle_status->Publish();
   success &= _vehicle_object_publisher->Publish();
+  success &= _vehicle_object_with_covariance_publisher->Publish();
   return success;
 }
 
 bool VehiclePublisher::SubscribersConnected() const {
   return _vehicle_info->SubscribersConnected() || _vehicle_status->SubscribersConnected() ||
-         _vehicle_object_publisher->SubscribersConnected();
+         _vehicle_object_publisher->SubscribersConnected() || 
+         _vehicle_object_with_covariance_publisher->SubscribersConnected();
 }
 
 void VehiclePublisher::UpdateVehicle(std::shared_ptr<carla::ros2::types::Object> &object,
@@ -99,6 +104,7 @@ void VehiclePublisher::UpdateVehicle(std::shared_ptr<carla::ros2::types::Object>
           .carla_vehicle_ackermann_control());
 
   _vehicle_object_publisher->UpdateObject(object);
+  _vehicle_object_with_covariance_publisher->UpdateObject(object);
 }
 
 }  // namespace ros2

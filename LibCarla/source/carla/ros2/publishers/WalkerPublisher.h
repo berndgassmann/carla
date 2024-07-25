@@ -5,6 +5,7 @@
 #pragma once
 
 #include "carla/ros2/publishers/ObjectPublisher.h"
+#include "carla/ros2/publishers/ObjectWithCovariancePublisher.h"
 #include "carla/ros2/publishers/PublisherBaseTransform.h"
 #include "carla/ros2/types/Object.h"
 #include "carla/ros2/types/Transform.h"
@@ -18,7 +19,8 @@ class WalkerPublisher : public PublisherBaseTransform {
 public:
   WalkerPublisher(std::shared_ptr<carla::ros2::types::WalkerActorDefinition> walker_actor_definition,
                   std::shared_ptr<TransformPublisher> transform_publisher,
-                  std::shared_ptr<ObjectsPublisher> objects_publisher);
+                  std::shared_ptr<ObjectsPublisher> objects_publisher,
+                  std::shared_ptr<ObjectsWithCovariancePublisher> objects_with_covariance_publisher);
   virtual ~WalkerPublisher() = default;
 
   /**
@@ -40,6 +42,7 @@ public:
 
 private:
   std::shared_ptr<ObjectPublisher> _walker_object_publisher;
+  std::shared_ptr<ObjectWithCovariancePublisher> _walker_object_with_covariance_publisher;
 };
 }  // namespace ros2
 }  // namespace carla

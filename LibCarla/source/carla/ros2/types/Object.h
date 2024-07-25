@@ -20,6 +20,7 @@
 #include "carla/sensor/data/ActorDynamicState.h"
 #include "carla_msgs/msg/CarlaActorInfo.h"
 #include "derived_object_msgs/msg/Object.h"
+#include "derived_object_msgs/msg/ObjectWithCovariance.h"
 
 namespace carla {
 namespace ros2 {
@@ -152,6 +153,32 @@ public:
       auto const ros_extent = _bounding_box.extent * 2.f;
       object.shape().dimensions({ros_extent.x, ros_extent.y, ros_extent.z});
       object.shape().polygon().points(*Polygon(_bounding_box.GetLocalVertices()).polygon());
+    } else {
+      object.shape().type(shape_msgs::msg::SolidPrimitive_Constants::BOX_X);
+    }
+    object.classification(_classification);
+    object.classification_certainty(255u);
+    object.classification_age(_classification_age);
+    return object;
+  }
+
+  derived_object_msgs::msg::ObjectWithCovariance object_with_covariance() const {
+    derived_object_msgs::msg::ObjectWithCovariance object;
+    object.header().stamp(_accelerated_movement.Timestamp().time());
+    object.header().frame_id("map");
+    object.id(_actor_name_definition->id);
+    object.detection_level(derived_object_msgs::msg::Object_Constants::OBJECT_TRACKED);
+    object.object_classified(true);
+    object.pose(_transform.pose_with_covariance());
+    object.twist(_accelerated_movement.twist_with_covariance());
+    object.accel(_accelerated_movement.accel_with_covariance());
+
+    auto actor_definition = std::dynamic_pointer_cast<carla::ros2::types::ActorDefinition>(_actor_name_definition);
+    if (nullptr != actor_definition) {
+      object.shape().type(shape_msgs::msg::SolidPrimitive_Constants::BOX);
+      auto const ros_extent = _bounding_box.extent * 2.f;
+      object.shape().dimensions({ros_extent.x, ros_extent.y, ros_extent.z});
+      //object.shape().polygon().points(*Polygon(_bounding_box.GetLocalVertices()).polygon());
     } else {
       object.shape().type(shape_msgs::msg::SolidPrimitive_Constants::BOX_X);
     }

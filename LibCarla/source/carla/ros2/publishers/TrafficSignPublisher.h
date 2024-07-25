@@ -5,6 +5,7 @@
 #pragma once
 
 #include "carla/ros2/publishers/ObjectPublisher.h"
+#include "carla/ros2/publishers/ObjectWithCovariancePublisher.h"
 #include "carla/ros2/publishers/PublisherBaseSensor.h"
 #include "carla/ros2/types/Object.h"
 #include "carla/ros2/types/TrafficSignActorDefinition.h"
@@ -16,7 +17,8 @@ namespace ros2 {
 class TrafficSignPublisher : public PublisherBaseSensor {
 public:
   TrafficSignPublisher(std::shared_ptr<carla::ros2::types::TrafficSignActorDefinition> traffic_sign_actor_definition,
-                       std::shared_ptr<ObjectsPublisher> objects_publisher);
+                       std::shared_ptr<ObjectsPublisher> objects_publisher,
+                       std::shared_ptr<ObjectsWithCovariancePublisher> objects_with_covariance_publisher);
   virtual ~TrafficSignPublisher() = default;
 
   /**
@@ -38,6 +40,7 @@ public:
 
 private:
   std::shared_ptr<ObjectPublisher> _traffic_sign_object_publisher;
+  std::shared_ptr<ObjectWithCovariancePublisher> _traffic_sign_object_with_covariance_publisher;
 };
 }  // namespace ros2
 }  // namespace carla

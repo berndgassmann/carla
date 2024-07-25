@@ -36,9 +36,9 @@ using namespace eprosima::fastcdr::exception;
 
 geometry_msgs::msg::Twist::Twist()
 {
-    // m_linear com.eprosima.fastdds.idl.parser.typecode.StructTypeCode@4f0100a7
+    // m_linear com.eprosima.fastdds.idl.parser.typecode.StructTypeCode@2b48a640
 
-    // m_angular com.eprosima.fastdds.idl.parser.typecode.StructTypeCode@4f0100a7
+    // m_angular com.eprosima.fastdds.idl.parser.typecode.StructTypeCode@2b48a640
 
 
 }
