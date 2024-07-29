@@ -91,6 +91,7 @@ bool VehiclePublisher::SubscribersConnected() const {
 void VehiclePublisher::UpdateVehicle(std::shared_ptr<carla::ros2::types::Object> &object,
                                      carla::sensor::data::ActorDynamicState const &actor_dynamic_state) {
   _vehicle_status->SetMessageHeader(object->Timestamp().time(), "map");
+  _vehicle_status->Message().child_frame_id(frame_id());
   _vehicle_status->Message().pose(object->Transform().pose());
   _vehicle_status->Message().twist(object->AcceleratedMovement().twist());
   _vehicle_status->Message().velocity(object->Speed().speed().data());

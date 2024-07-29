@@ -39,23 +39,25 @@ using namespace eprosima::fastcdr::exception;
 
 carla_msgs::msg::CarlaVehicleStatus::CarlaVehicleStatus()
 {
-    // m_header com.eprosima.fastdds.idl.parser.typecode.StructTypeCode@4a83a74a
+    // m_header com.eprosima.fastdds.idl.parser.typecode.StructTypeCode@865dd6
 
-    // m_pose com.eprosima.fastdds.idl.parser.typecode.StructTypeCode@1349883
+    // m_child_frame_id com.eprosima.idl.parser.typecode.StringTypeCode@4da4253
+    m_child_frame_id ="";
+    // m_pose com.eprosima.fastdds.idl.parser.typecode.StructTypeCode@3972a855
 
-    // m_twist com.eprosima.fastdds.idl.parser.typecode.StructTypeCode@4b29d1d2
+    // m_twist com.eprosima.fastdds.idl.parser.typecode.StructTypeCode@62e7f11d
 
-    // m_velocity com.eprosima.idl.parser.typecode.PrimitiveTypeCode@7f485fda
+    // m_velocity com.eprosima.idl.parser.typecode.PrimitiveTypeCode@503d687a
     m_velocity = 0.0;
-    // m_acceleration com.eprosima.fastdds.idl.parser.typecode.StructTypeCode@28261e8e
+    // m_acceleration com.eprosima.fastdds.idl.parser.typecode.StructTypeCode@6a370f4
 
-    // m_orientation com.eprosima.fastdds.idl.parser.typecode.StructTypeCode@d737b89
+    // m_orientation com.eprosima.fastdds.idl.parser.typecode.StructTypeCode@4cc8eb05
 
-    // m_active_control_type com.eprosima.idl.parser.typecode.PrimitiveTypeCode@8519cb4
+    // m_active_control_type com.eprosima.idl.parser.typecode.PrimitiveTypeCode@51f116b8
     m_active_control_type = 0;
-    // m_last_applied_vehicle_control com.eprosima.fastdds.idl.parser.typecode.StructTypeCode@35dab4eb
+    // m_last_applied_vehicle_control com.eprosima.fastdds.idl.parser.typecode.StructTypeCode@19d481b
 
-    // m_last_applied_ackermann_control com.eprosima.fastdds.idl.parser.typecode.StructTypeCode@2d901eb0
+    // m_last_applied_ackermann_control com.eprosima.fastdds.idl.parser.typecode.StructTypeCode@1f97cf0d
 
 
 }
@@ -70,12 +72,14 @@ carla_msgs::msg::CarlaVehicleStatus::~CarlaVehicleStatus()
 
 
 
+
 }
 
 carla_msgs::msg::CarlaVehicleStatus::CarlaVehicleStatus(
         const CarlaVehicleStatus& x)
 {
     m_header = x.m_header;
+    m_child_frame_id = x.m_child_frame_id;
     m_pose = x.m_pose;
     m_twist = x.m_twist;
     m_velocity = x.m_velocity;
@@ -90,6 +94,7 @@ carla_msgs::msg::CarlaVehicleStatus::CarlaVehicleStatus(
         CarlaVehicleStatus&& x)
 {
     m_header = std::move(x.m_header);
+    m_child_frame_id = std::move(x.m_child_frame_id);
     m_pose = std::move(x.m_pose);
     m_twist = std::move(x.m_twist);
     m_velocity = x.m_velocity;
@@ -105,6 +110,7 @@ carla_msgs::msg::CarlaVehicleStatus& carla_msgs::msg::CarlaVehicleStatus::operat
 {
 
     m_header = x.m_header;
+    m_child_frame_id = x.m_child_frame_id;
     m_pose = x.m_pose;
     m_twist = x.m_twist;
     m_velocity = x.m_velocity;
@@ -122,6 +128,7 @@ carla_msgs::msg::CarlaVehicleStatus& carla_msgs::msg::CarlaVehicleStatus::operat
 {
 
     m_header = std::move(x.m_header);
+    m_child_frame_id = std::move(x.m_child_frame_id);
     m_pose = std::move(x.m_pose);
     m_twist = std::move(x.m_twist);
     m_velocity = x.m_velocity;
@@ -138,7 +145,7 @@ bool carla_msgs::msg::CarlaVehicleStatus::operator ==(
         const CarlaVehicleStatus& x) const
 {
 
-    return (m_header == x.m_header && m_pose == x.m_pose && m_twist == x.m_twist && m_velocity == x.m_velocity && m_acceleration == x.m_acceleration && m_orientation == x.m_orientation && m_active_control_type == x.m_active_control_type && m_last_applied_vehicle_control == x.m_last_applied_vehicle_control && m_last_applied_ackermann_control == x.m_last_applied_ackermann_control);
+    return (m_header == x.m_header && m_child_frame_id == x.m_child_frame_id && m_pose == x.m_pose && m_twist == x.m_twist && m_velocity == x.m_velocity && m_acceleration == x.m_acceleration && m_orientation == x.m_orientation && m_active_control_type == x.m_active_control_type && m_last_applied_vehicle_control == x.m_last_applied_vehicle_control && m_last_applied_ackermann_control == x.m_last_applied_ackermann_control);
 }
 
 bool carla_msgs::msg::CarlaVehicleStatus::operator !=(
@@ -154,6 +161,8 @@ size_t carla_msgs::msg::CarlaVehicleStatus::getMaxCdrSerializedSize(
 
 
     current_alignment += std_msgs::msg::Header::getMaxCdrSerializedSize(current_alignment);
+    current_alignment += 4 + eprosima::fastcdr::Cdr::alignment(current_alignment, 4) + 255 + 1;
+
     current_alignment += geometry_msgs::msg::Pose::getMaxCdrSerializedSize(current_alignment);
     current_alignment += geometry_msgs::msg::Twist::getMaxCdrSerializedSize(current_alignment);
     current_alignment += 4 + eprosima::fastcdr::Cdr::alignment(current_alignment, 4);
@@ -179,6 +188,8 @@ size_t carla_msgs::msg::CarlaVehicleStatus::getCdrSerializedSize(
 
 
     current_alignment += std_msgs::msg::Header::getCdrSerializedSize(data.header(), current_alignment);
+    current_alignment += 4 + eprosima::fastcdr::Cdr::alignment(current_alignment, 4) + data.child_frame_id().size() + 1;
+
     current_alignment += geometry_msgs::msg::Pose::getCdrSerializedSize(data.pose(), current_alignment);
     current_alignment += geometry_msgs::msg::Twist::getCdrSerializedSize(data.twist(), current_alignment);
     current_alignment += 4 + eprosima::fastcdr::Cdr::alignment(current_alignment, 4);
@@ -200,6 +211,7 @@ void carla_msgs::msg::CarlaVehicleStatus::serialize(
 {
 
     scdr << m_header;
+    scdr << m_child_frame_id;
     scdr << m_pose;
     scdr << m_twist;
     scdr << m_velocity;
@@ -216,6 +228,7 @@ void carla_msgs::msg::CarlaVehicleStatus::deserialize(
 {
 
     dcdr >> m_header;
+    dcdr >> m_child_frame_id;
     dcdr >> m_pose;
     dcdr >> m_twist;
     dcdr >> m_velocity;
@@ -262,6 +275,43 @@ const std_msgs::msg::Header& carla_msgs::msg::CarlaVehicleStatus::header() const
 std_msgs::msg::Header& carla_msgs::msg::CarlaVehicleStatus::header()
 {
     return m_header;
+}
+/*!
+ * @brief This function copies the value in member child_frame_id
+ * @param _child_frame_id New value to be copied in member child_frame_id
+ */
+void carla_msgs::msg::CarlaVehicleStatus::child_frame_id(
+        const std::string& _child_frame_id)
+{
+    m_child_frame_id = _child_frame_id;
+}
+
+/*!
+ * @brief This function moves the value in member child_frame_id
+ * @param _child_frame_id New value to be moved in member child_frame_id
+ */
+void carla_msgs::msg::CarlaVehicleStatus::child_frame_id(
+        std::string&& _child_frame_id)
+{
+    m_child_frame_id = std::move(_child_frame_id);
+}
+
+/*!
+ * @brief This function returns a constant reference to member child_frame_id
+ * @return Constant reference to member child_frame_id
+ */
+const std::string& carla_msgs::msg::CarlaVehicleStatus::child_frame_id() const
+{
+    return m_child_frame_id;
+}
+
+/*!
+ * @brief This function returns a reference to member child_frame_id
+ * @return Reference to member child_frame_id
+ */
+std::string& carla_msgs::msg::CarlaVehicleStatus::child_frame_id()
+{
+    return m_child_frame_id;
 }
 /*!
  * @brief This function copies the value in member pose
@@ -561,7 +611,7 @@ void carla_msgs::msg::CarlaVehicleStatus::serializeKey(
         eprosima::fastcdr::Cdr& scdr) const
 {
     (void) scdr;
-             
+              
 }
 
 
