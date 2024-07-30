@@ -36,23 +36,23 @@ using namespace eprosima::fastcdr::exception;
 
 carla_msgs::msg::CarlaVehicleControl::CarlaVehicleControl()
 {
-    // m_header com.eprosima.fastdds.idl.parser.typecode.StructTypeCode@2d710f1a
+    // m_header com.eprosima.fastdds.idl.parser.typecode.StructTypeCode@1eb5174b
 
-    // m_throttle com.eprosima.idl.parser.typecode.PrimitiveTypeCode@29215f06
+    // m_throttle com.eprosima.idl.parser.typecode.PrimitiveTypeCode@67080771
     m_throttle = 0.0;
-    // m_steer com.eprosima.idl.parser.typecode.PrimitiveTypeCode@59505b48
+    // m_steer com.eprosima.idl.parser.typecode.PrimitiveTypeCode@72cde7cc
     m_steer = 0.0;
-    // m_brake com.eprosima.idl.parser.typecode.PrimitiveTypeCode@4efac082
+    // m_brake com.eprosima.idl.parser.typecode.PrimitiveTypeCode@5fd4f8f5
     m_brake = 0.0;
-    // m_hand_brake com.eprosima.idl.parser.typecode.PrimitiveTypeCode@13fd2ccd
+    // m_hand_brake com.eprosima.idl.parser.typecode.PrimitiveTypeCode@53976f5c
     m_hand_brake = false;
-    // m_reverse com.eprosima.idl.parser.typecode.PrimitiveTypeCode@b9b00e0
+    // m_reverse com.eprosima.idl.parser.typecode.PrimitiveTypeCode@2bfc268b
     m_reverse = false;
-    // m_gear com.eprosima.idl.parser.typecode.PrimitiveTypeCode@506ae4d4
+    // m_gear com.eprosima.idl.parser.typecode.PrimitiveTypeCode@2f8dad04
     m_gear = 0;
-    // m_manual_gear_shift com.eprosima.idl.parser.typecode.PrimitiveTypeCode@7d4f9aae
+    // m_manual_gear_shift com.eprosima.idl.parser.typecode.PrimitiveTypeCode@29e495ff
     m_manual_gear_shift = false;
-    // m_control_priority com.eprosima.idl.parser.typecode.PrimitiveTypeCode@72e5a8e
+    // m_control_priority com.eprosima.idl.parser.typecode.PrimitiveTypeCode@41e1e210
     m_control_priority = 4;
 
 }

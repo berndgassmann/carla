@@ -11,7 +11,7 @@
 #include "carla/ros2/types/VehicleControl.h"
 #include "carla/rpc/VehiclePhysicsControl.h"
 #include "carla/sensor/data/ActorDynamicState.h"
-#include "carla_msgs/msg/CarlaVehicleStatus.h"
+#include "carla_msgs/msg/CarlaVehicleControlStatus.h"
 
 namespace carla {
 namespace ros2 {
@@ -24,10 +24,10 @@ using VehicleAckermannControlCallback = std::function<void(VehicleAckermannContr
 inline uint8_t GetVehicleControlType(carla::sensor::data::ActorDynamicState const &actor_dynamic_state) {
   switch (actor_dynamic_state.state.vehicle_data.control_type) {
     case carla::rpc::VehicleControlType::AckermannControl:
-      return carla_msgs::msg::CarlaVehicleStatus_Constants::ACKERMANN_CONTROL;
+      return carla_msgs::msg::CarlaVehicleControlStatus_Constants::ACKERMANN_CONTROL;
     case carla::rpc::VehicleControlType::VehicleControl:
     default:
-      return carla_msgs::msg::CarlaVehicleStatus_Constants::VEHICLE_CONTROL;
+      return carla_msgs::msg::CarlaVehicleControlStatus_Constants::VEHICLE_CONTROL;
   }
 }
 

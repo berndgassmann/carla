@@ -12,16 +12,22 @@
 #include "carla/ros2/types/VehicleActorDefinition.h"
 #include "carla/rpc/VehiclePhysicsControl.h"
 #include "carla/sensor/data/ActorDynamicState.h"
+#include "carla_msgs/msg/CarlaVehicleControlStatusPubSubTypes.h"
 #include "carla_msgs/msg/CarlaVehicleInfoPubSubTypes.h"
-#include "carla_msgs/msg/CarlaVehicleStatusPubSubTypes.h"
+#include "nav_msgs/msg/OdometryPubSubTypes.h"
+#include "std_msgs/msg/Float32PubSubTypes.h"
 
 namespace carla {
 namespace ros2 {
 
 using VehicleInfoPublisherImpl =
     DdsPublisherImpl<carla_msgs::msg::CarlaVehicleInfo, carla_msgs::msg::CarlaVehicleInfoPubSubType>;
-using VehicleStatusPublisherImpl =
-    DdsPublisherImpl<carla_msgs::msg::CarlaVehicleStatus, carla_msgs::msg::CarlaVehicleStatusPubSubType>;
+using VehicleControlStatusPublisherImpl =
+    DdsPublisherImpl<carla_msgs::msg::CarlaVehicleControlStatus, carla_msgs::msg::CarlaVehicleControlStatusPubSubType>;
+using VehicleSpeedPublisherImpl =
+    DdsPublisherImpl<std_msgs::msg::Float32, std_msgs::msg::Float32PubSubType>;
+using VehicleOdometryPublisherImpl = 
+    DdsPublisherImpl<nav_msgs::msg::Odometry, nav_msgs::msg::OdometryPubSubType>;
 
 class VehiclePublisher : public PublisherBaseTransform {
 public:
@@ -49,9 +55,11 @@ public:
                      carla::sensor::data::ActorDynamicState const &actor_dynamic_state);
 
 private:
-  std::shared_ptr<VehicleInfoPublisherImpl> _vehicle_info;
+  std::shared_ptr<VehicleInfoPublisherImpl> _vehicle_info_publisher;
   bool _vehicle_info_published{false};
-  std::shared_ptr<VehicleStatusPublisherImpl> _vehicle_status;
+  std::shared_ptr<VehicleControlStatusPublisherImpl> _vehicle_control_status_publisher;
+  std::shared_ptr<VehicleOdometryPublisherImpl> _vehicle_odometry_publisher;
+  std::shared_ptr<VehicleSpeedPublisherImpl> _vehicle_speed_publisher;
   std::shared_ptr<ObjectPublisher> _vehicle_object_publisher;
   std::shared_ptr<ObjectWithCovariancePublisher> _vehicle_object_with_covariance_publisher;
 };
