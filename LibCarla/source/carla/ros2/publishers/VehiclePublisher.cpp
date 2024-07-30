@@ -22,6 +22,7 @@ VehiclePublisher::VehiclePublisher(std::shared_ptr<carla::ros2::types::VehicleAc
     _vehicle_control_status_publisher(std::make_shared<VehicleControlStatusPublisherImpl>()),
     _vehicle_odometry_publisher(std::make_shared<VehicleOdometryPublisherImpl>()),
     _vehicle_speed_publisher(std::make_shared<VehicleSpeedPublisherImpl>()),
+    _vehicle_steering_angle_publisher(std::make_shared<VehicleSteeringAnglePublisherImpl>()),
     _vehicle_object_publisher(std::make_shared<ObjectPublisher>(*this, objects_publisher)),
     _vehicle_object_with_covariance_publisher(std::make_shared<ObjectWithCovariancePublisher>(*this, objects_with_covariance_publisher)) {
   // prefill some vehicle info data
@@ -71,6 +72,7 @@ bool VehiclePublisher::Init(std::shared_ptr<DdsDomainParticipantImpl> domain_par
          _vehicle_control_status_publisher->Init(domain_participant, get_topic_name("vehicle_control_status"), get_topic_qos()) &&
          _vehicle_odometry_publisher->Init(domain_participant, get_topic_name("odometry"), get_topic_qos()) &&
          _vehicle_speed_publisher->Init(domain_participant, get_topic_name("speed"), get_topic_qos()) &&
+         _vehicle_steering_angle_publisher->Init(domain_participant, get_topic_name("steering_angle"), get_topic_qos()) &&
          _vehicle_object_publisher->Init(domain_participant) &&
          _vehicle_object_with_covariance_publisher->Init(domain_participant);
 }
@@ -83,6 +85,7 @@ bool VehiclePublisher::Publish() {
   success &= _vehicle_control_status_publisher->Publish();
   success &= _vehicle_odometry_publisher->Publish();
   success &= _vehicle_speed_publisher->Publish();
+  success &= _vehicle_steering_angle_publisher->Publish();
   success &= _vehicle_object_publisher->Publish();
   success &= _vehicle_object_with_covariance_publisher->Publish();
   return success;
@@ -90,8 +93,8 @@ bool VehiclePublisher::Publish() {
 
 bool VehiclePublisher::SubscribersConnected() const {
   return _vehicle_info_publisher->SubscribersConnected() || _vehicle_control_status_publisher->SubscribersConnected() ||
-        _vehicle_odometry_publisher->SubscribersConnected() || _vehicle_speed_publisher->SubscribersConnected() ||
-         _vehicle_object_publisher->SubscribersConnected() || 
+         _vehicle_odometry_publisher->SubscribersConnected() || _vehicle_speed_publisher->SubscribersConnected() ||
+         _vehicle_steering_angle_publisher->SubscribersConnected() || _vehicle_object_publisher->SubscribersConnected() || 
          _vehicle_object_with_covariance_publisher->SubscribersConnected();
 }
 
@@ -103,7 +106,13 @@ void VehiclePublisher::UpdateVehicle(std::shared_ptr<carla::ros2::types::Object>
   _vehicle_odometry_publisher->Message().twist(object->AcceleratedMovement().twist_with_covariance());
   
   _vehicle_speed_publisher->Message().data(object->Speed().speed().data());
+  _vehicle_speed_publisher->SetMessageUpdated();
+
   
+  _vehicle_steering_angle_publisher->Message().data(
+    carla::geom::Math::ToRadians(actor_dynamic_state.state.vehicle_data.steering_angle_degree));
+  _vehicle_steering_angle_publisher->SetMessageUpdated();
+
   _vehicle_control_status_publisher->Message().active_control_type(carla::ros2::types::GetVehicleControlType(actor_dynamic_state));
   _vehicle_control_status_publisher->Message().last_applied_vehicle_control(
       carla::ros2::types::VehicleControl(actor_dynamic_state.state.vehicle_data.GetVehicleControl())
@@ -111,6 +120,7 @@ void VehiclePublisher::UpdateVehicle(std::shared_ptr<carla::ros2::types::Object>
   _vehicle_control_status_publisher->Message().last_applied_ackermann_control(
       carla::ros2::types::VehicleAckermannControl(actor_dynamic_state.state.vehicle_data.GetAckermannControl())
           .carla_vehicle_ackermann_control());
+  _vehicle_control_status_publisher->SetMessageUpdated();
 
   _vehicle_object_publisher->UpdateObject(object);
   _vehicle_object_with_covariance_publisher->UpdateObject(object);

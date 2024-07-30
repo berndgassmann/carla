@@ -26,6 +26,8 @@ using VehicleControlStatusPublisherImpl =
     DdsPublisherImpl<carla_msgs::msg::CarlaVehicleControlStatus, carla_msgs::msg::CarlaVehicleControlStatusPubSubType>;
 using VehicleSpeedPublisherImpl =
     DdsPublisherImpl<std_msgs::msg::Float32, std_msgs::msg::Float32PubSubType>;
+using VehicleSteeringAnglePublisherImpl =
+    DdsPublisherImpl<std_msgs::msg::Float32, std_msgs::msg::Float32PubSubType>;
 using VehicleOdometryPublisherImpl = 
     DdsPublisherImpl<nav_msgs::msg::Odometry, nav_msgs::msg::OdometryPubSubType>;
 
@@ -60,6 +62,7 @@ private:
   std::shared_ptr<VehicleControlStatusPublisherImpl> _vehicle_control_status_publisher;
   std::shared_ptr<VehicleOdometryPublisherImpl> _vehicle_odometry_publisher;
   std::shared_ptr<VehicleSpeedPublisherImpl> _vehicle_speed_publisher;
+  std::shared_ptr<VehicleSteeringAnglePublisherImpl> _vehicle_steering_angle_publisher;
   std::shared_ptr<ObjectPublisher> _vehicle_object_publisher;
   std::shared_ptr<ObjectWithCovariancePublisher> _vehicle_object_with_covariance_publisher;
 };
