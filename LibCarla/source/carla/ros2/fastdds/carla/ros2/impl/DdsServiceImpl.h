@@ -81,21 +81,28 @@ public:
       return false;
     }
     _request_type.register_type(_participant);
+    auto topic_qos = eprosima::fastdds::dds::TOPIC_QOS_DEFAULT;
+    topic_qos.history().kind = eprosima::fastdds::dds::KEEP_ALL_HISTORY_QOS;
+    topic_qos.reliability().kind = eprosima::fastdds::dds::RELIABLE_RELIABILITY_QOS;
     _request_topic =
-        _participant->create_topic(request_name, _request_type->getName(), eprosima::fastdds::dds::TOPIC_QOS_DEFAULT);
+        _participant->create_topic(request_name, _request_type->getName(), topic_qos);
     if (_request_topic == nullptr) {
       carla::log_error("DdsServiceImpl[", topic_name, "]::Init(): Failed to create Request Topic");
       return false;
     }
-    _subscriber = _participant->create_subscriber(eprosima::fastdds::dds::SUBSCRIBER_QOS_DEFAULT);
+    auto subscriber_qos= eprosima::fastdds::dds::SUBSCRIBER_QOS_DEFAULT;
+    _subscriber = _participant->create_subscriber(subscriber_qos);
     if (_subscriber == nullptr) {
       carla::log_error("DdsServiceImpl[", topic_name, "]::Init(): Failed to create Subscriber");
       return false;
     }
     eprosima::fastdds::dds::DataReaderListener* reader_listener =
         static_cast<eprosima::fastdds::dds::DataReaderListener*>(this);
+    auto datareader_qos = eprosima::fastdds::dds::DATAREADER_QOS_DEFAULT;
+    datareader_qos.history().kind = eprosima::fastdds::dds::KEEP_ALL_HISTORY_QOS;
+    datareader_qos.reliability().kind = eprosima::fastdds::dds::RELIABLE_RELIABILITY_QOS;
     _datareader =
-        _subscriber->create_datareader(_request_topic, eprosima::fastdds::dds::DATAREADER_QOS_DEFAULT, reader_listener);
+        _subscriber->create_datareader(_request_topic, datareader_qos, reader_listener);
     if (_datareader == nullptr) {
       carla::log_error("DdsServiceImpl[", topic_name, "]::Init(): Failed to create DataReader");
       return false;
@@ -109,20 +116,24 @@ public:
     }
     _resonse_type.register_type(_participant);
     _response_topic =
-        _participant->create_topic(response_name, _resonse_type->getName(), eprosima::fastdds::dds::TOPIC_QOS_DEFAULT);
+        _participant->create_topic(response_name, _resonse_type->getName(), topic_qos);
     if (_response_topic == nullptr) {
       carla::log_error("DdsServiceImpl[", topic_name, "]::Init(): Failed to create Response Topic");
       return false;
     }
-    _publisher = _participant->create_publisher(eprosima::fastdds::dds::PUBLISHER_QOS_DEFAULT);
+    auto publisher_qos = eprosima::fastdds::dds::PUBLISHER_QOS_DEFAULT;
+    _publisher = _participant->create_publisher(publisher_qos);
     if (_publisher == nullptr) {
       carla::log_error("DdsServiceImpl[", _response_topic->get_name(), "]::Init() Failed to create Publisher");
       return false;
     }
 
-    auto wqos = eprosima::fastdds::dds::DATAWRITER_QOS_DEFAULT;
-    wqos.endpoint().history_memory_policy = eprosima::fastrtps::rtps::PREALLOCATED_WITH_REALLOC_MEMORY_MODE;
-    _datawriter = _publisher->create_datawriter(_response_topic, wqos);
+    auto writer_qos = eprosima::fastdds::dds::DATAWRITER_QOS_DEFAULT;
+    writer_qos.endpoint().history_memory_policy = eprosima::fastrtps::rtps::PREALLOCATED_WITH_REALLOC_MEMORY_MODE;
+    writer_qos.history().kind = eprosima::fastdds::dds::KEEP_ALL_HISTORY_QOS;
+    writer_qos.durability().kind = eprosima::fastdds::dds::TRANSIENT_LOCAL_DURABILITY_QOS;
+    writer_qos.reliability().kind = eprosima::fastdds::dds::RELIABLE_RELIABILITY_QOS;
+    _datawriter = _publisher->create_datawriter(_response_topic, writer_qos);
     if (_datawriter == nullptr) {
       carla::log_error("DdsServiceImpl[", _response_topic->get_name(), "]::Init() Failed to create DataWriter");
       return false;
