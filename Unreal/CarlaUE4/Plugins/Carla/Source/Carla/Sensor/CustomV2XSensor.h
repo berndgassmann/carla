@@ -24,7 +24,7 @@ class CARLA_API ACustomV2XSensor : public ASensor
     using FV2XData = carla::sensor::data::CustomV2XDataS;
     using V2XDataList = std::vector<carla::sensor::data::CustomV2XData>;
     struct DataToSend {
-        std::string RoleName;
+        std::string ChannelId;
         carla::sensor::data::CustomV2XData Message;
     };
     using ActorV2XDataMap = std::map<AActor *, DataToSend>;
@@ -69,7 +69,7 @@ private:
     const long mProtocolVersion = 2;
     const long mMessageId = ITSContainer::messageID_custom;
     long mStationId;
-    std::string mRoleName;
+    std::string mChannelId;
     std::string mMessageData;
     bool mMessageDataChanged = false;
     constexpr static uint16_t data_size = sizeof(CustomV2XM_t::message);

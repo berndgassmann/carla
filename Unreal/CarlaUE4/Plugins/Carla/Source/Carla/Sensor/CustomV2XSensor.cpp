@@ -58,10 +58,10 @@ void ACustomV2XSensor::Set(const FActorDescription &ActorDescription)
     Super::Set(ActorDescription);
     UActorBlueprintFunctionLibrary::SetCustomV2X(ActorDescription, this);
 
-    auto Role = ActorDescription.Variations.Find("role_name");
-    if (Role != nullptr) 
+    auto Channel = ActorDescription.Variations.Find("channel_id");
+    if (Channel != nullptr) 
     {
-        mRoleName = TCHAR_TO_UTF8(*Role->Value);
+        mChannelId = TCHAR_TO_UTF8(*Channel->Value);
     }
 }
 
@@ -113,7 +113,7 @@ void ACustomV2XSensor::PrePhysTick(float DeltaSeconds)
             message_pw.Message = CreateCustomV2XMessage();
             
             message_pw.Power = PathLossModelObj->GetTransmitPower();
-            gActorV2XDataMap.insert({GetOwner(), {.RoleName = mRoleName, .Message = message_pw}});
+            gActorV2XDataMap.insert({GetOwner(), {.ChannelId = mChannelId, .Message = message_pw}});
         }
     }
 }
@@ -153,8 +153,8 @@ void ACustomV2XSensor::PostPhysTick(UWorld *World, ELevelTick TickType, float De
     {
         if (pair.first != GetOwner())
         {
-            // only sensors with the same role_name talk to each other
-            if ( mRoleName == pair.second.RoleName ) 
+            // only sensors with the same ChannelId talk to each other
+            if ( mChannelId == pair.second.ChannelId ) 
             { 
                 ActorPowerPair actor_power_pair;
                 actor_power_pair.first = pair.first;
