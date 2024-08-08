@@ -75,7 +75,7 @@ namespace carla_msgs
         #ifdef TOPIC_DATA_TYPE_API_HAS_IS_BOUNDED
             eProsima_user_DllExport inline bool is_bounded() const override
             {
-                return false;
+                return true;
             }
 
         #endif  // TOPIC_DATA_TYPE_API_HAS_IS_BOUNDED
@@ -83,7 +83,7 @@ namespace carla_msgs
         #ifdef TOPIC_DATA_TYPE_API_HAS_IS_PLAIN
             eProsima_user_DllExport inline bool is_plain() const override
             {
-                return false;
+                return true;
             }
 
         #endif  // TOPIC_DATA_TYPE_API_HAS_IS_PLAIN
@@ -92,8 +92,8 @@ namespace carla_msgs
             eProsima_user_DllExport inline bool construct_sample(
                     void* memory) const override
             {
-                (void)memory;
-                return false;
+                new (memory) CarlaV2XCustomData();
+                return true;
             }
 
         #endif  // TOPIC_DATA_TYPE_API_HAS_CONSTRUCT_SAMPLE

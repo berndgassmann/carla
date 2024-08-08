@@ -52,7 +52,8 @@ void UeV2XCustomPublisher::UpdateSensorData(
     carla_v2x_custom_message.header().protocol_version() = custom_v2x_data.Message.header.protocolVersion;
     carla_v2x_custom_message.header().message_id() = custom_v2x_data.Message.header.messageID;
     carla_v2x_custom_message.header().station_id().value() = custom_v2x_data.Message.header.stationID;
-    carla_v2x_custom_message.data() = custom_v2x_data.Message.message;
+    carla_v2x_custom_message.data().data_size() = custom_v2x_data.Message.data.data_size;
+    carla_v2x_custom_message.data().bytes() = custom_v2x_data.Message.data.bytes;
     carla_v2x_custom_data.message() = carla_v2x_custom_message;
     _impl->Message().data().push_back(carla_v2x_custom_data);
   }

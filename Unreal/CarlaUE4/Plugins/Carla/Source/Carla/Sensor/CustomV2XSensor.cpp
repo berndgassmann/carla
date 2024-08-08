@@ -106,37 +106,22 @@ void ACustomV2XSensor::PrePhysTick(float DeltaSeconds)
         // Check whether the message is generated
         if (mMessageDataChanged)
         {
+            mMessageDataChanged = false;
+
             // If message is generated store it
             // make a pair of message and sending power
             // if different v2x sensors send with different power, we need to store that
             carla::sensor::data::CustomV2XData message_pw;
-            message_pw.Message = CreateCustomV2XMessage();
-            
+            message_pw.Message.header.protocolVersion = mProtocolVersion;
+            message_pw.Message.header.messageID = mMessageId;
+            message_pw.Message.header.stationID = mStationId;
+            message_pw.Message.data = mMessageData;
             message_pw.Power = PathLossModelObj->GetTransmitPower();
             gActorV2XDataMap.insert({GetOwner(), {.ChannelId = mChannelId, .Message = message_pw}});
         }
     }
 }
 
-CustomV2XM_t ACustomV2XSensor::CreateCustomV2XMessage()
-{
-    CustomV2XM_t message = CustomV2XM_t();
-
-    CreateITSPduHeader(message);
-    // safe strncpy: ensure null terminated target string, other payload is dropped
-    std::strncpy(message.message, mMessageData.c_str(), sizeof(message.message));
-    message.message[sizeof(message.message)-1] = 0;
-    mMessageDataChanged = false;
-    return message;
-}
-
-void ACustomV2XSensor::CreateITSPduHeader(CustomV2XM_t &message)
-{
-    ITSContainer::ItsPduHeader_t& header = message.header;
-    header.protocolVersion = mProtocolVersion;
-    header.messageID = mMessageId;
-    header.stationID = mStationId;
-}
 
 /*
  * Function takes care of sending messages to the current actor.
@@ -214,9 +199,9 @@ void ACustomV2XSensor::WriteMessageToV2XData(const ACustomV2XSensor::V2XDataList
 }
 
 
-void ACustomV2XSensor::Send(const FString message)
+void ACustomV2XSensor::Send(const carla::rpc::CustomV2XBytes &data)
 {
-    mMessageData = TCHAR_TO_UTF8(*message);
+    mMessageData = data;
     mMessageDataChanged = true;
 }
 

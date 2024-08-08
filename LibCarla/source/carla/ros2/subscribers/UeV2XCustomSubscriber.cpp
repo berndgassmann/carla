@@ -21,8 +21,11 @@ bool UeV2XCustomSubscriber::Init(std::shared_ptr<DdsDomainParticipantImpl> domai
 
 void UeV2XCustomSubscriber::ProcessMessages() {
   while (_impl->HasPublishersConnected() && _impl->HasNewMessage()) {
-    std::string const message = _impl->GetMessage().data();
-    _v2x_custom_send_callback(message);
+    carla::rpc::CustomV2XBytes data;
+    data.bytes = _impl->GetMessage().bytes();
+    data.data_size = _impl->GetMessage().data_size();
+
+    _v2x_custom_send_callback(data);
   }
 }
 

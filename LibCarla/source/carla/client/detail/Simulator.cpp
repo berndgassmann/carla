@@ -442,8 +442,8 @@ EpisodeProxy Simulator::GetCurrentEpisode() {
     _client.FreezeAllTrafficLights(frozen);
   }
 
-  void Simulator::Send(const Sensor &sensor, std::string message) {
-    _client.Send(sensor.GetId(), message);
+  void Simulator::Send(const Sensor &sensor, const carla::rpc::CustomV2XBytes &data) {
+    _client.Send(sensor.GetId(), data);
   }
 
   // =========================================================================

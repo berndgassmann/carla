@@ -250,8 +250,8 @@ void RegisterActorROS2(std::shared_ptr<carla::ros2::ROS2> ROS2, FCarlaActor* Car
       carla::streaming::detail::token_type(Sensor->GetToken()).get_stream_id());
     auto *V2XCustomSensor = Cast<ACustomV2XSensor>(CarlaActor->GetActor());
     if (V2XCustomSensor != nullptr) {
-      carla::ros2::types::V2XCustomSendCallback V2XCustomSendCallback = [V2XCustomSensor](std::string const &Message) -> void {
-        V2XCustomSensor->Send(FString(Message.c_str()));
+      carla::ros2::types::V2XCustomSendCallback V2XCustomSendCallback = [V2XCustomSensor](carla::rpc::CustomV2XBytes const &Data) -> void {
+        V2XCustomSensor->Send(Data);
       };
       ROS2->AddSensorUe(SensorActorDefinition, V2XCustomSendCallback);
     }

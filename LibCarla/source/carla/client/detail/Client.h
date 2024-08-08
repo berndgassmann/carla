@@ -16,6 +16,7 @@
 #include "carla/rpc/AttachmentType.h"
 #include "carla/rpc/Command.h"
 #include "carla/rpc/CommandResponse.h"
+#include "carla/rpc/CustomV2XBytes.h"
 #include "carla/rpc/EnvironmentObject.h"
 #include "carla/rpc/EpisodeInfo.h"
 #include "carla/rpc/EpisodeSettings.h"
@@ -433,7 +434,7 @@ namespace detail {
         rpc::ActorId ActorId,
         uint32_t GBufferId);
 
-    void Send(rpc::ActorId ActorId, std::string message);
+    void Send(rpc::ActorId ActorId, const rpc::CustomV2XBytes &data);
 
     void DrawDebugShape(const rpc::DebugShape &shape);
 

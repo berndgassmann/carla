@@ -3,6 +3,9 @@
 #include <vector>
 #include <cstring>
 
+#include "carla/rpc/CustomV2XBytes.h"
+
+
 class ITSContainer
 {
     
@@ -752,8 +755,6 @@ public:
         GenerationDeltaTime_t generationDeltaTime;
         CamParameters_t camParameters;
     } CoopAwareness_t;
-
-
 };
 
     /* CoopAwareness */
@@ -763,9 +764,8 @@ public:
         CAMContainer::CoopAwareness_t cam;
     } CAM_t;
 
-
     typedef struct CustomV2XM
     {
         ITSContainer::ItsPduHeader_t header;
-        char message[100];
+        carla::rpc::CustomV2XBytes data;
     } CustomV2XM_t;

@@ -36,7 +36,7 @@ using namespace eprosima::fastcdr::exception;
 
 carla_msgs::msg::CarlaV2XCustomDataList::CarlaV2XCustomDataList()
 {
-    // m_data com.eprosima.idl.parser.typecode.SequenceTypeCode@50eac852
+    // m_data com.eprosima.idl.parser.typecode.SequenceTypeCode@47af7f3d
 
 
 }

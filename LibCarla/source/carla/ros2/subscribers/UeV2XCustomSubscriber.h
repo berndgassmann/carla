@@ -9,15 +9,15 @@
 
 #include "carla/ros2/subscribers/SubscriberBase.h"
 #include "carla/ros2/types/SensorActorDefinition.h"
-#include "std_msgs/msg/StringPubSubTypes.h"
+#include "carla_msgs/msg/CarlaV2XByteArrayPubSubTypes.h"
 
 namespace carla {
 namespace ros2 {
 
 using UeV2XCustomSubscriberImpl =
-    DdsSubscriberImpl<std_msgs::msg::String, std_msgs::msg::StringPubSubType>;
+    DdsSubscriberImpl<carla_msgs::msg::CarlaV2XByteArray, carla_msgs::msg::CarlaV2XByteArrayPubSubType>;
 
-class UeV2XCustomSubscriber : public SubscriberBase<std_msgs::msg::String> {
+class UeV2XCustomSubscriber : public SubscriberBase<carla_msgs::msg::CarlaV2XByteArray> {
 public:
   explicit UeV2XCustomSubscriber(ROS2NameRecord& parent,
                                  carla::ros2::types::V2XCustomSendCallback v2x_custom_send_callback);

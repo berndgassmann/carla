@@ -7,6 +7,7 @@
 #include "carla/ros2/types/ActorNameDefinition.h"
 #include "carla/ros2/types/PublisherSensorType.h"
 #include "carla/streaming/detail/Types.h"
+#include "carla/rpc/CustomV2XBytes.h"
 
 #include <functional>
 
@@ -14,7 +15,7 @@ namespace carla {
 namespace ros2 {
 namespace types {
 
-using V2XCustomSendCallback = std::function<void(std::string const &)>;
+using V2XCustomSendCallback = std::function<void(rpc::CustomV2XBytes const &)>;
 
 struct SensorActorDefinition : public ActorNameDefinition {
   SensorActorDefinition(ActorNameDefinition const &actor_name_definition,

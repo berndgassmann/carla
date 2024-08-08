@@ -51,7 +51,7 @@ public:
     virtual void PostPhysTick(UWorld *World, ELevelTick TickType, float DeltaTime) override;
     void SetOwner(AActor *Owner) override;
 
-    void Send(const FString message);
+    void Send(const carla::rpc::CustomV2XBytes &data);
 
 private:
     // global data
@@ -63,15 +63,10 @@ private:
     //write
     void WriteMessageToV2XData(const V2XDataList &msg_received_power_list);
 
-    //msg gen
-    void CreateITSPduHeader(CustomV2XM_t &message);
-    CustomV2XM_t CreateCustomV2XMessage();
     const long mProtocolVersion = 2;
     const long mMessageId = ITSContainer::messageID_custom;
     long mStationId;
     std::string mChannelId;
-    std::string mMessageData;
+    carla::rpc::CustomV2XBytes mMessageData;
     bool mMessageDataChanged = false;
-    constexpr static uint16_t data_size = sizeof(CustomV2XM_t::message);
-
 };

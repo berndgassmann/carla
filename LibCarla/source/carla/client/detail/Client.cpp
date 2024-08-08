@@ -672,8 +672,8 @@ namespace detail {
     return _pimpl->CallAndWait<bool>("is_actor_enabled_for_ros", actor);
   }
 
-  void Client::Send(rpc::ActorId ActorId, std::string message) {
-    _pimpl->AsyncCall("send", ActorId, message);
+  void Client::Send(rpc::ActorId ActorId, const rpc::CustomV2XBytes &data) {
+    _pimpl->AsyncCall("send", ActorId, data);
   }
 
   void Client::SubscribeToGBuffer(

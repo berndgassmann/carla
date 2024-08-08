@@ -36,10 +36,10 @@ using namespace eprosima::fastcdr::exception;
 
 carla_msgs::msg::CarlaV2XCustomMessage::CarlaV2XCustomMessage()
 {
-    // m_header com.eprosima.fastdds.idl.parser.typecode.StructTypeCode@6b81ce95
+    // m_header com.eprosima.fastdds.idl.parser.typecode.StructTypeCode@5223e5ee
 
-    // m_data com.eprosima.idl.parser.typecode.StringTypeCode@2a798d51
-    m_data ="";
+    // m_data com.eprosima.fastdds.idl.parser.typecode.StructTypeCode@22a637e7
+
 
 }
 
@@ -102,8 +102,7 @@ size_t carla_msgs::msg::CarlaV2XCustomMessage::getMaxCdrSerializedSize(
 
 
     current_alignment += etsi_its_cam_msgs::msg::ItsPduHeader::getMaxCdrSerializedSize(current_alignment);
-    current_alignment += 4 + eprosima::fastcdr::Cdr::alignment(current_alignment, 4) + 255 + 1;
-
+    current_alignment += carla_msgs::msg::CarlaV2XByteArray::getMaxCdrSerializedSize(current_alignment);
 
     return current_alignment - initial_alignment;
 }
@@ -117,8 +116,7 @@ size_t carla_msgs::msg::CarlaV2XCustomMessage::getCdrSerializedSize(
 
 
     current_alignment += etsi_its_cam_msgs::msg::ItsPduHeader::getCdrSerializedSize(data.header(), current_alignment);
-    current_alignment += 4 + eprosima::fastcdr::Cdr::alignment(current_alignment, 4) + data.data().size() + 1;
-
+    current_alignment += carla_msgs::msg::CarlaV2XByteArray::getCdrSerializedSize(data.data(), current_alignment);
 
     return current_alignment - initial_alignment;
 }
@@ -182,7 +180,7 @@ etsi_its_cam_msgs::msg::ItsPduHeader& carla_msgs::msg::CarlaV2XCustomMessage::he
  * @param _data New value to be copied in member data
  */
 void carla_msgs::msg::CarlaV2XCustomMessage::data(
-        const std::string& _data)
+        const carla_msgs::msg::CarlaV2XByteArray& _data)
 {
     m_data = _data;
 }
@@ -192,7 +190,7 @@ void carla_msgs::msg::CarlaV2XCustomMessage::data(
  * @param _data New value to be moved in member data
  */
 void carla_msgs::msg::CarlaV2XCustomMessage::data(
-        std::string&& _data)
+        carla_msgs::msg::CarlaV2XByteArray&& _data)
 {
     m_data = std::move(_data);
 }
@@ -201,7 +199,7 @@ void carla_msgs::msg::CarlaV2XCustomMessage::data(
  * @brief This function returns a constant reference to member data
  * @return Constant reference to member data
  */
-const std::string& carla_msgs::msg::CarlaV2XCustomMessage::data() const
+const carla_msgs::msg::CarlaV2XByteArray& carla_msgs::msg::CarlaV2XCustomMessage::data() const
 {
     return m_data;
 }
@@ -210,7 +208,7 @@ const std::string& carla_msgs::msg::CarlaV2XCustomMessage::data() const
  * @brief This function returns a reference to member data
  * @return Reference to member data
  */
-std::string& carla_msgs::msg::CarlaV2XCustomMessage::data()
+carla_msgs::msg::CarlaV2XByteArray& carla_msgs::msg::CarlaV2XCustomMessage::data()
 {
     return m_data;
 }
