@@ -45,16 +45,11 @@ bool UeWorldPublisher::Publish() {
   return _clock_publisher->Publish() && _map_publisher->Publish();
 }
 
-void UeWorldPublisher::PreTickAction() {
-  if (!_initialized) {
-    return;
-  }
-}
-
 void UeWorldPublisher::ProcessMessages() {
   if (!_initialized) {
     return;
   }
+
   _carla_control_subscriber->ProcessMessages();
   _sync_subscriber->ProcessMessages();
   for (auto& vehicle : _vehicles) {
@@ -69,11 +64,10 @@ void UeWorldPublisher::ProcessMessages() {
   UpdateAndPublishStatus();
 }
 
-void UeWorldPublisher::PostTickAction() {
+void UeWorldPublisher::UpdateSensorDataPostAction() {
   if (!_initialized) {
     return;
   }
-
 
   UpdateAndPublishStatus();
 

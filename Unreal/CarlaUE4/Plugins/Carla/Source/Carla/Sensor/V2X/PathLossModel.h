@@ -62,9 +62,7 @@ private:
                                  const FVector Destination,
                                  const double Distance3d,
                                  const double ht,
-                                 const double ht_local,
                                  const double hr,
-                                 const double hr_local,
                                  const double reference_z);
     void EstimatePathStateAndVehicleObstacles(AActor *OtherActor, FVector Source, double TxHeight, double RxHeight, double reference_z, EPathState &state, std::vector<FVector> &vehicle_obstacles);
     double MakeVehicleBlockageLoss(double TxHeight, double RxHeight, double obj_height, double obj_distance);

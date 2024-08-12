@@ -13,6 +13,7 @@
 #include "V2X/PathLossModel.h"
 #include <list>
 #include <map>
+#include <mutex>
 #include "CustomV2XSensor.generated.h"
 
 
@@ -22,12 +23,14 @@ class CARLA_API ACustomV2XSensor : public ASensor
     GENERATED_BODY()
 
     using FV2XData = carla::sensor::data::CustomV2XDataS;
-    using V2XDataList = std::vector<carla::sensor::data::CustomV2XData>;
-    struct DataToSend {
+    using V2XDataList = std::list<carla::sensor::data::CustomV2XData>;
+    struct SenderId {
+        AActor * Actor;
         std::string ChannelId;
-        carla::sensor::data::CustomV2XData Message;
+
+        bool operator < (const SenderId & other) const { return (Actor < other.Actor) && (ChannelId < other.ChannelId); }
     };
-    using ActorV2XDataMap = std::map<AActor *, DataToSend>;
+    using ActorV2XDataMap = std::map<SenderId, V2XDataList>;
 
 public:
     ACustomV2XSensor(const FObjectInitializer &ObjectInitializer);
@@ -54,19 +57,15 @@ public:
     void Send(const carla::rpc::CustomV2XBytes &data);
 
 private:
+    SenderId GetSenderId() { return {.Actor=this, .ChannelId = mChannelId}; }
     // global data
+    std::mutex v2xDataLock;
     static ActorV2XDataMap gActorV2XDataMap;
 
     PathLossModel *PathLossModelObj;
-    FV2XData mV2XData;
-
-    //write
-    void WriteMessageToV2XData(const V2XDataList &msg_received_power_list);
 
     const long mProtocolVersion = 2;
     const long mMessageId = ITSContainer::messageID_custom;
     long mStationId;
     std::string mChannelId;
-    carla::rpc::CustomV2XBytes mMessageData;
-    bool mMessageDataChanged = false;
 };

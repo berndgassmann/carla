@@ -74,27 +74,25 @@ public:
 
   void RemoveActor(ActorId const actor);
 
+  /**
+   * Implement actions before sensor data processing
+   */
+  void ProcessDataFromUeSensorPreAction();
   void ProcessDataFromUeSensor(carla::streaming::detail::stream_id_type const stream_id,
                                std::shared_ptr<const carla::streaming::detail::Message> message);
+  /**
+   * Implement actions after sensor data processing
+   */
+  void ProcessDataFromUeSensorPostAction();
 
   void EnableForROS(carla::streaming::detail::stream_actor_id_type stream_actor_id);
   void DisableForROS(carla::streaming::detail::stream_actor_id_type stream_actor_id);  
   bool IsEnabledForROS(carla::streaming::detail::stream_actor_id_type stream_actor_id);
 
   /**
-   * Implement actions before each tick
-   */
-  void PreTickAction();
-
-  /**
    * Process incoming messages
    */
   void ProcessMessages();
-
-  /**
-   * Implement actions after each tick
-   */
-  void PostTickAction();
 
   uint64_t CurrentFrame() const;
   carla::ros2::types::Timestamp const& CurrentTimestamp() const;

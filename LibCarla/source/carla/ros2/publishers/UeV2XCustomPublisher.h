@@ -38,10 +38,9 @@ public:
   bool SubscribersConnected() const override;
 
   /**
-   * Process incoming messages
+   * Implement UePublisherBaseSensor::UpdateSensorDataPreAction()
    */
-  void ProcessMessages() override;
-
+  void UpdateSensorDataPreAction() override;
   /**
    * Implements UePublisherBaseSensor::UpdateSensorData() interface
    */

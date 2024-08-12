@@ -153,7 +153,7 @@ public:
     auto rcode = reader->take_next_sample(&request, &info);
     if (rcode == eprosima::fastrtps::types::ReturnCode_t::ReturnCodeValue::RETCODE_OK) {
       if (eprosima::fastdds::dds::InstanceStateKind::ALIVE_INSTANCE_STATE == info.instance_state) {
-        carla::log_warning("DdsServiceImpl[", _request_topic->get_name(), "]::on_data_available(): Incoming request ");
+        carla::log_debug("DdsServiceImpl[", _request_topic->get_name(), "]::on_data_available(): Incoming request ");
         _incoming_requests.push_back({request, info.sample_identity});
       } else {
         carla::log_error("DdsServiceImpl[", _request_topic->get_name(),

@@ -22,17 +22,19 @@ public:
   virtual ~UePublisherBaseSensor() = default;
 
   /**
+   * Implement actions before sensor data updates
+   */
+  virtual void UpdateSensorDataPreAction() {};
+  /**
    * Function to update the data for this sensor
    */
   virtual void UpdateSensorData(
       std::shared_ptr<carla::sensor::s11n::SensorHeaderSerializer::Header const> sensor_header,
       carla::SharedBufferView buffer_view) = 0;
-
   /**
-   * Some sensors also have to process incoming requests
-  */
-  virtual void ProcessMessages() {}
-
+   * Implement actions after sensor data updates
+   */
+  virtual void UpdateSensorDataPostAction() {};
 
   builtin_interfaces::msg::Time GetTime(
       std::shared_ptr<carla::sensor::s11n::SensorHeaderSerializer::Header const> sensor_header) const {

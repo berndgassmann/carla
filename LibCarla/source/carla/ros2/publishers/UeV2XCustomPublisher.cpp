@@ -17,7 +17,7 @@ UeV2XCustomPublisher::UeV2XCustomPublisher(std::shared_ptr<carla::ros2::types::S
     _impl(std::make_shared<UeV2XCustomPublisherImpl>()) {}
 
 bool UeV2XCustomPublisher::Init(std::shared_ptr<DdsDomainParticipantImpl> domain_participant) {
-  _initialized = _impl->InitHistoryPreallocatedWithReallocMemoryMode(domain_participant, get_topic_name(), get_topic_qos()) && _subscriber->Init(domain_participant);
+  _initialized = _impl->InitHistoryPreallocatedWithReallocMemoryMode(domain_participant, get_topic_name(), get_topic_qos().reliable()) && _subscriber->Init(domain_participant);
   return _initialized;
 }
 
@@ -28,7 +28,8 @@ bool UeV2XCustomPublisher::SubscribersConnected() const {
   return _impl->SubscribersConnected();
 }
 
-void UeV2XCustomPublisher::ProcessMessages() {
+void UeV2XCustomPublisher::UpdateSensorDataPreAction()
+{
   if (!_initialized) {
     return;
   }

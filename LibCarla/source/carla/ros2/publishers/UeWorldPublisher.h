@@ -67,19 +67,9 @@ public:
   }
 
   /**
-   * Implement actions before each tick
-   */
-  void PreTickAction();
-
-  /**
    * Process incoming messages
    */
-  void ProcessMessages() override;
-
-  /**
-   * Implement actions after each tick
-   */
-  void PostTickAction();
+  void ProcessMessages();
 
   /**
    * Implement actions on actors removed
@@ -91,6 +81,11 @@ public:
    */
   void UpdateSensorData(std::shared_ptr<carla::sensor::s11n::SensorHeaderSerializer::Header const> sensor_header,
                         carla::SharedBufferView buffer_view) override;
+  /**
+   * Implement UePublisherBaseSensor::UpdateSensorDataPostAction()
+   */
+  void UpdateSensorDataPostAction() override;
+
 
   void AddVehicleUe(std::shared_ptr<carla::ros2::types::VehicleActorDefinition> vehicle_actor_definition,
                     carla::ros2::types::VehicleControlCallback vehicle_control_callback,

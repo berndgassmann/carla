@@ -366,13 +366,6 @@ void FCarlaEngine::OnPreTick(UWorld *, ELevelTick TickType, float DeltaSeconds)
       while (!FramesToProcess.size());
     }
 
-    #if defined(WITH_ROS2)
-    if (ROS2->IsEnabled())
-    {
-      ROS2->PreTickAction();
-    }
-    #endif
-
     // update frame counter
     UpdateFrameCounter();
 
@@ -401,6 +394,13 @@ void FCarlaEngine::OnPostTick(UWorld *World, ELevelTick TickType, float DeltaSec
   // tick the recorder/replayer system
   if (GetCurrentEpisode())
   {
+    #if defined(WITH_ROS2)
+    auto ROS2 = carla::ros2::ROS2::GetInstance();
+    if (ROS2->IsEnabled())
+    {
+      ROS2->ProcessDataFromUeSensorPreAction();
+    }
+    #endif
     if (bIsPrimaryServer)
     {
       if (SecondaryServer->HasClientsConnected()) {
@@ -448,7 +448,7 @@ void FCarlaEngine::OnPostTick(UWorld *World, ELevelTick TickType, float DeltaSec
     auto ROS2 = carla::ros2::ROS2::GetInstance();
     if (ROS2->IsEnabled())
     {
-      ROS2->PostTickAction();
+      ROS2->ProcessDataFromUeSensorPostAction();
     }
     #endif
   }

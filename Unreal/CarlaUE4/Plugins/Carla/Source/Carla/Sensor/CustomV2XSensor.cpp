@@ -43,7 +43,7 @@ void ACustomV2XSensor::SetOwner(AActor *Owner)
         }
     }
 
-    PathLossModelObj->SetOwner(Owner);
+    PathLossModelObj->SetOwner(this);
 }
 
 FActorDefinition ACustomV2XSensor::GetSensorDefinition()
@@ -99,26 +99,8 @@ void ACustomV2XSensor::PrePhysTick(float DeltaSeconds)
     // Clear the message created during the last sim cycle
     if (GetOwner())
     {
-        ACustomV2XSensor::gActorV2XDataMap.erase(GetOwner());
-
-        // Step 0: Create message to send, if triggering conditions fulfilled
-        // this needs to be done in pre phys tick to enable synchronous reception in all other v2x sensors
-        // Check whether the message is generated
-        if (mMessageDataChanged)
-        {
-            mMessageDataChanged = false;
-
-            // If message is generated store it
-            // make a pair of message and sending power
-            // if different v2x sensors send with different power, we need to store that
-            carla::sensor::data::CustomV2XData message_pw;
-            message_pw.Message.header.protocolVersion = mProtocolVersion;
-            message_pw.Message.header.messageID = mMessageId;
-            message_pw.Message.header.stationID = mStationId;
-            message_pw.Message.data = mMessageData;
-            message_pw.Power = PathLossModelObj->GetTransmitPower();
-            gActorV2XDataMap.insert({GetOwner(), {.ChannelId = mChannelId, .Message = message_pw}});
-        }
+        std::lock_guard lock(v2xDataLock);
+        ACustomV2XSensor::gActorV2XDataMap.erase(GetSenderId());
     }
 }
 
@@ -130,27 +112,28 @@ void ACustomV2XSensor::PrePhysTick(float DeltaSeconds)
  */
 void ACustomV2XSensor::PostPhysTick(UWorld *World, ELevelTick TickType, float DeltaTime)
 {
+    // tracing after we get the lock
     TRACE_CPUPROFILER_EVENT_SCOPE(ACustomV2XSensor::PostPhysTick);
-
     // Step 1: Create an actor list which has messages to send targeting this v2x sensor instance
     std::vector<ActorPowerPair> ActorPowerList;
-    for (const auto &pair : gActorV2XDataMap)
     {
-        if (pair.first != GetOwner())
+       std::lock_guard lock(v2xDataLock);
+        for (const auto &pair : gActorV2XDataMap)
         {
-            // only sensors with the same ChannelId talk to each other
-            if ( mChannelId == pair.second.ChannelId ) 
-            { 
+            // only different sensors with the same ChannelId talk to each other
+            if ((pair.first.Actor != this) && (mChannelId == pair.first.ChannelId))
+            {
                 ActorPowerPair actor_power_pair;
-                actor_power_pair.first = pair.first;
-                // actor sending with transmit power
-                actor_power_pair.second = pair.second.Message.Power;
+                actor_power_pair.first = pair.first.Actor;
+                // actor sending with transmit power (identical for all messages of this tick)
+                actor_power_pair.second = pair.second.front().Power;
                 ActorPowerList.push_back(actor_power_pair);
             }
         }
     }
-
+ 
     // Step 2: Simulate the communication for the actors in actor list to current actor.
+    FV2XData v2XData;
     if (!ActorPowerList.empty())
     {
         UCarlaEpisode *carla_episode = UCarlaStatics::GetCurrentEpisode(GetWorld());
@@ -162,46 +145,45 @@ void ACustomV2XSensor::PostPhysTick(UWorld *World, ELevelTick TickType, float De
         // get registry to retrieve carla actor IDs
         const FActorRegistry &Registry = carla_episode->GetActorRegistry();
 
-        V2XDataList msg_received_power_list;
-        for (const auto &pair : actor_receivepower_map)
         {
-            carla::sensor::data::CustomV2XData send_msg_and_pw = gActorV2XDataMap.at(pair.first).Message;
-            carla::sensor::data::CustomV2XData received_msg_and_pw;
-            // sent CAM
-            received_msg_and_pw.Message = send_msg_and_pw.Message;
-            // receive power
-            received_msg_and_pw.Power = pair.second;
+            std::lock_guard lock(v2xDataLock);
+            for (const auto &pair : actor_receivepower_map)
+            {
+                for ( const auto & send_msg_and_pw: gActorV2XDataMap.at({pair.first, mChannelId}))
+                {
+                    carla::sensor::data::CustomV2XData received_msg_and_pw;
+                    // sent CAM
+                    received_msg_and_pw.Message = send_msg_and_pw.Message;
+                    // receive power
+                    received_msg_and_pw.Power = pair.second;
 
-            msg_received_power_list.push_back(received_msg_and_pw);
+                    v2XData.WriteMessage(received_msg_and_pw);
+                }
+            }
         }
-
-        WriteMessageToV2XData(msg_received_power_list);
     }
     // Step 5: Send message
 
-    if (mV2XData.GetMessageCount() > 0)
+    if (v2XData.GetMessageCount() > 0)
     {
         auto DataStream = GetDataStream(*this);
-        DataStream.SerializeAndSend(*this, mV2XData, DataStream.PopBufferFromPool());
-    }
-    mV2XData.Reset();
-}
-
-/*
- * Function the store the message into the structure so it can be sent to python client
- */
-void ACustomV2XSensor::WriteMessageToV2XData(const ACustomV2XSensor::V2XDataList &msg_received_power_list)
-{
-    for (const auto &elem : msg_received_power_list)
-    {
-        mV2XData.WriteMessage(elem);
+        DataStream.SerializeAndSend(*this, v2XData, DataStream.PopBufferFromPool());
     }
 }
-
 
 void ACustomV2XSensor::Send(const carla::rpc::CustomV2XBytes &data)
 {
-    mMessageData = data;
-    mMessageDataChanged = true;
+    // we have to queue the data immediately otherwhise only one single message can be processed per frame!
+    std::lock_guard lock(v2xDataLock);
+
+    // make a pair of message and sending power
+    // if different v2x sensors send with different power, we need to store that
+    carla::sensor::data::CustomV2XData message_pw;
+    message_pw.Message.header.protocolVersion = mProtocolVersion;
+    message_pw.Message.header.messageID = mMessageId;
+    message_pw.Message.header.stationID = mStationId;
+    message_pw.Message.data = data;
+    message_pw.Power = PathLossModelObj->GetTransmitPower();
+    gActorV2XDataMap.insert({GetSenderId(), V2XDataList()}).first->second.push_back(message_pw);
 }
 

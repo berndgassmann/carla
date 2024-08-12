@@ -91,7 +91,7 @@ void ROS2::NotifyInitGame() {
 
   // The world is crucial and has to be instanciated immediately
   if (AddSensorUe(_world_observer_sensor_actor_definition)) {
-    PreTickAction();
+    ProcessDataFromUeSensorPreAction();
   }
   if (_world_publisher != nullptr) {
     _transform_publisher = _world_publisher->GetTransformPublisher();
@@ -286,6 +286,8 @@ void ROS2::CreateSensorUePublisher(UeSensor &sensor) {
       // if anyone listening to the topic
     case types::PublisherSensorType::CameraGBufferUint8:
     case types::PublisherSensorType::CameraGBufferFloat:
+
+    
     case types::PublisherSensorType::LaneInvasionSensor:
     case types::PublisherSensorType::ObstacleDetectionSensor:
     default: {
@@ -316,7 +318,14 @@ void ROS2::RemoveActor(ActorId const actor) {
   _world_publisher->RemoveActor(actor);
 }
 
-void ROS2::PreTickAction() {
+void ROS2::ProcessMessages() {
+  for (auto service : _services) {
+    service->CheckRequest();
+  }
+  _world_publisher->ProcessMessages();
+}
+
+void ROS2::ProcessDataFromUeSensorPreAction() {
   for (auto &ue_sensor : _ue_sensors) {
     if (ue_sensor.second.publisher_expected && (ue_sensor.second.publisher == nullptr)) {
       CreateSensorUePublisher(ue_sensor.second);
@@ -324,11 +333,11 @@ void ROS2::PreTickAction() {
     if (ue_sensor.second.publisher != nullptr) {
       if (ue_sensor.second.publisher->SubscribersConnected() && ue_sensor.second.session == nullptr) {
         ue_sensor.second.session = std::make_shared<ROS2Session>(ue_sensor.first);
-        log_warning("ROS2::PreTickAction[", std::to_string(*ue_sensor.second.sensor_actor_definition),
+        log_warning("ROS2::ProcessDataFromUeSensorPreAction[", std::to_string(*ue_sensor.second.sensor_actor_definition),
                     "]: Registering session");
         _dispatcher->RegisterSession(ue_sensor.second.session);
       } else if (!ue_sensor.second.publisher->SubscribersConnected() && ue_sensor.second.session != nullptr) {
-        log_warning("ROS2::PreTickAction[", std::to_string(*ue_sensor.second.sensor_actor_definition),
+        log_warning("ROS2::ProcessDataFromUeSensorPreAction[", std::to_string(*ue_sensor.second.sensor_actor_definition),
                     "]: Deregistering session");
         _dispatcher->DeregisterSession(ue_sensor.second.session);
         ue_sensor.second.session.reset();
@@ -336,32 +345,20 @@ void ROS2::PreTickAction() {
     }
   }
 
-  _world_publisher->PreTickAction();
-}
-
-void ROS2::ProcessMessages() {
-  for (auto service : _services) {
-    service->CheckRequest();
-  }
   for (auto &ue_sensor : _ue_sensors) {
-    if ( (ue_sensor.second.publisher != nullptr) && (ue_sensor.second.v2x_custom_send_callback != nullptr) ) {
-      ue_sensor.second.publisher->ProcessMessages();
+    if ( (ue_sensor.second.publisher != nullptr) ) {
+      ue_sensor.second.publisher->UpdateSensorDataPreAction();
     } 
   }
-  _world_publisher->ProcessMessages();
+  _world_publisher->UpdateSensorDataPreAction();
 }
 
-void ROS2::PostTickAction() {
-  _world_publisher->PostTickAction();
-}
 
 void ROS2::ProcessDataFromUeSensor(carla::streaming::detail::stream_id_type const stream_id,
                                    std::shared_ptr<const carla::streaming::detail::Message> message) {
   auto ue_sensor = _ue_sensors.find(stream_id);
   if (ue_sensor != _ue_sensors.end()) {
     auto const &sensor_actor_definition = ue_sensor->second.sensor_actor_definition;
-    log_info("Sensor Data to ROS data: frame.(", CurrentFrame(), ") stream.",
-              std::to_string(*sensor_actor_definition), " Processing...");
 
     auto buffer_list_view = message->GetBufferViewSequence();
     // currently we only support sensor header + data buffer
@@ -398,6 +395,16 @@ void ROS2::ProcessDataFromUeSensor(carla::streaming::detail::stream_id_type cons
               " not registered. Dropping data.");
   }
 }
+
+void ROS2::ProcessDataFromUeSensorPostAction() {
+  for (auto &ue_sensor : _ue_sensors) {
+    if ( (ue_sensor.second.publisher != nullptr) ) {
+      ue_sensor.second.publisher->UpdateSensorDataPostAction();
+    } 
+  }
+  _world_publisher->UpdateSensorDataPostAction();
+}
+
 
 void ROS2::EnableForROS(carla::streaming::detail::stream_actor_id_type stream_actor_id) {
   auto ue_sensor = _ue_sensors.find(stream_actor_id.stream_id);

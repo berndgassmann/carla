@@ -50,8 +50,8 @@ void AV2XSensor::SetOwner(AActor *Owner)
         }
         UWorld *world = GetWorld();
         CaServiceObj->SetOwner(world, Owner);
-        PathLossModelObj->SetOwner(Owner);
     }
+    PathLossModelObj->SetOwner(this);
 }
 
 FActorDefinition AV2XSensor::GetSensorDefinition()
@@ -108,7 +108,7 @@ void AV2XSensor::PrePhysTick(float DeltaSeconds)
     // Clear the message created during the last sim cycle
     if (GetOwner())
     {
-        AV2XSensor::mActorV2XDataMap.erase(GetOwner());
+        AV2XSensor::mActorV2XDataMap.erase(this);
 
         // Step 0: Create message to send, if triggering conditions fulfilled
         // this needs to be done in pre phys tick to enable synchronous reception in all other v2x sensors
@@ -121,7 +121,7 @@ void AV2XSensor::PrePhysTick(float DeltaSeconds)
             carla::sensor::data::CAMData cam_pw;
             cam_pw.Message = CaServiceObj->GetCamMessage();
             cam_pw.Power = PathLossModelObj->GetTransmitPower();
-            AV2XSensor::mActorV2XDataMap.insert({GetOwner(), cam_pw});
+            AV2XSensor::mActorV2XDataMap.insert({this, cam_pw});
         }
     }
 }
@@ -174,7 +174,7 @@ void AV2XSensor::PostPhysTick(UWorld *World, ELevelTick TickType, float DeltaTim
         std::vector<ActorPowerPair> ActorPowerList;
         for (const auto &pair : AV2XSensor::mActorV2XDataMap)
         {
-            if (pair.first != GetOwner())
+            if (pair.first != this)
             {
                 ActorPowerPair actor_power_pair;
                 actor_power_pair.first = pair.first;

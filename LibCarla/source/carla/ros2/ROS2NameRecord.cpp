@@ -20,6 +20,7 @@ ROS2NameRecord::ROS2NameRecord(std::shared_ptr<carla::ros2::types::ActorNameDefi
 }
 
 ROS2NameRecord::~ROS2NameRecord() {
+  log_warning("ROS2::~ROS2NameRecord(", std::to_string(*_actor_name_definition), ")");
   ROS2::GetInstance()->GetNameRegistry()->UnregisterRecord(this);
 }
 
