@@ -310,6 +310,7 @@ void ROS2::CreateSensorUePublisher(UeSensor &sensor) {
 void ROS2::RemoveActor(ActorId const actor) {
   for (auto iter = _ue_sensors.begin(); iter != _ue_sensors.end(); /*no update of iter*/) {
     if (iter->second.sensor_actor_definition->id == actor) {
+      log_warning("ROS2::RemoveSensorUe(", std::to_string(*iter->second.sensor_actor_definition), ")");
       iter = _ue_sensors.erase(iter);
     } else {
       ++iter;

@@ -235,11 +235,32 @@ void UeWorldPublisher::RemoveActor(ActorId actor) {
   }
   _objects.erase(actor);
   _objects_changed = true;
-  _vehicles.erase(actor);
-  _walkers.erase(actor);
-  _traffic_lights.erase(actor);
+  auto vehicle_iter = _vehicles.find(actor);
+  if ( vehicle_iter != _vehicles.end() ) {
+    log_warning("ROS2::RemoveVehicleUe(", std::to_string(
+      *std::static_pointer_cast<carla::ros2::types::VehicleActorDefinition>(vehicle_iter->second._vehicle_publisher->_actor_name_definition)), ")");
+    _vehicles.erase(vehicle_iter);
+  }
+  auto walker_iter = _walkers.find(actor);
+  if ( walker_iter != _walkers.end() ) {
+    log_warning("ROS2::RemoveWalkerUe(", std::to_string(
+      *std::static_pointer_cast<carla::ros2::types::WalkerActorDefinition>(walker_iter->second._walker_publisher->_actor_name_definition)), ")");
+    _walkers.erase(walker_iter);
+  }
+  auto traffic_light_iter = _traffic_lights.find(actor);
+  if ( traffic_light_iter != _traffic_lights.end() ) {
+    log_warning("ROS2::RemoveTrafficLightUe(", std::to_string(
+      *std::static_pointer_cast<carla::ros2::types::TrafficLightActorDefinition>(traffic_light_iter->second._traffic_light_publisher->_actor_name_definition)), ")");
+    _traffic_lights.erase(traffic_light_iter);
+  }
   _traffic_lights_publisher->RemoveTrafficLight(actor);
-  _traffic_signs.erase(actor);
+
+  auto traffic_sign_iter = _traffic_signs.find(actor);
+  if ( traffic_sign_iter != _traffic_signs.end() ) {
+    log_warning("ROS2::RemoveTrafficSignUe(", std::to_string(
+      *std::static_pointer_cast<carla::ros2::types::TrafficSignActorDefinition>(traffic_sign_iter->second._traffic_sign_publisher->_actor_name_definition)), ")");
+    _traffic_signs.erase(traffic_sign_iter);
+  }
 }
 
 void UeWorldPublisher::UpdateAndPublishStatus() {
