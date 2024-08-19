@@ -19,6 +19,7 @@
 #include "carla/sensor/data/SemanticLidarData.h"
 #include "carla/sensor/s11n/SensorHeaderSerializer.h"
 
+#include "carla/ros2/publishers/CarlaActorListPublisher.h"
 #include "carla/ros2/publishers/TransformPublisher.h"
 #include "carla/ros2/publishers/UeCollisionPublisher.h"
 #include "carla/ros2/publishers/UeDVSCameraPublisher.h"
@@ -83,11 +84,14 @@ void ROS2::Enable(carla::rpc::RpcServerInterface *carla_server,
       *world_observer_actor_definition,
       carla::ros2::types::PublisherSensorType::WorldObserver, 
       world_observer_stream_id);
+  _carla_sensor_actor_list_publisher = std::make_shared<CarlaActorListPublisher>("sensor_list");
   log_warning("ROS2 enabled");
 }
 
 void ROS2::NotifyInitGame() {
   log_warning("ROS2 NotifyInitGame");
+
+  _carla_sensor_actor_list_publisher->Init(_domain_participant_impl);
 
   // The world is crucial and has to be instanciated immediately
   if (AddSensorUe(_world_observer_sensor_actor_definition)) {
@@ -130,7 +134,6 @@ void ROS2::NotifyBeginEpisode() {
       *_carla_server, carla::ros2::types::ActorNameDefinition::CreateFromRoleName("set_episode_settings"));
   set_epsisode_settings_service->Init(_domain_participant_impl);
   _services.push_back(set_epsisode_settings_service);
-
 }
 
 void ROS2::NotifyEndEpisode() {
@@ -150,6 +153,7 @@ void ROS2::NotifyEndGame() {
 void ROS2::Disable() {
   NotifyEndEpisode();
   NotifyEndGame();
+  _carla_sensor_actor_list_publisher.reset();
   _world_observer_sensor_actor_definition.reset();
   _dispatcher.reset();
   _domain_participant_impl.reset();
@@ -194,6 +198,7 @@ bool ROS2::AddSensorUe(std::shared_ptr<carla::ros2::types::SensorActorDefinition
                 "): Sensor already_registered. Ignoring");
     return false;
   }
+  _ue_sensors_changed = true;
   insert_result.first->second.v2x_custom_send_callback = v2x_custom_send_callback;
   return true;
 }    
@@ -211,6 +216,7 @@ void ROS2::AttachActors(ActorId const child, ActorId const parent) {
                   " has to be destroyed due to re-attachment");
         sensor.publisher.reset();
       }
+      _ue_sensors_changed = true;
       break;
     }
   }
@@ -312,6 +318,7 @@ void ROS2::RemoveActor(ActorId const actor) {
     if (iter->second.sensor_actor_definition->id == actor) {
       log_warning("ROS2::RemoveSensorUe(", std::to_string(*iter->second.sensor_actor_definition), ")");
       iter = _ue_sensors.erase(iter);
+      _ue_sensors_changed = true;
     } else {
       ++iter;
     }
@@ -351,6 +358,19 @@ void ROS2::ProcessDataFromUeSensorPreAction() {
       ue_sensor.second.publisher->UpdateSensorDataPreAction();
     } 
   }
+
+
+  if (_ue_sensors_changed) {
+    _ue_sensors_changed = false;
+    carla_msgs::msg::CarlaActorList actor_list;
+    for (auto &ue_sensor : _ue_sensors) {
+      actor_list.actors().push_back(ue_sensor.second.sensor_actor_definition->carla_actor_info(_name_registry));
+    }
+    _carla_sensor_actor_list_publisher->UpdateCarlaActorList(actor_list);
+    _carla_sensor_actor_list_publisher->Publish();
+  }
+
+
   _world_publisher->UpdateSensorDataPreAction();
 }
 

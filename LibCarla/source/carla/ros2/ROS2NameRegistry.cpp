@@ -83,6 +83,8 @@ std::string ROS2NameRegistry::TopicPrefix(ActorId const actor_id) {
         auto iter_a = result_topic_name.begin();
         auto iter_b = topic_name.begin();
         while (iter_a != result_topic_name.end() && iter_b != topic_name.end() && (*iter_a == *iter_b)) {
+          iter_a++;
+          iter_b++;
         }
         if (iter_a == result_topic_name.end()) {
           // result_topic_name is already shortest common prefix

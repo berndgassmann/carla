@@ -15,7 +15,7 @@ using CarlaActorListPublisherImpl =
 
 class CarlaActorListPublisher : public PublisherBase {
 public:
-  CarlaActorListPublisher();
+  CarlaActorListPublisher(std::string const &role_name);
   virtual ~CarlaActorListPublisher() = default;
 
   /**

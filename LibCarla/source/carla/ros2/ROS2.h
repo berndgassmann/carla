@@ -27,6 +27,7 @@ namespace ros2 {
 class DdsDomainParticipantImpl;
 class UePublisherBaseSensor;
 class TransformPublisher;
+class CarlaActorListPublisher;
 class UeWorldPublisher;
 class ServiceInterface;
 
@@ -120,6 +121,7 @@ private:
     std::shared_ptr<ROS2Session> session;
   };
   std::unordered_map<carla::streaming::detail::stream_id_type, UeSensor> _ue_sensors;
+  bool _ue_sensors_changed{false};
   std::shared_ptr<TransformPublisher> _transform_publisher;
 
   std::shared_ptr<UeWorldPublisher> _world_publisher;
@@ -127,6 +129,8 @@ private:
   std::list<std::shared_ptr<carla::ros2::ServiceInterface>> _services;
 
   void CreateSensorUePublisher(UeSensor& sensor);
+
+  std::shared_ptr<CarlaActorListPublisher> _carla_sensor_actor_list_publisher;
 
   // sigleton
   ROS2(){};

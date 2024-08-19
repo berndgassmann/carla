@@ -7,7 +7,6 @@
 #include <limits>
 
 #include "carla/geom/BoundingBox.h"
-#include "carla/ros2/ROS2NameRegistry.h"
 #include "carla/ros2/types/AcceleratedMovement.h"
 #include "carla/ros2/types/Polygon.h"
 #include "carla/ros2/types/Timestamp.h"
@@ -18,7 +17,6 @@
 #include "carla/ros2/types/WalkerActorDefinition.h"
 #include "carla/rpc/VehiclePhysicsControl.h"
 #include "carla/sensor/data/ActorDynamicState.h"
-#include "carla_msgs/msg/CarlaActorInfo.h"
 #include "derived_object_msgs/msg/Object.h"
 #include "derived_object_msgs/msg/ObjectWithCovariance.h"
 
@@ -188,21 +186,6 @@ public:
     return object;
   }
 
-  carla_msgs::msg::CarlaActorInfo carla_actor_info(std::shared_ptr<ROS2NameRegistry> name_registry) const {
-    carla_msgs::msg::CarlaActorInfo actor_info;
-    actor_info.id(_actor_name_definition->id);
-    actor_info.parent_id(name_registry->ParentActorId(_actor_name_definition->id));
-    actor_info.type(_actor_name_definition->type_id);
-    actor_info.rosname(_actor_name_definition->ros_name);
-    actor_info.rolename(_actor_name_definition->role_name);
-    actor_info.object_type(_actor_name_definition->object_type);
-    actor_info.base_type(_actor_name_definition->base_type);
-    auto topic_prefix = name_registry->TopicPrefix(_actor_name_definition->id);
-    // remove "rt" prefix
-    actor_info.topic_prefix(topic_prefix.substr(3));
-    return actor_info;
-  }
-
   carla::ros2::types::Timestamp const& Timestamp() const {
     return _accelerated_movement.Timestamp();
   }
@@ -221,6 +204,10 @@ public:
 
   uint8_t classification() {
     return _classification;
+  }
+
+  carla_msgs::msg::CarlaActorInfo carla_actor_info(std::shared_ptr<ROS2NameRegistry> name_registry) const {
+    return _actor_name_definition->carla_actor_info(name_registry);
   }
 
 private:

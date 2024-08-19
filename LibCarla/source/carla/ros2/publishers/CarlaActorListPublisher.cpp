@@ -9,8 +9,8 @@
 namespace carla {
 namespace ros2 {
 
-CarlaActorListPublisher::CarlaActorListPublisher()
-  : PublisherBase(carla::ros2::types::ActorNameDefinition::CreateFromRoleName("actor_list")),
+CarlaActorListPublisher::CarlaActorListPublisher(std::string const &role_name)
+  : PublisherBase(carla::ros2::types::ActorNameDefinition::CreateFromRoleName(role_name)),
     _impl(std::make_shared<CarlaActorListPublisherImpl>()) {}
 
 bool CarlaActorListPublisher::Init(std::shared_ptr<DdsDomainParticipantImpl> domain_participant) {

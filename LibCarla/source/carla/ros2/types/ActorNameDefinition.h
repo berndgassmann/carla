@@ -7,9 +7,13 @@
 #include <string>
 
 #include "carla/streaming/detail/Types.h"
+#include "carla_msgs/msg/CarlaActorInfo.h"
 
 namespace carla {
 namespace ros2 {
+
+class ROS2NameRegistry;
+
 namespace types {
 
 struct ActorNameDefinition {
@@ -29,6 +33,8 @@ struct ActorNameDefinition {
     actor_name_definition->enabled_for_ros = enabled_for_ros_;
     return actor_name_definition;
   }
+
+  carla_msgs::msg::CarlaActorInfo carla_actor_info(std::shared_ptr<ROS2NameRegistry> name_registry) const;
 
   virtual ~ActorNameDefinition() = default;
 
