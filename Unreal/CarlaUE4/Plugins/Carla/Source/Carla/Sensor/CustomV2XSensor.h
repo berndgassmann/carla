@@ -58,6 +58,9 @@ public:
 
 private:
     SenderId GetSenderId() { return {.Actor=this, .ChannelId = mChannelId}; }
+    
+    // infrastructure stationID cannot be dermined before sending data, because on construction time the CARLA Actor is not yet created
+    void UpdateStationId();
     // global data
     std::mutex v2xDataLock;
     static ActorV2XDataMap gActorV2XDataMap;
@@ -66,6 +69,6 @@ private:
 
     const long mProtocolVersion = 2;
     const long mMessageId = ITSContainer::messageID_custom;
-    long mStationId;
+    long mStationId {0};
     std::string mChannelId;
 };

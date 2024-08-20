@@ -28,22 +28,30 @@ ACustomV2XSensor::ACustomV2XSensor(const FObjectInitializer &ObjectInitializer)
 
 void ACustomV2XSensor::SetOwner(AActor *Owner)
 {
-    UE_LOG(LogCarla, Warning, TEXT("CustomV2XSensor: called setowner with %p"), Owner);
-
     Super::SetOwner(Owner);
 
-    mStationId = 0;
-    if(Owner != nullptr)
-    {
+    if(Owner != nullptr) {
         UCarlaEpisode* CarlaEpisode = UCarlaStatics::GetCurrentEpisode(GetWorld());
         FCarlaActor* CarlaActor = CarlaEpisode->FindCarlaActor(Owner);
-        if (CarlaActor != nullptr)
-        {
+        if (CarlaActor != nullptr) {
             mStationId = static_cast<long>(CarlaActor->GetActorId());
         }
     }
 
+    UpdateStationId();
+
     PathLossModelObj->SetOwner(this);
+}
+
+void ACustomV2XSensor::UpdateStationId()
+{
+    if ( mStationId == 0) {
+        UCarlaEpisode* CarlaEpisode = UCarlaStatics::GetCurrentEpisode(GetWorld());
+        FCarlaActor* CarlaActor = CarlaEpisode->FindCarlaActor(this);
+        if (CarlaActor != nullptr) {
+            mStationId = static_cast<long>(CarlaActor->GetActorId());
+        }
+    }
 }
 
 FActorDefinition ACustomV2XSensor::GetSensorDefinition()
@@ -54,7 +62,6 @@ FActorDefinition ACustomV2XSensor::GetSensorDefinition()
 /* Function to add configurable parameters*/
 void ACustomV2XSensor::Set(const FActorDescription &ActorDescription)
 {
-    UE_LOG(LogCarla, Warning, TEXT("CustomV2XSensor: Set function called"));
     Super::Set(ActorDescription);
     UActorBlueprintFunctionLibrary::SetCustomV2X(ActorDescription, this);
 
@@ -175,6 +182,8 @@ void ACustomV2XSensor::Send(const carla::rpc::CustomV2XBytes &data)
 {
     // we have to queue the data immediately otherwhise only one single message can be processed per frame!
     std::lock_guard lock(v2xDataLock);
+
+    UpdateStationId();
 
     // make a pair of message and sending power
     // if different v2x sensors send with different power, we need to store that

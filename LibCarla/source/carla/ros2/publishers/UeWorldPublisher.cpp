@@ -113,8 +113,6 @@ void UeWorldPublisher::AddVehicleUe(
   ue_vehicle._actor_set_transform_subscriber =
       std::make_shared<ActorSetTransformSubscriber>(*vehicle_publisher, std::move(vehicle_set_transform_callback));
 
-  ue_vehicle._sync_subscriber= std::make_shared<CarlaSynchronizationWindowSubscriber>(*vehicle_publisher, _carla_server);
-
   auto vehicle_result = _vehicles.insert({vehicle_actor_definition->id, ue_vehicle});
   if (!vehicle_result.second) {
     vehicle_result.first->second = std::move(ue_vehicle);
@@ -129,7 +127,6 @@ void UeWorldPublisher::UeVehicle::Init(std::shared_ptr<DdsDomainParticipantImpl>
     _vehicle_controller->Init(domain_participant);
     _vehicle_ackermann_controller->Init(domain_participant);
     _actor_set_transform_subscriber->Init(domain_participant);
-    _sync_subscriber->Init(domain_participant);
   }
 }
 
@@ -150,7 +147,6 @@ void UeWorldPublisher::AddWalkerUe(std::shared_ptr<carla::ros2::types::WalkerAct
   UeWalker ue_walker(walker_publisher);
   ue_walker._walker_controller =
       std::make_shared<WalkerControlSubscriber>(*walker_publisher, std::move(walker_control_callback));
-  ue_walker._sync_subscriber= std::make_shared<CarlaSynchronizationWindowSubscriber>(*walker_publisher, _carla_server);
 
   auto walker_result = _walkers.insert({walker_actor_definition->id, ue_walker});
   if (!walker_result.second) {
@@ -165,7 +161,6 @@ void UeWorldPublisher::UeWalker::Init(std::shared_ptr<DdsDomainParticipantImpl> 
   if ( _walker_publisher->is_enabled_for_ros() ) {
     _walker_publisher->Init(domain_participant);
     _walker_controller->Init(domain_participant);
-    _sync_subscriber->Init(domain_participant);
   }
 }
 

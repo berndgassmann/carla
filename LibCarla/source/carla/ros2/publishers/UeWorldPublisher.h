@@ -161,7 +161,6 @@ private:
     std::shared_ptr<VehicleControlSubscriber> _vehicle_controller;
     std::shared_ptr<AckermannControlSubscriber> _vehicle_ackermann_controller;
     std::shared_ptr<ActorSetTransformSubscriber> _actor_set_transform_subscriber;
-    std::shared_ptr<CarlaSynchronizationWindowSubscriber> _sync_subscriber;
 
     void Init(std::shared_ptr<DdsDomainParticipantImpl> domain_participant);
   };
@@ -173,7 +172,6 @@ private:
     std::shared_ptr<WalkerPublisher> _walker_publisher;
     std::shared_ptr<WalkerControlSubscriber> _walker_controller;
     carla::ros2::types::WalkerControlCallback _walker_control_callback;
-    std::shared_ptr<CarlaSynchronizationWindowSubscriber> _sync_subscriber;
     void Init(std::shared_ptr<DdsDomainParticipantImpl> domain_participant);
   };
   std::unordered_map<ActorId, UeWalker> _walkers;
