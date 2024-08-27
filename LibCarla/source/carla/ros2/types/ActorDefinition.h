@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <functional>
+
 #include "carla/geom/BoundingBox.h"
 #include "carla/ros2/types/ActorNameDefinition.h"
 #include "carla/ros2/types/Polygon.h"
