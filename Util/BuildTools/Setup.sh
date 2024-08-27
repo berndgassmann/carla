@@ -983,15 +983,23 @@ if ${USE_ROS2} ; then
     git submodule update --init
     git clone --depth 1 --branch ${FOONATHAN_MEMORY_VENDOR_BRANCH} ${FOONATHAN_MEMORY_VENDOR_REPO} ${FOONATHAN_MEMORY_VENDOR_SRC_DIR}
 
-    # we have to tweak the sources a bit to be able to compile with our boost version AND without exceptions
+    # we have to tweak the sources a bit to be able to compile with our boost version
     if [[ -e ${FASTDDS_BASENAME}-source/thirdparty/boost/include/boost ]]; then
       # remove their boost includes, but keep their entry point
       rm -rf ${FASTDDS_BASENAME}-source/thirdparty/boost/include/boost
-      # ensure the find boost compiles without exceptions
-      sed -i s/"CXX_STANDARD 11"/"CXX_STANDARD 11\n         COMPILE_DEFINITIONS \"-DBOOST_NO_EXCEPTIONS\""/ ${FASTDDS_BASENAME}-source/cmake/modules/FindThirdpartyBoost.cmake
-      sed -i s/"class ThirdpartyBoostCompileTest"/"#ifdef BOOST_NO_EXCEPTIONS\nnamespace boost {void throw_exception(std::exception const \& e) {}}\n#endif\nclass ThirdpartyBoostCompileTest"/ ${FASTDDS_BASENAME}-source/thirdparty/boost/test/ThirdpartyBoostCompile_test.cpp
     fi
     popd >/dev/null
+
+    log "fast dds: Customized toolchain file"
+    # ensure to NOT disable ASIO_EXCEPTIONS and BOOST_EXCEPTIONS for DDS build by adapting the toolchain file
+    # because these exceptions are actively deployed within FastDDS to detect e.g. if socket-addresses are already in use, etc.
+    # and react accordingly
+    # if we disable expections the exception is forwarded to CARLA server and the program gets finished, which is not desired
+    # behaviour
+    mkdir -p ${FASTDDS_BASENAME}-server-build/
+    cp "${CARLA_SERVER_TOOLCHAIN_FILE}" ${FASTDDS_BASENAME}-server-build/FastDDSToolChain.cmake
+    sed -i s/-DASIO_NO_EXCEPTIONS// ${FASTDDS_BASENAME}-server-build/FastDDSToolChain.cmake
+    sed -i s/-DBOOST_NO_EXCEPTIONS// ${FASTDDS_BASENAME}-server-build/FastDDSToolChain.cmake
 
     log "fast dds: Build asio"
     pushd ${FASTDDS_BASENAME}-source/thirdparty/asio/asio
@@ -1009,7 +1017,7 @@ if ${USE_ROS2} ; then
     pushd ${FASTDDS_BASENAME}-server-build/foonathan-memory-vendor >/dev/null
     cmake -G "Ninja" \
       -DCMAKE_INSTALL_PREFIX="${FASTDDS_BASENAME}-server-install" \
-      -DCMAKE_TOOLCHAIN_FILE="${CARLA_SERVER_TOOLCHAIN_FILE}" \
+      -DCMAKE_TOOLCHAIN_FILE="${FASTDDS_BASENAME}-server-build/FastDDSToolChain.cmake" \
       ${FASTDDS_BASENAME}-source/thirdparty/foonathan-memory-vendor
     ninja
     ninja install
@@ -1025,7 +1033,7 @@ if ${USE_ROS2} ; then
 
     cmake -G "Ninja" \
       -DCMAKE_INSTALL_PREFIX="${FASTDDS_BASENAME}-server-install" \
-      -DCMAKE_TOOLCHAIN_FILE="${CARLA_SERVER_TOOLCHAIN_FILE}" \
+      -DCMAKE_TOOLCHAIN_FILE="${FASTDDS_BASENAME}-server-build/FastDDSToolChain.cmake" \
       -DCMAKE_MODULE_PATH="${FASTDDS_BASENAME}-server-install" \
       -DBUILD_TESTING=OFF \
       -DCOMPILE_EXAMPLES=OFF \
@@ -1044,7 +1052,7 @@ if ${USE_ROS2} ; then
     ninja install
     popd >/dev/null
 
-    rm -Rf ${FASTDDS_BASENAME}-source ${FASTDDS_BASENAME}-server-build
+    #rm -Rf ${FASTDDS_BASENAME}-source ${FASTDDS_BASENAME}-server-build
   fi
 
   cp -pr ${FASTDDS_SERVER_INCLUDE}/* ${LIBCARLA_INSTALL_SERVER_FOLDER}/include/
