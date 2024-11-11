@@ -36,7 +36,7 @@ using namespace eprosima::fastcdr::exception;
 
 carla_msgs::msg::CarlaSynchronizationWindow::CarlaSynchronizationWindow()
 {
-    // m_synchronization_window_target_game_time com.eprosima.idl.parser.typecode.PrimitiveTypeCode@3b6ddd1d
+    // m_synchronization_window_target_game_time com.eprosima.idl.parser.typecode.PrimitiveTypeCode@6253c26
     m_synchronization_window_target_game_time = 0.0;
 
 }

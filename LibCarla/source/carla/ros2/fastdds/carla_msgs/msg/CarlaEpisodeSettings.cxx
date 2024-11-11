@@ -36,27 +36,27 @@ using namespace eprosima::fastcdr::exception;
 
 carla_msgs::msg::CarlaEpisodeSettings::CarlaEpisodeSettings()
 {
-    // m_synchronous_mode com.eprosima.idl.parser.typecode.PrimitiveTypeCode@55b0dcab
+    // m_synchronous_mode com.eprosima.idl.parser.typecode.PrimitiveTypeCode@68e965f5
     m_synchronous_mode = false;
-    // m_no_rendering_mode com.eprosima.idl.parser.typecode.PrimitiveTypeCode@38afe297
+    // m_no_rendering_mode com.eprosima.idl.parser.typecode.PrimitiveTypeCode@6f27a732
     m_no_rendering_mode = false;
-    // m_fixed_delta_seconds com.eprosima.idl.parser.typecode.PrimitiveTypeCode@70325e14
+    // m_fixed_delta_seconds com.eprosima.idl.parser.typecode.PrimitiveTypeCode@6c779568
     m_fixed_delta_seconds = 0.0;
-    // m_substepping com.eprosima.idl.parser.typecode.PrimitiveTypeCode@37ceb1df
+    // m_substepping com.eprosima.idl.parser.typecode.PrimitiveTypeCode@f381794
     m_substepping = true;
-    // m_max_substep_delta_time com.eprosima.idl.parser.typecode.PrimitiveTypeCode@7c9d8e2
+    // m_max_substep_delta_time com.eprosima.idl.parser.typecode.PrimitiveTypeCode@2cdd0d4b
     m_max_substep_delta_time = 0.01;
-    // m_max_substeps com.eprosima.idl.parser.typecode.PrimitiveTypeCode@20d525
+    // m_max_substeps com.eprosima.idl.parser.typecode.PrimitiveTypeCode@61d6015a
     m_max_substeps = 10;
-    // m_max_culling_distance com.eprosima.idl.parser.typecode.PrimitiveTypeCode@6200f9cb
+    // m_max_culling_distance com.eprosima.idl.parser.typecode.PrimitiveTypeCode@2525ff7e
     m_max_culling_distance = 0.0;
-    // m_deterministic_ragdolls com.eprosima.idl.parser.typecode.PrimitiveTypeCode@2002fc1d
+    // m_deterministic_ragdolls com.eprosima.idl.parser.typecode.PrimitiveTypeCode@524d6d96
     m_deterministic_ragdolls = false;
-    // m_tile_stream_distance com.eprosima.idl.parser.typecode.PrimitiveTypeCode@ae13544
+    // m_tile_stream_distance com.eprosima.idl.parser.typecode.PrimitiveTypeCode@152aa092
     m_tile_stream_distance = 3000.0;
-    // m_actor_active_distance com.eprosima.idl.parser.typecode.PrimitiveTypeCode@3d34d211
+    // m_actor_active_distance com.eprosima.idl.parser.typecode.PrimitiveTypeCode@44a7bfbc
     m_actor_active_distance = 2000.0;
-    // m_spectator_as_ego com.eprosima.idl.parser.typecode.PrimitiveTypeCode@7dc0f706
+    // m_spectator_as_ego com.eprosima.idl.parser.typecode.PrimitiveTypeCode@4ef37659
     m_spectator_as_ego = true;
 
 }

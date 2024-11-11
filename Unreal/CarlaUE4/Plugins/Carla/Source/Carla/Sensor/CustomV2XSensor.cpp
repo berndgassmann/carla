@@ -23,7 +23,7 @@ ACustomV2XSensor::ACustomV2XSensor(const FObjectInitializer &ObjectInitializer)
     RandomEngine = CreateDefaultSubobject<URandomEngine>(TEXT("RandomEngine"));
 
     // Init path loss model
-    PathLossModelObj = new PathLossModel(RandomEngine);
+    PathLossModelObj = new PathLossModel(RandomEngine, this);
 }
 
 void ACustomV2XSensor::SetOwner(AActor *Owner)
@@ -37,10 +37,6 @@ void ACustomV2XSensor::SetOwner(AActor *Owner)
             mStationId = static_cast<long>(CarlaActor->GetActorId());
         }
     }
-
-    UpdateStationId();
-
-    PathLossModelObj->SetOwner(this);
 }
 
 void ACustomV2XSensor::UpdateStationId()

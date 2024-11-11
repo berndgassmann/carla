@@ -70,8 +70,9 @@ public:
   void AddTrafficLightUe(
       std::shared_ptr<carla::ros2::types::TrafficLightActorDefinition> traffic_light_actor_definition);
   void AddTrafficSignUe(std::shared_ptr<carla::ros2::types::TrafficSignActorDefinition> traffic_sign_actor_definition);
-  bool AddSensorUe(std::shared_ptr<carla::ros2::types::SensorActorDefinition> sensor_actor_definition, 
-    carla::ros2::types::V2XCustomSendCallback v2x_custom_send_callback = nullptr);
+  bool AddSensorUe(std::shared_ptr<carla::ros2::types::SensorActorDefinition> sensor_actor_definition);
+  bool AddV2XCustomSensorUe(std::shared_ptr<carla::ros2::types::SensorActorDefinition> sensor_actor_definition, 
+    carla::ros2::types::V2XCustomSendCallback v2x_custom_send_callback);
 
   void RemoveActor(ActorId const actor);
 
@@ -128,9 +129,10 @@ private:
 
   std::list<std::shared_ptr<carla::ros2::ServiceInterface>> _services;
 
-  void CreateSensorUePublisher(UeSensor& sensor);
-
   std::shared_ptr<CarlaActorListPublisher> _carla_sensor_actor_list_publisher;
+
+  UeSensor* AddSensorUeInternal(std::shared_ptr<carla::ros2::types::SensorActorDefinition> sensor_actor_definition);
+  void CreateSensorUePublisher(UeSensor& sensor);
 
   // sigleton
   ROS2(){};

@@ -36,21 +36,21 @@ using namespace eprosima::fastcdr::exception;
 
 carla_msgs::msg::CarlaActorInfo::CarlaActorInfo()
 {
-    // m_id com.eprosima.idl.parser.typecode.PrimitiveTypeCode@11e21d0e
+    // m_id com.eprosima.idl.parser.typecode.PrimitiveTypeCode@17c1bced
     m_id = 0;
-    // m_parent_id com.eprosima.idl.parser.typecode.PrimitiveTypeCode@1dd02175
+    // m_parent_id com.eprosima.idl.parser.typecode.PrimitiveTypeCode@2d9d4f9d
     m_parent_id = 0;
-    // m_type com.eprosima.idl.parser.typecode.StringTypeCode@31206beb
+    // m_type com.eprosima.idl.parser.typecode.StringTypeCode@4034c28c
     m_type ="";
-    // m_rosname com.eprosima.idl.parser.typecode.StringTypeCode@3e77a1ed
+    // m_rosname com.eprosima.idl.parser.typecode.StringTypeCode@e50a6f6
     m_rosname ="";
-    // m_rolename com.eprosima.idl.parser.typecode.StringTypeCode@3ffcd140
+    // m_rolename com.eprosima.idl.parser.typecode.StringTypeCode@358c99f5
     m_rolename ="";
-    // m_object_type com.eprosima.idl.parser.typecode.StringTypeCode@23bb8443
+    // m_object_type com.eprosima.idl.parser.typecode.StringTypeCode@3ee0fea4
     m_object_type ="";
-    // m_base_type com.eprosima.idl.parser.typecode.StringTypeCode@1176dcec
+    // m_base_type com.eprosima.idl.parser.typecode.StringTypeCode@48524010
     m_base_type ="";
-    // m_topic_prefix com.eprosima.idl.parser.typecode.StringTypeCode@120d6fe6
+    // m_topic_prefix com.eprosima.idl.parser.typecode.StringTypeCode@4b168fa9
     m_topic_prefix ="";
 
 }

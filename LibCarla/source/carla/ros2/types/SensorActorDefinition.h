@@ -8,6 +8,7 @@
 #include "carla/ros2/types/PublisherSensorType.h"
 #include "carla/streaming/detail/Types.h"
 #include "carla/rpc/CustomV2XBytes.h"
+#include "carla/sensor/data/LibITS.h"
 
 #include <functional>
 

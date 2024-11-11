@@ -42,11 +42,11 @@ using namespace eprosima::fastcdr::exception;
 
 carla_msgs::msg::CarlaTrafficLightStatus::CarlaTrafficLightStatus()
 {
-    // m_header com.eprosima.fastdds.idl.parser.typecode.StructTypeCode@23c30a20
+    // m_header com.eprosima.fastdds.idl.parser.typecode.StructTypeCode@7674f035
 
-    // m_id com.eprosima.idl.parser.typecode.PrimitiveTypeCode@1e1a0406
+    // m_id com.eprosima.idl.parser.typecode.PrimitiveTypeCode@69e153c5
     m_id = 0;
-    // m_state com.eprosima.idl.parser.typecode.PrimitiveTypeCode@290222c1
+    // m_state com.eprosima.idl.parser.typecode.PrimitiveTypeCode@173ed316
     m_state = 0;
 
 }

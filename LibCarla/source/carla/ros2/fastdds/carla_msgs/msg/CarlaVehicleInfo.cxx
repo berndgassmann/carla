@@ -36,37 +36,37 @@ using namespace eprosima::fastcdr::exception;
 
 carla_msgs::msg::CarlaVehicleInfo::CarlaVehicleInfo()
 {
-    // m_id com.eprosima.idl.parser.typecode.PrimitiveTypeCode@5ab956d7
+    // m_id com.eprosima.idl.parser.typecode.PrimitiveTypeCode@2d9caaeb
     m_id = 0;
-    // m_type com.eprosima.idl.parser.typecode.StringTypeCode@3646a422
+    // m_type com.eprosima.idl.parser.typecode.StringTypeCode@42a15bdc
     m_type ="";
-    // m_rolename com.eprosima.idl.parser.typecode.StringTypeCode@750e2b97
+    // m_rolename com.eprosima.idl.parser.typecode.StringTypeCode@44a59da3
     m_rolename ="";
-    // m_wheels com.eprosima.idl.parser.typecode.SequenceTypeCode@3e27aa33
+    // m_wheels com.eprosima.idl.parser.typecode.SequenceTypeCode@27e47833
 
-    // m_max_rpm com.eprosima.idl.parser.typecode.PrimitiveTypeCode@2e385cce
+    // m_max_rpm com.eprosima.idl.parser.typecode.PrimitiveTypeCode@6f6745d6
     m_max_rpm = 0.0;
-    // m_moi com.eprosima.idl.parser.typecode.PrimitiveTypeCode@2ddc9a9f
+    // m_moi com.eprosima.idl.parser.typecode.PrimitiveTypeCode@27508c5d
     m_moi = 0.0;
-    // m_damping_rate_full_throttle com.eprosima.idl.parser.typecode.PrimitiveTypeCode@298a5e20
+    // m_damping_rate_full_throttle com.eprosima.idl.parser.typecode.PrimitiveTypeCode@4f704591
     m_damping_rate_full_throttle = 0.0;
-    // m_damping_rate_zero_throttle_clutch_engaged com.eprosima.idl.parser.typecode.PrimitiveTypeCode@2a7f1f10
+    // m_damping_rate_zero_throttle_clutch_engaged com.eprosima.idl.parser.typecode.PrimitiveTypeCode@4b5189ac
     m_damping_rate_zero_throttle_clutch_engaged = 0.0;
-    // m_damping_rate_zero_throttle_clutch_disengaged com.eprosima.idl.parser.typecode.PrimitiveTypeCode@46cdf8bd
+    // m_damping_rate_zero_throttle_clutch_disengaged com.eprosima.idl.parser.typecode.PrimitiveTypeCode@1e4d3ce5
     m_damping_rate_zero_throttle_clutch_disengaged = 0.0;
-    // m_use_gear_autobox com.eprosima.idl.parser.typecode.PrimitiveTypeCode@f0c8a99
+    // m_use_gear_autobox com.eprosima.idl.parser.typecode.PrimitiveTypeCode@3ddc6915
     m_use_gear_autobox = false;
-    // m_gear_switch_time com.eprosima.idl.parser.typecode.PrimitiveTypeCode@740cae06
+    // m_gear_switch_time com.eprosima.idl.parser.typecode.PrimitiveTypeCode@704deff2
     m_gear_switch_time = 0.0;
-    // m_clutch_strength com.eprosima.idl.parser.typecode.PrimitiveTypeCode@26d9b808
+    // m_clutch_strength com.eprosima.idl.parser.typecode.PrimitiveTypeCode@379614be
     m_clutch_strength = 0.0;
-    // m_mass com.eprosima.idl.parser.typecode.PrimitiveTypeCode@f78a47e
+    // m_mass com.eprosima.idl.parser.typecode.PrimitiveTypeCode@404bbcbd
     m_mass = 0.0;
-    // m_drag_coefficient com.eprosima.idl.parser.typecode.PrimitiveTypeCode@644baf4a
+    // m_drag_coefficient com.eprosima.idl.parser.typecode.PrimitiveTypeCode@1e81f160
     m_drag_coefficient = 0.0;
-    // m_center_of_mass com.eprosima.fastdds.idl.parser.typecode.StructTypeCode@7526515b
+    // m_center_of_mass com.eprosima.fastdds.idl.parser.typecode.StructTypeCode@1acaf3d
 
-    // m_shape com.eprosima.fastdds.idl.parser.typecode.StructTypeCode@1ed4ae0f
+    // m_shape com.eprosima.fastdds.idl.parser.typecode.StructTypeCode@6986852
 
 
 }

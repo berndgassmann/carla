@@ -44,6 +44,7 @@
 #  include "Carla/Sensor/SceneCaptureCamera.h"
 #  include "Carla/Sensor/SemanticSegmentationCamera.h"
 #  include "Carla/Sensor/InstanceSegmentationCamera.h"
+#  include "Carla/Sensor/V2XSensor.h"
 #endif
 
 void UActorDispatcher::Bind(FActorDefinition Definition, SpawnFunctionType Functor)
@@ -228,6 +229,8 @@ carla::ros2::types::PublisherSensorType GetPublisherSensorType(ASensor * Sensor)
     SensorType = carla::ros2::types::PublisherSensorType::CameraGBufferFloat;
   } else if ( dynamic_cast<ACustomV2XSensor *>(Sensor) ) {
     SensorType = carla::ros2::types::PublisherSensorType::V2XCustom;
+  } else if ( dynamic_cast<AV2XSensor *>(Sensor) ) {
+    SensorType = carla::ros2::types::PublisherSensorType::V2X;
   } else {
      // not derived from ASensor, is initialized in each case separately
      //carla::ros2::types::PublisherSensorType::WorldObserver
@@ -253,7 +256,7 @@ void RegisterActorROS2(std::shared_ptr<carla::ros2::ROS2> ROS2, FCarlaActor* Car
       carla::ros2::types::V2XCustomSendCallback V2XCustomSendCallback = [V2XCustomSensor](carla::rpc::CustomV2XBytes const &Data) -> void {
         V2XCustomSensor->Send(Data);
       };
-      ROS2->AddSensorUe(SensorActorDefinition, V2XCustomSendCallback);
+      ROS2->AddV2XCustomSensorUe(SensorActorDefinition, V2XCustomSendCallback);
     }
     else {
       ROS2->AddSensorUe(SensorActorDefinition);

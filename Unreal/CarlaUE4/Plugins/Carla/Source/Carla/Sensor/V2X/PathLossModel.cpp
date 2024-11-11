@@ -18,13 +18,9 @@ double PathLossModel::Frequency_GHz = 5.9f;
 double PathLossModel::Frequency = 5.9f * std::pow(10, 9);
 double PathLossModel::lambda = PathLossModel::c_speedoflight / (5.9f * std::pow(10, 9));
 
-PathLossModel::PathLossModel(URandomEngine *random_engine)
+PathLossModel::PathLossModel(URandomEngine *random_engine, AActor *Owner)
 {
     mRandomEngine = random_engine;
-}
-
-void PathLossModel::SetOwner(AActor *Owner)
-{
     mActorOwner = Owner;
 }
 

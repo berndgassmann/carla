@@ -40,9 +40,9 @@ using namespace eprosima::fastcdr::exception;
 
 carla_msgs::msg::CarlaLaneInvasionEvent::CarlaLaneInvasionEvent()
 {
-    // m_header com.eprosima.fastdds.idl.parser.typecode.StructTypeCode@37654521
+    // m_header com.eprosima.fastdds.idl.parser.typecode.StructTypeCode@2f217633
 
-    // m_crossed_lane_markings com.eprosima.idl.parser.typecode.SequenceTypeCode@15aab8c6
+    // m_crossed_lane_markings com.eprosima.idl.parser.typecode.SequenceTypeCode@5acf93bb
 
 
 }

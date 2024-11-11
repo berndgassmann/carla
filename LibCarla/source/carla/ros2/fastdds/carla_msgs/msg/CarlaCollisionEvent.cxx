@@ -36,11 +36,11 @@ using namespace eprosima::fastcdr::exception;
 
 carla_msgs::msg::CarlaCollisionEvent::CarlaCollisionEvent()
 {
-    // m_header com.eprosima.fastdds.idl.parser.typecode.StructTypeCode@1190200a
+    // m_header com.eprosima.fastdds.idl.parser.typecode.StructTypeCode@31f9b85e
 
-    // m_other_actor_id com.eprosima.idl.parser.typecode.PrimitiveTypeCode@6a2f6f80
+    // m_other_actor_id com.eprosima.idl.parser.typecode.PrimitiveTypeCode@424e1977
     m_other_actor_id = 0;
-    // m_normal_impulse com.eprosima.fastdds.idl.parser.typecode.StructTypeCode@45b4c3a9
+    // m_normal_impulse com.eprosima.fastdds.idl.parser.typecode.StructTypeCode@10d68fcd
 
 
 }

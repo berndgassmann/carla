@@ -36,11 +36,11 @@ using namespace eprosima::fastcdr::exception;
 
 carla_msgs::msg::CarlaActorBlueprint::CarlaActorBlueprint()
 {
-    // m_id com.eprosima.idl.parser.typecode.StringTypeCode@176d53b2
+    // m_id com.eprosima.idl.parser.typecode.StringTypeCode@971d0d8
     m_id ="";
-    // m_tags com.eprosima.idl.parser.typecode.SequenceTypeCode@971d0d8
+    // m_tags com.eprosima.idl.parser.typecode.SequenceTypeCode@51931956
 
-    // m_attributes com.eprosima.idl.parser.typecode.SequenceTypeCode@51931956
+    // m_attributes com.eprosima.idl.parser.typecode.SequenceTypeCode@2b4a2ec7
 
 
 }

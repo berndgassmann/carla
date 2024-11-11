@@ -384,8 +384,8 @@ static boost::python::list GetProtectedCommunicationZone(const CAMContainer::RSU
 {
     boost::python::list PCZlist;
 
-    for (ITSContainer::ProtectedCommunicationZone_t data : rsuMessage.protectedCommunicationZonesRSU.list)
-    {
+    for (auto i=0u; i< rsuMessage.protectedCommunicationZonesRSU.ProtectedCommunicationZoneCount; ++i) {
+        ITSContainer::ProtectedCommunicationZone_t const &data=rsuMessage.protectedCommunicationZonesRSU.data[i];
         boost::python::dict PCZDict;
         PCZDict["Protected Zone Type"] = data.protectedZoneType;
         if (data.expiryTimeAvailable)
@@ -480,8 +480,10 @@ boost::python::list GetPathHistory(const ITSContainer::PathHistory_t &pathHistor
 {
 
     boost::python::list PathHistoryList;
-    for (ITSContainer::PathPoint_t pathPoint : pathHistory.data)
+
+    for (auto i=0u; i<pathHistory.NumberOfPathPoint; ++i)
     {
+        ITSContainer::PathPoint_t const &pathPoint = pathHistory.data[i];
         boost::python::dict PathHistory;
         PathHistory["Delta Latitude"] = pathPoint.pathPosition.deltaLatitude;
         PathHistory["Delta Longitude"] = pathPoint.pathPosition.deltaLongitude;

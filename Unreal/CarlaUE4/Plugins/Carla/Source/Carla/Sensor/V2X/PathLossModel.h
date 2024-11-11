@@ -35,8 +35,7 @@ enum EScenario
 class PathLossModel
 {
 public:
-    PathLossModel(URandomEngine *random_engine);
-    void SetOwner(AActor *Owner);
+    PathLossModel(URandomEngine *random_engine, AActor *Owner);
     void SetScenario(EScenario scenario);
     void Simulate(const std::vector<ActorPowerPair> ActorList, UCarlaEpisode *CarlaEpisode, UWorld *World);
     ActorPowerMap GetReceiveActorPowerList();

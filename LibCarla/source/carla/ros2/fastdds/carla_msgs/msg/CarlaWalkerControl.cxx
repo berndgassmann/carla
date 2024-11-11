@@ -36,13 +36,13 @@ using namespace eprosima::fastcdr::exception;
 
 carla_msgs::msg::CarlaWalkerControl::CarlaWalkerControl()
 {
-    // m_header com.eprosima.fastdds.idl.parser.typecode.StructTypeCode@7ce026d3
+    // m_header com.eprosima.fastdds.idl.parser.typecode.StructTypeCode@563e4951
 
-    // m_direction com.eprosima.fastdds.idl.parser.typecode.StructTypeCode@7ce69770
+    // m_direction com.eprosima.fastdds.idl.parser.typecode.StructTypeCode@4066c471
 
-    // m_speed com.eprosima.idl.parser.typecode.PrimitiveTypeCode@1750fbeb
+    // m_speed com.eprosima.idl.parser.typecode.PrimitiveTypeCode@2b175c00
     m_speed = 0.0;
-    // m_jump com.eprosima.idl.parser.typecode.PrimitiveTypeCode@5b247367
+    // m_jump com.eprosima.idl.parser.typecode.PrimitiveTypeCode@3eb81efb
     m_jump = false;
 
 }

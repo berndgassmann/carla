@@ -39,11 +39,11 @@ using namespace eprosima::fastcdr::exception;
 
 carla_msgs::msg::CarlaVehicleControlStatus::CarlaVehicleControlStatus()
 {
-    // m_active_control_type com.eprosima.idl.parser.typecode.PrimitiveTypeCode@4ef37659
+    // m_active_control_type com.eprosima.idl.parser.typecode.PrimitiveTypeCode@62833051
     m_active_control_type = 0;
-    // m_last_applied_vehicle_control com.eprosima.fastdds.idl.parser.typecode.StructTypeCode@776b83cc
+    // m_last_applied_vehicle_control com.eprosima.fastdds.idl.parser.typecode.StructTypeCode@1c852c0f
 
-    // m_last_applied_ackermann_control com.eprosima.fastdds.idl.parser.typecode.StructTypeCode@37858383
+    // m_last_applied_ackermann_control com.eprosima.fastdds.idl.parser.typecode.StructTypeCode@a37aefe
 
 
 }

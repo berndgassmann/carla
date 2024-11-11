@@ -37,9 +37,9 @@ using namespace eprosima::fastcdr::exception;
 
 carla_msgs::msg::CarlaV2XByteArray::CarlaV2XByteArray()
 {
-    // m_data_size com.eprosima.idl.parser.typecode.PrimitiveTypeCode@14dd9eb7
+    // m_data_size com.eprosima.idl.parser.typecode.PrimitiveTypeCode@1a75e76a
     m_data_size = 0;
-    // m_bytes com.eprosima.idl.parser.typecode.AliasTypeCode@52e6fdee
+    // m_bytes com.eprosima.idl.parser.typecode.AliasTypeCode@5524cca1
     memset(&m_bytes, 0, (100) * 1);
 
 }

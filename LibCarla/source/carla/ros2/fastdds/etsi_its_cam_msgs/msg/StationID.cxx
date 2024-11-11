@@ -39,7 +39,7 @@ using namespace eprosima::fastcdr::exception;
 
 etsi_its_cam_msgs::msg::StationID::StationID()
 {
-    // m_value com.eprosima.idl.parser.typecode.PrimitiveTypeCode@25359ed8
+    // m_value com.eprosima.idl.parser.typecode.PrimitiveTypeCode@6e6d5d29
     m_value = 0;
 
 }

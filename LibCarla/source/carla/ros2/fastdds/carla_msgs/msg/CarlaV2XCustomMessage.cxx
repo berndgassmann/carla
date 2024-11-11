@@ -36,9 +36,9 @@ using namespace eprosima::fastcdr::exception;
 
 carla_msgs::msg::CarlaV2XCustomMessage::CarlaV2XCustomMessage()
 {
-    // m_header com.eprosima.fastdds.idl.parser.typecode.StructTypeCode@5223e5ee
+    // m_header com.eprosima.fastdds.idl.parser.typecode.StructTypeCode@3de8f619
 
-    // m_data com.eprosima.fastdds.idl.parser.typecode.StructTypeCode@22a637e7
+    // m_data com.eprosima.fastdds.idl.parser.typecode.StructTypeCode@2ab4bc72
 
 
 }

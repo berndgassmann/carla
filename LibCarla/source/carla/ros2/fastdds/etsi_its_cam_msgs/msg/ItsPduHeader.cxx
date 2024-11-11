@@ -54,11 +54,11 @@ using namespace eprosima::fastcdr::exception;
 
 etsi_its_cam_msgs::msg::ItsPduHeader::ItsPduHeader()
 {
-    // m_protocol_version com.eprosima.idl.parser.typecode.PrimitiveTypeCode@4278a03f
+    // m_protocol_version com.eprosima.idl.parser.typecode.PrimitiveTypeCode@640f11a1
     m_protocol_version = 0;
-    // m_message_id com.eprosima.idl.parser.typecode.PrimitiveTypeCode@124c278f
+    // m_message_id com.eprosima.idl.parser.typecode.PrimitiveTypeCode@5c10f1c3
     m_message_id = 0;
-    // m_station_id com.eprosima.fastdds.idl.parser.typecode.StructTypeCode@15b204a1
+    // m_station_id com.eprosima.fastdds.idl.parser.typecode.StructTypeCode@7ac2e39b
 
 
 }

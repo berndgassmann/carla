@@ -1,6 +1,6 @@
 #pragma once
 #include <stdint.h>
-#include <vector>
+#include <array>
 #include <cstring>
 
 #include "carla/rpc/CustomV2XBytes.h"
@@ -534,7 +534,7 @@ public:
     /* ProtectedCommunicationZonesRSU */
     typedef struct ProtectedCommunicationZonesRSU {
         long ProtectedCommunicationZoneCount;
-        std::vector<ProtectedCommunicationZone_t> list;
+        std::array<ProtectedCommunicationZone_t, 16u> data;  /* (SIZE(1..16)) */
     } ProtectedCommunicationZonesRSU_t;
 
     /* VehicleRole Dependencies */
@@ -629,7 +629,7 @@ public:
     /* PathHistory */
     typedef struct PathHistory {
         long NumberOfPathPoint;
-        std::vector<PathPoint_t> data;
+        std::array<PathPoint_t, 40u> data; /* (SIZE(0..40)) */
     } PathHistory_t;
 };
 

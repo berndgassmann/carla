@@ -35,6 +35,7 @@
 #include "carla/ros2/publishers/UeSSCameraPublisher.h"
 #include "carla/ros2/publishers/UeSemanticLidarPublisher.h"
 #include "carla/ros2/publishers/UeWorldPublisher.h"
+#include "carla/ros2/publishers/UeV2XPublisher.h"
 #include "carla/ros2/publishers/UeV2XCustomPublisher.h"
 #include "carla/ros2/publishers/VehiclePublisher.h"
 
@@ -84,13 +85,13 @@ void ROS2::Enable(carla::rpc::RpcServerInterface *carla_server,
       *world_observer_actor_definition,
       carla::ros2::types::PublisherSensorType::WorldObserver, 
       world_observer_stream_id);
-  _carla_sensor_actor_list_publisher = std::make_shared<CarlaActorListPublisher>("sensor_list");
   log_warning("ROS2 enabled");
 }
 
 void ROS2::NotifyInitGame() {
   log_warning("ROS2 NotifyInitGame");
 
+  _carla_sensor_actor_list_publisher = std::make_shared<CarlaActorListPublisher>("sensor_list");
   _carla_sensor_actor_list_publisher->Init(_domain_participant_impl);
 
   // The world is crucial and has to be instanciated immediately
@@ -148,6 +149,7 @@ void ROS2::NotifyEndGame() {
   NotifyEndEpisode();
   _world_publisher.reset();
   _transform_publisher.reset();
+  _carla_sensor_actor_list_publisher.reset();
 }
 
 void ROS2::Disable() {
@@ -189,19 +191,31 @@ void ROS2::AddTrafficSignUe(
   _world_publisher->AddTrafficSignUe(traffic_sign_actor_definition);
 }
 
-bool ROS2::AddSensorUe(std::shared_ptr<carla::ros2::types::SensorActorDefinition> sensor_actor_definition, 
-     carla::ros2::types::V2XCustomSendCallback v2x_custom_send_callback) {
-
+ROS2::UeSensor* ROS2::AddSensorUeInternal(std::shared_ptr<carla::ros2::types::SensorActorDefinition> sensor_actor_definition) {
   auto insert_result = _ue_sensors.insert({sensor_actor_definition->stream_id, UeSensor(sensor_actor_definition)});
   if (!insert_result.second) {
     log_warning("ROS2::AddSensorUe(", std::to_string(*sensor_actor_definition),
                 "): Sensor already_registered. Ignoring");
-    return false;
+    return nullptr;
   }
   _ue_sensors_changed = true;
-  insert_result.first->second.v2x_custom_send_callback = v2x_custom_send_callback;
-  return true;
+  return &insert_result.first->second;
 }    
+
+bool ROS2::AddSensorUe(std::shared_ptr<carla::ros2::types::SensorActorDefinition> sensor_actor_definition) {
+  auto ue_sensor = AddSensorUeInternal(sensor_actor_definition);
+  return  ue_sensor != nullptr;
+}
+
+bool ROS2::AddV2XCustomSensorUe(std::shared_ptr<carla::ros2::types::SensorActorDefinition> sensor_actor_definition, 
+    carla::ros2::types::V2XCustomSendCallback v2x_custom_send_callback) {
+  auto ue_sensor = AddSensorUeInternal(sensor_actor_definition);
+  if ( ue_sensor != nullptr ) {
+    ue_sensor->v2x_custom_send_callback = v2x_custom_send_callback;
+    return true;
+  }
+  return false;
+}
 
 void ROS2::AttachActors(ActorId const child, ActorId const parent) {
   log_warning("ROS2::AttachActors[", child, "]: parent=", parent);
@@ -281,6 +295,10 @@ void ROS2::CreateSensorUePublisher(UeSensor &sensor) {
       _world_publisher =
           std::make_shared<UeWorldPublisher>(*_carla_server, _name_registry, sensor.sensor_actor_definition);
       sensor.publisher = std::static_pointer_cast<UePublisherBaseSensor>(_world_publisher);
+    } break;
+    case types::PublisherSensorType::V2X : {
+      sensor.publisher = std::static_pointer_cast<UePublisherBaseSensor>(
+          std::make_shared<UeV2XPublisher>(sensor.sensor_actor_definition, _transform_publisher));
     } break;
     case types::PublisherSensorType::V2XCustom : {
       sensor.publisher = std::static_pointer_cast<UePublisherBaseSensor>(

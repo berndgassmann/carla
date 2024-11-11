@@ -36,9 +36,9 @@ using namespace eprosima::fastcdr::exception;
 
 carla_msgs::msg::CarlaWorldInfo::CarlaWorldInfo()
 {
-    // m_map_name com.eprosima.idl.parser.typecode.StringTypeCode@6f53b8a
+    // m_map_name com.eprosima.idl.parser.typecode.StringTypeCode@75d2da2d
     m_map_name ="";
-    // m_opendrive com.eprosima.idl.parser.typecode.StringTypeCode@5c80cf32
+    // m_opendrive com.eprosima.idl.parser.typecode.StringTypeCode@4278284b
     m_opendrive ="";
 
 }
