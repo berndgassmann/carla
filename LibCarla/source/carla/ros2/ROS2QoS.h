@@ -61,7 +61,7 @@ struct ROS2QoS {
 static constexpr ROS2QoS DEFAULT_ROS2_QOS{ ._reliability = ROS2QoS::Reliability::RELIABLE, ._durability = ROS2QoS::Durability::VOLATILE,
                                           ._history = ROS2QoS::History::KEEP_LAST, ._history_depth = 10};
 
-static constexpr ROS2QoS DEFAULT_SENSOR_DATA_QOS{._reliability = ROS2QoS::Reliability::BEST_EFFORT, ._durability = ROS2QoS::Durability::VOLATILE,
+static constexpr ROS2QoS DEFAULT_SENSOR_DATA_QOS{._reliability = ROS2QoS::Reliability::RELIABLE, ._durability = ROS2QoS::Durability::VOLATILE,
                                                  ._history = ROS2QoS::History::KEEP_LAST, ._history_depth = 10};
 
 static constexpr ROS2QoS DEFAULT_SUBSCRIBER_QOS{._reliability = ROS2QoS::Reliability::BEST_EFFORT, ._durability = ROS2QoS::Durability::VOLATILE,

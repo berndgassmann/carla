@@ -81,7 +81,7 @@ if exist "%FASTDDS_INSTALL_DIR%" (
 if not exist "%FASTDDS_SRC_DIR%" (
     echo %FILE_N% Cloning "Fast-DDS"
 
-    git clone --depth 1 --branch 2.11.3 https://github.com/eProsima/Fast-DDS.git "%FASTDDS_SRC_DIR:~0,-1%"
+    git clone --depth 1 --branch 2.14.4 https://github.com/eProsima/Fast-DDS.git "%FASTDDS_SRC_DIR:~0,-1%"
     if %errorlevel% neq 0 goto error_git
     git submodule init
     if %errorlevel% neq 0 goto error_git
