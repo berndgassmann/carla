@@ -70,6 +70,10 @@ namespace geom {
       return a.x * b.x + a.y * b.y + a.z * b.z;
     }
 
+    static auto Length(const Vector3D &a) {
+      return std::sqrt(Math::Dot(a, a));
+    }
+
     static auto Dot2D(const Vector3D &a, const Vector3D &b) {
       return a.x * b.x + a.y * b.y;
     }
@@ -94,8 +98,11 @@ namespace geom {
       return a * (1.0f - f) + (b * f);
     }
 
-    /// Returns the angle between 2 vectors in radians
-    static double GetVectorAngle(const Vector3D &a, const Vector3D &b);
+    /// Returns the angle between 2 vectors in radians in  [-PI; PI]
+    static float GetVectorAngle(const Vector3D &a, const Vector3D &b);
+
+    /// Returns the abs angle between 2 vectors in radians in [0; PI]
+    static float GetVectorAngleAbs(const Vector3D &a, const Vector3D &b);
 
     /// Returns a pair containing:
     /// - @b first:  distance from v to p' where p' = p projected on segment
@@ -173,6 +180,53 @@ namespace geom {
     static float CosineVectorAngle(Vector3D const &a, Vector3D const &b)
     {
       return CosineVectorAngleFromUnitVectors(a.MakeUnitVector(), b.MakeUnitVector());
+    }
+
+    /** Returns the absolute of the sine of the angle between the two vectors
+     * 
+     * This is based on the Cross() of the vectors
+     *   a x b = ||a|| * ||b|| * sin(phi) * n
+     * with n being the unit vector of the vector with right angles to both a and b
+     * 
+     * \param a just a vector
+     * \param b another vector
+     * 
+     * \returns The absolute of the sine of the angle between the two given vectors
+     */
+    static float SineVectorAngleAbs(Vector3D const &a, Vector3D const &b) 
+    {
+      return Math::Length(Math::Cross(a.MakeUnitVector(), b.MakeUnitVector()));
+    }
+
+    /** Returns the sine of the angle between the two unit vectors whereas the sign is dertermined in respect to the up-vector
+     * 
+     * This is based on the Cross() of the vectors
+     *   a x b = ||a|| * ||b|| * sin(phi) * n
+     * with n being the unit vector of the vector with right angles to both a and b
+     * 
+     * Be aware: use this optimized function if you are sure that vectors a_unit and b_unit are actually a unit vectors!
+     *
+     * \param a_unit must be a unit vector
+     * \param b_unit must be a unit vector
+     * 
+     * \returns The absolute of the sine of the angle between the two given vectors
+     */
+    static float SineVectorAngleFromUnitVectors(Vector3D const &a_unit, Vector3D const &b_unit);
+
+    /** Returns the sine of the angle between the two vectors whereas the sign is dertermined in respect to the up-vector
+     * 
+     * This is based on the Cross() of the vectors
+     *   a x b = ||a|| * ||b|| * sin(phi) * n
+     * with n being the unit vector of the vector with right angles to both a and b
+     * 
+     * \param a just a vector
+     * \param b another vector
+     * 
+     * \returns The absolute of the sine of the angle between the two given vectors
+     */
+    static float SineVectorAngle(Vector3D const &a, Vector3D const &b)
+    {
+      return SineVectorAngleFromUnitVectors(a.MakeUnitVector(), b.MakeUnitVector());
     }
 
     /** Returns the signbit of the cosine of the angle between vector \c a and unit vector \c b_unit
