@@ -84,13 +84,12 @@ public:
     auto topic_qos = eprosima::fastdds::dds::TOPIC_QOS_DEFAULT;
     topic_qos.history().kind = eprosima::fastdds::dds::KEEP_ALL_HISTORY_QOS;
     topic_qos.reliability().kind = eprosima::fastdds::dds::RELIABLE_RELIABILITY_QOS;
-    _request_topic =
-        _participant->create_topic(request_name, _request_type->getName(), topic_qos);
+    _request_topic = _participant->create_topic(request_name, _request_type->getName(), topic_qos);
     if (_request_topic == nullptr) {
       carla::log_error("DdsServiceImpl[", topic_name, "]::Init(): Failed to create Request Topic");
       return false;
     }
-    auto subscriber_qos= eprosima::fastdds::dds::SUBSCRIBER_QOS_DEFAULT;
+    auto subscriber_qos = eprosima::fastdds::dds::SUBSCRIBER_QOS_DEFAULT;
     _subscriber = _participant->create_subscriber(subscriber_qos);
     if (_subscriber == nullptr) {
       carla::log_error("DdsServiceImpl[", topic_name, "]::Init(): Failed to create Subscriber");
@@ -101,8 +100,7 @@ public:
     auto datareader_qos = eprosima::fastdds::dds::DATAREADER_QOS_DEFAULT;
     datareader_qos.history().kind = eprosima::fastdds::dds::KEEP_ALL_HISTORY_QOS;
     datareader_qos.reliability().kind = eprosima::fastdds::dds::RELIABLE_RELIABILITY_QOS;
-    _datareader =
-        _subscriber->create_datareader(_request_topic, datareader_qos, reader_listener);
+    _datareader = _subscriber->create_datareader(_request_topic, datareader_qos, reader_listener);
     if (_datareader == nullptr) {
       carla::log_error("DdsServiceImpl[", topic_name, "]::Init(): Failed to create DataReader");
       return false;
@@ -115,8 +113,7 @@ public:
       return false;
     }
     _resonse_type.register_type(_participant);
-    _response_topic =
-        _participant->create_topic(response_name, _resonse_type->getName(), topic_qos);
+    _response_topic = _participant->create_topic(response_name, _resonse_type->getName(), topic_qos);
     if (_response_topic == nullptr) {
       carla::log_error("DdsServiceImpl[", topic_name, "]::Init(): Failed to create Response Topic");
       return false;

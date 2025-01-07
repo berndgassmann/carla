@@ -24,7 +24,8 @@ VehiclePublisher::VehiclePublisher(std::shared_ptr<carla::ros2::types::VehicleAc
     _vehicle_speed_publisher(std::make_shared<VehicleSpeedPublisherImpl>()),
     _vehicle_steering_angle_publisher(std::make_shared<VehicleSteeringAnglePublisherImpl>()),
     _vehicle_object_publisher(std::make_shared<ObjectPublisher>(*this, objects_publisher)),
-    _vehicle_object_with_covariance_publisher(std::make_shared<ObjectWithCovariancePublisher>(*this, objects_with_covariance_publisher)) {
+    _vehicle_object_with_covariance_publisher(
+        std::make_shared<ObjectWithCovariancePublisher>(*this, objects_with_covariance_publisher)) {
   // prefill some vehicle info data
   _vehicle_info_publisher->Message().id(vehicle_actor_definition->id);
   _vehicle_info_publisher->Message().type(vehicle_actor_definition->type_id);
@@ -57,22 +58,28 @@ VehiclePublisher::VehiclePublisher(std::shared_ptr<carla::ros2::types::VehicleAc
       vehicle_actor_definition->vehicle_physics_control.damping_rate_zero_throttle_clutch_engaged);
   _vehicle_info_publisher->Message().damping_rate_zero_throttle_clutch_disengaged(
       vehicle_actor_definition->vehicle_physics_control.damping_rate_zero_throttle_clutch_disengaged);
-  _vehicle_info_publisher->Message().use_gear_autobox(vehicle_actor_definition->vehicle_physics_control.use_gear_autobox);
-  _vehicle_info_publisher->Message().gear_switch_time(vehicle_actor_definition->vehicle_physics_control.gear_switch_time);
+  _vehicle_info_publisher->Message().use_gear_autobox(
+      vehicle_actor_definition->vehicle_physics_control.use_gear_autobox);
+  _vehicle_info_publisher->Message().gear_switch_time(
+      vehicle_actor_definition->vehicle_physics_control.gear_switch_time);
   _vehicle_info_publisher->Message().clutch_strength(vehicle_actor_definition->vehicle_physics_control.clutch_strength);
   _vehicle_info_publisher->Message().mass(vehicle_actor_definition->vehicle_physics_control.mass);
-  _vehicle_info_publisher->Message().drag_coefficient(vehicle_actor_definition->vehicle_physics_control.drag_coefficient);
+  _vehicle_info_publisher->Message().drag_coefficient(
+      vehicle_actor_definition->vehicle_physics_control.drag_coefficient);
   _vehicle_info_publisher->Message().center_of_mass(CoordinateSystemTransform::TransformLocationToVector3Msg(
       vehicle_actor_definition->vehicle_physics_control.center_of_mass));
   _vehicle_info_publisher->SetMessageUpdated();
 }
 
 bool VehiclePublisher::Init(std::shared_ptr<DdsDomainParticipantImpl> domain_participant) {
-  return _vehicle_info_publisher->Init(domain_participant, get_topic_name("vehicle_info"), PublisherBase::get_topic_qos()) &&
-         _vehicle_control_status_publisher->Init(domain_participant, get_topic_name("vehicle_control_status"), get_topic_qos()) &&
+  return _vehicle_info_publisher->Init(domain_participant, get_topic_name("vehicle_info"),
+                                       PublisherBase::get_topic_qos()) &&
+         _vehicle_control_status_publisher->Init(domain_participant, get_topic_name("vehicle_control_status"),
+                                                 get_topic_qos()) &&
          _vehicle_odometry_publisher->Init(domain_participant, get_topic_name("odometry"), get_topic_qos()) &&
          _vehicle_speed_publisher->Init(domain_participant, get_topic_name("speed"), get_topic_qos()) &&
-         _vehicle_steering_angle_publisher->Init(domain_participant, get_topic_name("steering_angle"), get_topic_qos()) &&
+         _vehicle_steering_angle_publisher->Init(domain_participant, get_topic_name("steering_angle"),
+                                                 get_topic_qos()) &&
          _vehicle_object_publisher->Init(domain_participant) &&
          _vehicle_object_with_covariance_publisher->Init(domain_participant);
 }
@@ -94,7 +101,8 @@ bool VehiclePublisher::Publish() {
 bool VehiclePublisher::SubscribersConnected() const {
   return _vehicle_info_publisher->SubscribersConnected() || _vehicle_control_status_publisher->SubscribersConnected() ||
          _vehicle_odometry_publisher->SubscribersConnected() || _vehicle_speed_publisher->SubscribersConnected() ||
-         _vehicle_steering_angle_publisher->SubscribersConnected() || _vehicle_object_publisher->SubscribersConnected() || 
+         _vehicle_steering_angle_publisher->SubscribersConnected() ||
+         _vehicle_object_publisher->SubscribersConnected() ||
          _vehicle_object_with_covariance_publisher->SubscribersConnected();
 }
 
@@ -104,16 +112,16 @@ void VehiclePublisher::UpdateVehicle(std::shared_ptr<carla::ros2::types::Object>
   _vehicle_odometry_publisher->Message().child_frame_id(frame_id());
   _vehicle_odometry_publisher->Message().pose(object->Transform().pose_with_covariance());
   _vehicle_odometry_publisher->Message().twist(object->AcceleratedMovement().twist_with_covariance());
-  
+
   _vehicle_speed_publisher->Message().data(object->Speed().speed().data());
   _vehicle_speed_publisher->SetMessageUpdated();
 
-  
   _vehicle_steering_angle_publisher->Message().data(
-    carla::geom::Math::ToRadians(actor_dynamic_state.state.vehicle_data.steering_angle_degree));
+      carla::geom::Math::ToRadians(actor_dynamic_state.state.vehicle_data.steering_angle_degree));
   _vehicle_steering_angle_publisher->SetMessageUpdated();
 
-  _vehicle_control_status_publisher->Message().active_control_type(carla::ros2::types::GetVehicleControlType(actor_dynamic_state));
+  _vehicle_control_status_publisher->Message().active_control_type(
+      carla::ros2::types::GetVehicleControlType(actor_dynamic_state));
   _vehicle_control_status_publisher->Message().last_applied_vehicle_control(
       carla::ros2::types::VehicleControl(actor_dynamic_state.state.vehicle_data.GetVehicleControl())
           .carla_vehicle_control());

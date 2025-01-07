@@ -145,10 +145,9 @@ public:
     return true;
   }
 
-  std::string GetPublisherGuid(
-      eprosima::fastdds::dds::InstanceHandle_t const& instance_handle) {
+  std::string GetPublisherGuid(eprosima::fastdds::dds::InstanceHandle_t const& instance_handle) {
     auto insert_result = _instance_handles.insert({instance_handle, ""});
-    if ( insert_result.second ) {
+    if (insert_result.second) {
       // only perform the conversion from GUID to string once when inserted first time
       eprosima::fastrtps::rtps::GUID_t guid(insert_result.first->first);
       std::stringstream namestream;

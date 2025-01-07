@@ -12,12 +12,13 @@
 namespace carla {
 namespace ros2 {
 
-using ObjectWithCovariancePublisherImpl =
-    DdsPublisherImpl<derived_object_msgs::msg::ObjectWithCovariance, derived_object_msgs::msg::ObjectWithCovariancePubSubType>;
+using ObjectWithCovariancePublisherImpl = DdsPublisherImpl<derived_object_msgs::msg::ObjectWithCovariance,
+                                                           derived_object_msgs::msg::ObjectWithCovariancePubSubType>;
 
 class ObjectWithCovariancePublisher : public PublisherInterface {
 public:
-  ObjectWithCovariancePublisher(ROS2NameRecord &parent_publisher, std::shared_ptr<ObjectsWithCovariancePublisher> objects_publisher);
+  ObjectWithCovariancePublisher(ROS2NameRecord &parent_publisher,
+                                std::shared_ptr<ObjectsWithCovariancePublisher> objects_publisher);
   virtual ~ObjectWithCovariancePublisher() = default;
 
   /**

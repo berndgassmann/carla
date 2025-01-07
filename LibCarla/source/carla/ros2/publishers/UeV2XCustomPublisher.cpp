@@ -9,15 +9,18 @@
 namespace carla {
 namespace ros2 {
 
-UeV2XCustomPublisher::UeV2XCustomPublisher(std::shared_ptr<carla::ros2::types::SensorActorDefinition> sensor_actor_definition,
-                                 carla::ros2::types::V2XCustomSendCallback v2x_custom_send_callback,
-                                 std::shared_ptr<TransformPublisher> transform_publisher)
+UeV2XCustomPublisher::UeV2XCustomPublisher(
+    std::shared_ptr<carla::ros2::types::SensorActorDefinition> sensor_actor_definition,
+    carla::ros2::types::V2XCustomSendCallback v2x_custom_send_callback,
+    std::shared_ptr<TransformPublisher> transform_publisher)
   : UePublisherBaseSensor(sensor_actor_definition, transform_publisher),
     _subscriber(std::make_shared<UeV2XCustomSubscriber>(*this, v2x_custom_send_callback)),
     _impl(std::make_shared<UeV2XCustomPublisherImpl>()) {}
 
 bool UeV2XCustomPublisher::Init(std::shared_ptr<DdsDomainParticipantImpl> domain_participant) {
-  _initialized = _impl->InitHistoryPreallocatedWithReallocMemoryMode(domain_participant, get_topic_name(), get_topic_qos().reliable()) && _subscriber->Init(domain_participant);
+  _initialized = _impl->InitHistoryPreallocatedWithReallocMemoryMode(domain_participant, get_topic_name(),
+                                                                     get_topic_qos().reliable()) &&
+                 _subscriber->Init(domain_participant);
   return _initialized;
 }
 
@@ -28,8 +31,7 @@ bool UeV2XCustomPublisher::SubscribersConnected() const {
   return _impl->SubscribersConnected();
 }
 
-void UeV2XCustomPublisher::UpdateSensorDataPreAction()
-{
+void UeV2XCustomPublisher::UpdateSensorDataPreAction() {
   if (!_initialized) {
     return;
   }
@@ -39,14 +41,13 @@ void UeV2XCustomPublisher::UpdateSensorDataPreAction()
 void UeV2XCustomPublisher::UpdateSensorData(
     std::shared_ptr<carla::sensor::s11n::SensorHeaderSerializer::Header const> sensor_header,
     carla::SharedBufferView buffer_view) {
-
   auto custom_v2x_data_vector = vector_view(buffer_view);
 
-  if ( _impl->WasMessagePublished() ) {
+  if (_impl->WasMessagePublished()) {
     _impl->Message().data().clear();
   }
 
-  for (carla::sensor::data::CustomV2XData const &custom_v2x_data: custom_v2x_data_vector) {
+  for (carla::sensor::data::CustomV2XData const &custom_v2x_data : custom_v2x_data_vector) {
     carla_msgs::msg::CarlaV2XCustomData carla_v2x_custom_data;
     carla_v2x_custom_data.power(custom_v2x_data.Power);
     carla_msgs::msg::CarlaV2XCustomMessage carla_v2x_custom_message;

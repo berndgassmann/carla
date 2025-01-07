@@ -42,7 +42,6 @@ public:
                         const carla::SharedBufferView buffer_view) override;
 
 private:
-
   carla::geom::GeoLocation data(carla::SharedBufferView buffer_view) {
     return MsgPack::UnPack<carla::geom::GeoLocation>(buffer_view->data(), buffer_view->size());
   }

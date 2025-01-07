@@ -24,12 +24,9 @@ using VehicleInfoPublisherImpl =
     DdsPublisherImpl<carla_msgs::msg::CarlaVehicleInfo, carla_msgs::msg::CarlaVehicleInfoPubSubType>;
 using VehicleControlStatusPublisherImpl =
     DdsPublisherImpl<carla_msgs::msg::CarlaVehicleControlStatus, carla_msgs::msg::CarlaVehicleControlStatusPubSubType>;
-using VehicleSpeedPublisherImpl =
-    DdsPublisherImpl<std_msgs::msg::Float32, std_msgs::msg::Float32PubSubType>;
-using VehicleSteeringAnglePublisherImpl =
-    DdsPublisherImpl<std_msgs::msg::Float32, std_msgs::msg::Float32PubSubType>;
-using VehicleOdometryPublisherImpl = 
-    DdsPublisherImpl<nav_msgs::msg::Odometry, nav_msgs::msg::OdometryPubSubType>;
+using VehicleSpeedPublisherImpl = DdsPublisherImpl<std_msgs::msg::Float32, std_msgs::msg::Float32PubSubType>;
+using VehicleSteeringAnglePublisherImpl = DdsPublisherImpl<std_msgs::msg::Float32, std_msgs::msg::Float32PubSubType>;
+using VehicleOdometryPublisherImpl = DdsPublisherImpl<nav_msgs::msg::Odometry, nav_msgs::msg::OdometryPubSubType>;
 
 class VehiclePublisher : public PublisherBaseTransform {
 public:

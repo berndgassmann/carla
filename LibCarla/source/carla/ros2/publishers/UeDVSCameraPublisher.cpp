@@ -40,10 +40,9 @@ void UeDVSCameraPublisher::UpdateSensorData(
   auto header_view = this->header_view(buffer_view);
   auto data_vector_view = this->vector_view(buffer_view);
 
-  const sensor_msgs::msg::CameraInfo camera_info(header_view->height, header_view->width, header_view->fov_angle);
   auto const stamp = GetTime(sensor_header);
-  UpdateCameraInfo(stamp, camera_info);
-  UpdateImageHeader(stamp, camera_info);
+  UpdateCameraInfo(stamp, header_view->height, header_view->width, header_view->fov_angle);
+  UpdateImageHeader(stamp, header_view->height, header_view->width);
 
   SetImageData(data_vector_view);
   SetPointCloudData(data_vector_view);
@@ -66,35 +65,29 @@ void UeDVSCameraPublisher::SetPointCloudData(std::vector<DVSEvent, DVSEventVecto
   sensor_msgs::msg::PointField descriptor1;
   descriptor1.name("x");
   descriptor1.offset(offsetof(DVSEvent, x));
-  descriptor1.datatype(sensor_msgs::msg::PointField__UINT16);
+  descriptor1.datatype(sensor_msgs::msg::PointField_Constants::UINT16);
   descriptor1.count(1);
   sensor_msgs::msg::PointField descriptor2;
   descriptor2.name("y");
   descriptor2.offset(offsetof(DVSEvent, y));
-  descriptor2.datatype(sensor_msgs::msg::PointField__UINT16);
+  descriptor2.datatype(sensor_msgs::msg::PointField_Constants::UINT16);
   descriptor2.count(1);
   sensor_msgs::msg::PointField descriptor3;
   descriptor3.name("t");
   descriptor3.offset(offsetof(DVSEvent, t));
-  descriptor3.datatype(
-      sensor_msgs::msg::PointField__FLOAT64);  // PointField__INT64 is not existing, but would be required here!!
+  descriptor3.datatype(sensor_msgs::msg::PointField_Constants::FLOAT64);  // PointField_Constants::INT64 is not
+                                                                          // existing, but would be required here!!
   descriptor3.count(1);
   sensor_msgs::msg::PointField descriptor4;
   descriptor4.name("pol");
   descriptor4.offset(offsetof(DVSEvent, pol));
-  descriptor4.datatype(sensor_msgs::msg::PointField__INT8);
+  descriptor4.datatype(sensor_msgs::msg::PointField_Constants::INT8);
   descriptor4.count(1);
-
 
 #pragma pack(push, 1)
   // definition of the actual data type to be put into the point_cloud (which is different to DVSEvent!!)
   struct DVSPointCloudData {
-    explicit DVSPointCloudData(DVSEvent event)
-     : x (event.x)
-     , y (event.y)
-     , t (event.t)
-     , pol (event.pol)
-     {}
+    explicit DVSPointCloudData(DVSEvent event) : x(event.x), y(event.y), t(event.t), pol(event.pol) {}
     std::uint16_t x;
     std::uint16_t y;
     double t;
@@ -112,10 +105,11 @@ void UeDVSCameraPublisher::SetPointCloudData(std::vector<DVSEvent, DVSEventVecto
   _point_cloud->Message().row_step(width() * point_size);
   _point_cloud->Message().is_dense(false);
   std::vector<uint8_t> pcl_data_uint8_t;
-  pcl_data_uint8_t.resize(data_vector_view.size()*point_size);
+  pcl_data_uint8_t.resize(data_vector_view.size() * point_size);
   for (size_t i = 0; i < data_vector_view.size(); ++i) {
     // convert the DVSEvent format to DVSPointCloudData putting it directly into the desired array to be sent out
-    *(reinterpret_cast<DVSPointCloudData*>(pcl_data_uint8_t.data()+i*point_size)) = DVSPointCloudData(data_vector_view[i]);
+    *(reinterpret_cast<DVSPointCloudData *>(pcl_data_uint8_t.data() + i * point_size)) =
+        DVSPointCloudData(data_vector_view[i]);
   }
   _point_cloud->Message().data(std::move(pcl_data_uint8_t));
 }

@@ -37,8 +37,9 @@ carla_msgs::srv::SpawnObject_Response SpawnObjectService::SpawnObject(
     carla_msgs::srv::SpawnObject_Request const &request) {
   carla_msgs::srv::SpawnObject_Response response;
 
-  log_warning("ROS2:SpawnObjectService processing request for '", request.blueprint().id(), "' Pose: ", request.random_pose()?"random":"provided");
-  
+  log_warning("ROS2:SpawnObjectService processing request for '", request.blueprint().id(),
+              "' Pose: ", request.random_pose() ? "random" : "provided");
+
   int32_t retry_count = 5;
   do {
     carla::geom::Transform transform;
@@ -61,9 +62,10 @@ carla_msgs::srv::SpawnObject_Response SpawnObjectService::SpawnObject(
       carla::ros2::types::Transform ros_transform(request.transform());
       transform = ros_transform.GetTransform();
     }
-    log_warning("ROS2:SpawnObjectService processing request. Pose: (", transform.location.x, ", ", transform.location.y, ", ", transform.location.z, ")");
-    auto blueprints =
-        carla::actors::BlueprintLibrary(_carla_server.call_get_actor_definitions().Get()).Filter(request.blueprint().id());
+    log_warning("ROS2:SpawnObjectService processing request. Pose: (", transform.location.x, ", ", transform.location.y,
+                ", ", transform.location.z, ")");
+    auto blueprints = carla::actors::BlueprintLibrary(_carla_server.call_get_actor_definitions().Get())
+                          .Filter(request.blueprint().id());
     if (blueprints->empty()) {
       log_error("ROS2:SpawnObjectService failed to retrieve any matching blueprint", request.blueprint().id());
       response.error_string("SpawnObjectService: failed to retrieve matching blueprint");
@@ -74,7 +76,7 @@ carla_msgs::srv::SpawnObject_Response SpawnObjectService::SpawnObject(
       std::sample(blueprints->begin(), blueprints->end(), std::back_inserter(blueprint_result), 1,
                   std::mt19937{std::random_device{}()});
       if (blueprint_result.size() == 0) {
-      log_error("ROS2:SpawnObjectService failed to retrieve random matching blueprint", request.blueprint().id());
+        log_error("ROS2:SpawnObjectService failed to retrieve random matching blueprint", request.blueprint().id());
         response.error_string("SpawnObjectService: failed to retrieve random matching blueprint");
         response.id(-1);
         return response;
@@ -85,7 +87,7 @@ carla_msgs::srv::SpawnObject_Response SpawnObjectService::SpawnObject(
       }
 
       auto actor_description = blueprint.MakeActorDescription();
-      
+
       carla::rpc::ActorAttributeValue attribute_value;
       attribute_value.id = "enabled_for_ros";
       attribute_value.type = carla::rpc::ActorAttributeType::Bool;
@@ -101,10 +103,9 @@ carla_msgs::srv::SpawnObject_Response SpawnObjectService::SpawnObject(
                                                             carla::rpc::AttachmentType::Rigid, "");
       }
       if (result.HasError()) {
-        if ( retry_count > 0 ) {
+        if (retry_count > 0) {
           retry_count--;
-        }
-        else {
+        } else {
           response.id(-1);
           response.error_string(result.GetError().What());
           log_warning("ROS2:SpawnObjectService spawn failed: ", result.GetError().What());
@@ -116,7 +117,7 @@ carla_msgs::srv::SpawnObject_Response SpawnObjectService::SpawnObject(
         return response;
       }
     }
-  }while(retry_count > 0);
+  } while (retry_count > 0);
 }
 
 }  // namespace ros2

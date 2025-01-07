@@ -9,8 +9,8 @@
 namespace carla {
 namespace ros2 {
 
-ActorSetTransformSubscriber::ActorSetTransformSubscriber(ROS2NameRecord& parent,
-                                                   carla::ros2::types::ActorSetTransformCallback actor_set_transform_callback)
+ActorSetTransformSubscriber::ActorSetTransformSubscriber(
+    ROS2NameRecord& parent, carla::ros2::types::ActorSetTransformCallback actor_set_transform_callback)
   : SubscriberBase(parent),
     _impl(std::make_shared<ActorSetTransformSubscriberImpl>(*this)),
     _actor_set_transform_callback(actor_set_transform_callback) {}

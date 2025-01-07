@@ -91,7 +91,7 @@ public:
   }
 
   /**
-   * If the last message was sent out or the message has never been set to updated, this returns \c true 
+   * If the last message was sent out or the message has never been set to updated, this returns \c true
    * indicating the publisher to be able to overwrite the message.
    */
   bool WasMessagePublished() {

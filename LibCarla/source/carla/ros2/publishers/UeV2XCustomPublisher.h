@@ -14,13 +14,14 @@
 namespace carla {
 namespace ros2 {
 
-using UeV2XCustomPublisherImpl = DdsPublisherImpl<carla_msgs::msg::CarlaV2XCustomDataList, carla_msgs::msg::CarlaV2XCustomDataListPubSubType>;
+using UeV2XCustomPublisherImpl =
+    DdsPublisherImpl<carla_msgs::msg::CarlaV2XCustomDataList, carla_msgs::msg::CarlaV2XCustomDataListPubSubType>;
 
 class UeV2XCustomPublisher : public UePublisherBaseSensor {
 public:
   UeV2XCustomPublisher(std::shared_ptr<carla::ros2::types::SensorActorDefinition> sensor_actor_definition,
-                  carla::ros2::types::V2XCustomSendCallback v2x_custom_send_callback,
-                  std::shared_ptr<TransformPublisher> transform_publisher);
+                       carla::ros2::types::V2XCustomSendCallback v2x_custom_send_callback,
+                       std::shared_ptr<TransformPublisher> transform_publisher);
   virtual ~UeV2XCustomPublisher() = default;
 
   /**
@@ -52,10 +53,8 @@ private:
   using CustomV2XDataVectorAllocator = carla::sensor::data::SerializerVectorAllocator<CustomV2XData>;
 
   std::vector<CustomV2XData, CustomV2XDataVectorAllocator> vector_view(const carla::SharedBufferView buffer_view) {
-    return carla::sensor::data::buffer_data_accessed_by_vector<CustomV2XData>(
-        buffer_view, 0);
+    return carla::sensor::data::buffer_data_accessed_by_vector<CustomV2XData>(buffer_view, 0);
   }
-
 
   bool _initialized{false};
   std::shared_ptr<UeV2XCustomSubscriber> _subscriber;

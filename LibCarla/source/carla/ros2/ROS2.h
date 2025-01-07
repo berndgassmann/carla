@@ -40,10 +40,7 @@ public:
   static std::shared_ptr<ROS2> GetInstance();
 
   // starting/stopping
-  enum class TopicVisibilityDefaultMode {
-    eOn,
-    eOff
-  }; 
+  enum class TopicVisibilityDefaultMode { eOn, eOff };
   void Enable(carla::rpc::RpcServerInterface* carla_server,
               carla::streaming::detail::stream_id_type const world_observer_stream_id,
               TopicVisibilityDefaultMode topic_visibility_default_mode);
@@ -71,8 +68,8 @@ public:
       std::shared_ptr<carla::ros2::types::TrafficLightActorDefinition> traffic_light_actor_definition);
   void AddTrafficSignUe(std::shared_ptr<carla::ros2::types::TrafficSignActorDefinition> traffic_sign_actor_definition);
   bool AddSensorUe(std::shared_ptr<carla::ros2::types::SensorActorDefinition> sensor_actor_definition);
-  bool AddV2XCustomSensorUe(std::shared_ptr<carla::ros2::types::SensorActorDefinition> sensor_actor_definition, 
-    carla::ros2::types::V2XCustomSendCallback v2x_custom_send_callback);
+  bool AddV2XCustomSensorUe(std::shared_ptr<carla::ros2::types::SensorActorDefinition> sensor_actor_definition,
+                            carla::ros2::types::V2XCustomSendCallback v2x_custom_send_callback);
 
   void RemoveActor(ActorId const actor);
 
@@ -88,7 +85,7 @@ public:
   void ProcessDataFromUeSensorPostAction();
 
   void EnableForROS(carla::streaming::detail::stream_actor_id_type stream_actor_id);
-  void DisableForROS(carla::streaming::detail::stream_actor_id_type stream_actor_id);  
+  void DisableForROS(carla::streaming::detail::stream_actor_id_type stream_actor_id);
   bool IsEnabledForROS(carla::streaming::detail::stream_actor_id_type stream_actor_id);
 
   /**

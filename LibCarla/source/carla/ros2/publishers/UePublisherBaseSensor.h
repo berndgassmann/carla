@@ -24,7 +24,7 @@ public:
   /**
    * Implement actions before sensor data updates
    */
-  virtual void UpdateSensorDataPreAction() {};
+  virtual void UpdateSensorDataPreAction(){};
   /**
    * Function to update the data for this sensor
    */
@@ -34,7 +34,7 @@ public:
   /**
    * Implement actions after sensor data updates
    */
-  virtual void UpdateSensorDataPostAction() {};
+  virtual void UpdateSensorDataPostAction(){};
 
   builtin_interfaces::msg::Time GetTime(
       std::shared_ptr<carla::sensor::s11n::SensorHeaderSerializer::Header const> sensor_header) const {

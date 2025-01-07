@@ -34,7 +34,9 @@ if (LIBCARLA_USE_ROS)
     foreach(dir ${subdirs})
       if(IS_DIRECTORY "${libcarla_source_path}/carla/ros2/${ROS2_MW_NAME}/${dir}/${typedir}")
         file(GLOB libcarla_carla_ros2_types_${dir}_headers
-              "${libcarla_source_path}/carla/ros2/${ROS2_MW_NAME}/${dir}/${typedir}/*.h"
+        "${libcarla_source_path}/carla/ros2/${ROS2_MW_NAME}/${dir}/${typedir}/*.h"
+        "${libcarla_source_path}/carla/ros2/${ROS2_MW_NAME}/${dir}/${typedir}/*.hpp"
+        "${libcarla_source_path}/carla/ros2/${ROS2_MW_NAME}/${dir}/${typedir}/*.ipp"
         )
         install(FILES ${libcarla_carla_ros2_types_${dir}_headers} DESTINATION include/carla/ros2/ros_types/${dir}/${typedir}/)
       endif()

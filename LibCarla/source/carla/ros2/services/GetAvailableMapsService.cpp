@@ -30,7 +30,7 @@ carla_msgs::srv::GetAvailableMaps_Response GetAvailableMapsService::GetAvailable
     carla_msgs::srv::GetAvailableMaps_Request const &request) {
   carla_msgs::srv::GetAvailableMaps_Response response;
 
-  for ( auto const &map_name: _carla_server.call_get_available_maps().Get()) {
+  for (auto const &map_name : _carla_server.call_get_available_maps().Get()) {
     response.maps().push_back(map_name);
   }
   return response;

@@ -26,8 +26,6 @@ struct ActorDefinition : public ActorNameDefinition {
   carla::ros2::types::Polygon vertex_polygon;
 };
 
-
-
 }  // namespace types
 }  // namespace ros2
 }  // namespace carla

@@ -58,17 +58,25 @@ struct ROS2QoS {
   int32_t _history_depth;
 };
 
-static constexpr ROS2QoS DEFAULT_ROS2_QOS{ ._reliability = ROS2QoS::Reliability::RELIABLE, ._durability = ROS2QoS::Durability::VOLATILE,
-                                          ._history = ROS2QoS::History::KEEP_LAST, ._history_depth = 10};
+static constexpr ROS2QoS DEFAULT_ROS2_QOS{._reliability = ROS2QoS::Reliability::RELIABLE,
+                                          ._durability = ROS2QoS::Durability::VOLATILE,
+                                          ._history = ROS2QoS::History::KEEP_LAST,
+                                          ._history_depth = 10};
 
-static constexpr ROS2QoS DEFAULT_SENSOR_DATA_QOS{._reliability = ROS2QoS::Reliability::RELIABLE, ._durability = ROS2QoS::Durability::VOLATILE,
-                                                 ._history = ROS2QoS::History::KEEP_LAST, ._history_depth = 10};
+static constexpr ROS2QoS DEFAULT_SENSOR_DATA_QOS{._reliability = ROS2QoS::Reliability::RELIABLE,
+                                                 ._durability = ROS2QoS::Durability::VOLATILE,
+                                                 ._history = ROS2QoS::History::KEEP_LAST,
+                                                 ._history_depth = 10};
 
-static constexpr ROS2QoS DEFAULT_SUBSCRIBER_QOS{._reliability = ROS2QoS::Reliability::BEST_EFFORT, ._durability = ROS2QoS::Durability::VOLATILE,
-                                                ._history = ROS2QoS::History::KEEP_LAST, ._history_depth = 10};
+static constexpr ROS2QoS DEFAULT_SUBSCRIBER_QOS{._reliability = ROS2QoS::Reliability::BEST_EFFORT,
+                                                ._durability = ROS2QoS::Durability::VOLATILE,
+                                                ._history = ROS2QoS::History::KEEP_LAST,
+                                                ._history_depth = 10};
 
-static constexpr ROS2QoS DEFAULT_PUBLISHER_QOS{._reliability = ROS2QoS::Reliability::RELIABLE, ._durability = ROS2QoS::Durability::TRANSIENT_LOCAL,
-                                               ._history = ROS2QoS::History::KEEP_LAST, ._history_depth = 10};
+static constexpr ROS2QoS DEFAULT_PUBLISHER_QOS{._reliability = ROS2QoS::Reliability::RELIABLE,
+                                               ._durability = ROS2QoS::Durability::TRANSIENT_LOCAL,
+                                               ._history = ROS2QoS::History::KEEP_LAST,
+                                               ._history_depth = 10};
 
 }  // namespace ros2
 }  // namespace carla

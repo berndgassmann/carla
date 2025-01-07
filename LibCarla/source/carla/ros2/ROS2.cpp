@@ -34,9 +34,9 @@
 #include "carla/ros2/publishers/UeRadarPublisher.h"
 #include "carla/ros2/publishers/UeSSCameraPublisher.h"
 #include "carla/ros2/publishers/UeSemanticLidarPublisher.h"
-#include "carla/ros2/publishers/UeWorldPublisher.h"
-#include "carla/ros2/publishers/UeV2XPublisher.h"
 #include "carla/ros2/publishers/UeV2XCustomPublisher.h"
+#include "carla/ros2/publishers/UeV2XPublisher.h"
+#include "carla/ros2/publishers/UeWorldPublisher.h"
 #include "carla/ros2/publishers/VehiclePublisher.h"
 
 #include "carla/ros2/services/DestroyObjectService.h"
@@ -82,8 +82,7 @@ void ROS2::Enable(carla::rpc::RpcServerInterface *carla_server,
   // take basic actor role definition as this is acting as naming parent of others with /carla/world
   auto world_observer_actor_definition = carla::ros2::types::ActorNameDefinition::CreateFromRoleName("/", true);
   _world_observer_sensor_actor_definition = std::make_shared<carla::ros2::types::SensorActorDefinition>(
-      *world_observer_actor_definition,
-      carla::ros2::types::PublisherSensorType::WorldObserver, 
+      *world_observer_actor_definition, carla::ros2::types::PublisherSensorType::WorldObserver,
       world_observer_stream_id);
   log_warning("ROS2 enabled");
 }
@@ -169,8 +168,8 @@ void ROS2::AddVehicleUe(std::shared_ptr<carla::ros2::types::VehicleActorDefiniti
                         carla::ros2::types::VehicleAckermannControlCallback vehicle_ackermann_control_callback,
                         carla::ros2::types::ActorSetTransformCallback vehicle_set_transform_callback) {
   log_warning("ROS2::AddVehicleUe(", std::to_string(*vehicle_actor_definition), ")");
-  _world_publisher->AddVehicleUe(vehicle_actor_definition, vehicle_control_callback,
-                                 vehicle_ackermann_control_callback, vehicle_set_transform_callback);
+  _world_publisher->AddVehicleUe(vehicle_actor_definition, vehicle_control_callback, vehicle_ackermann_control_callback,
+                                 vehicle_set_transform_callback);
 }
 
 void ROS2::AddWalkerUe(std::shared_ptr<carla::ros2::types::WalkerActorDefinition> walker_actor_definition,
@@ -191,7 +190,8 @@ void ROS2::AddTrafficSignUe(
   _world_publisher->AddTrafficSignUe(traffic_sign_actor_definition);
 }
 
-ROS2::UeSensor* ROS2::AddSensorUeInternal(std::shared_ptr<carla::ros2::types::SensorActorDefinition> sensor_actor_definition) {
+ROS2::UeSensor *ROS2::AddSensorUeInternal(
+    std::shared_ptr<carla::ros2::types::SensorActorDefinition> sensor_actor_definition) {
   auto insert_result = _ue_sensors.insert({sensor_actor_definition->stream_id, UeSensor(sensor_actor_definition)});
   if (!insert_result.second) {
     log_warning("ROS2::AddSensorUe(", std::to_string(*sensor_actor_definition),
@@ -200,17 +200,17 @@ ROS2::UeSensor* ROS2::AddSensorUeInternal(std::shared_ptr<carla::ros2::types::Se
   }
   _ue_sensors_changed = true;
   return &insert_result.first->second;
-}    
+}
 
 bool ROS2::AddSensorUe(std::shared_ptr<carla::ros2::types::SensorActorDefinition> sensor_actor_definition) {
   auto ue_sensor = AddSensorUeInternal(sensor_actor_definition);
-  return  ue_sensor != nullptr;
+  return ue_sensor != nullptr;
 }
 
-bool ROS2::AddV2XCustomSensorUe(std::shared_ptr<carla::ros2::types::SensorActorDefinition> sensor_actor_definition, 
-    carla::ros2::types::V2XCustomSendCallback v2x_custom_send_callback) {
+bool ROS2::AddV2XCustomSensorUe(std::shared_ptr<carla::ros2::types::SensorActorDefinition> sensor_actor_definition,
+                                carla::ros2::types::V2XCustomSendCallback v2x_custom_send_callback) {
   auto ue_sensor = AddSensorUeInternal(sensor_actor_definition);
-  if ( ue_sensor != nullptr ) {
+  if (ue_sensor != nullptr) {
     ue_sensor->v2x_custom_send_callback = v2x_custom_send_callback;
     return true;
   }
@@ -296,13 +296,13 @@ void ROS2::CreateSensorUePublisher(UeSensor &sensor) {
           std::make_shared<UeWorldPublisher>(*_carla_server, _name_registry, sensor.sensor_actor_definition);
       sensor.publisher = std::static_pointer_cast<UePublisherBaseSensor>(_world_publisher);
     } break;
-    case types::PublisherSensorType::V2X : {
+    case types::PublisherSensorType::V2X: {
       sensor.publisher = std::static_pointer_cast<UePublisherBaseSensor>(
           std::make_shared<UeV2XPublisher>(sensor.sensor_actor_definition, _transform_publisher));
     } break;
-    case types::PublisherSensorType::V2XCustom : {
-      sensor.publisher = std::static_pointer_cast<UePublisherBaseSensor>(
-          std::make_shared<UeV2XCustomPublisher>(sensor.sensor_actor_definition, sensor.v2x_custom_send_callback, _transform_publisher));
+    case types::PublisherSensorType::V2XCustom: {
+      sensor.publisher = std::static_pointer_cast<UePublisherBaseSensor>(std::make_shared<UeV2XCustomPublisher>(
+          sensor.sensor_actor_definition, sensor.v2x_custom_send_callback, _transform_publisher));
     } break;
     case types::PublisherSensorType::RssSensor:
       // no server side interface to be implemented: maybe move client based implementation from client to the sensor
@@ -311,7 +311,6 @@ void ROS2::CreateSensorUePublisher(UeSensor &sensor) {
     case types::PublisherSensorType::CameraGBufferUint8:
     case types::PublisherSensorType::CameraGBufferFloat:
 
-    
     case types::PublisherSensorType::LaneInvasionSensor:
     case types::PublisherSensorType::ObstacleDetectionSensor:
     default: {
@@ -359,12 +358,12 @@ void ROS2::ProcessDataFromUeSensorPreAction() {
     if (ue_sensor.second.publisher != nullptr) {
       if (ue_sensor.second.publisher->SubscribersConnected() && ue_sensor.second.session == nullptr) {
         ue_sensor.second.session = std::make_shared<ROS2Session>(ue_sensor.first);
-        log_warning("ROS2::ProcessDataFromUeSensorPreAction[", std::to_string(*ue_sensor.second.sensor_actor_definition),
-                    "]: Registering session");
+        log_warning("ROS2::ProcessDataFromUeSensorPreAction[",
+                    std::to_string(*ue_sensor.second.sensor_actor_definition), "]: Registering session");
         _dispatcher->RegisterSession(ue_sensor.second.session);
       } else if (!ue_sensor.second.publisher->SubscribersConnected() && ue_sensor.second.session != nullptr) {
-        log_warning("ROS2::ProcessDataFromUeSensorPreAction[", std::to_string(*ue_sensor.second.sensor_actor_definition),
-                    "]: Deregistering session");
+        log_warning("ROS2::ProcessDataFromUeSensorPreAction[",
+                    std::to_string(*ue_sensor.second.sensor_actor_definition), "]: Deregistering session");
         _dispatcher->DeregisterSession(ue_sensor.second.session);
         ue_sensor.second.session.reset();
       }
@@ -372,11 +371,10 @@ void ROS2::ProcessDataFromUeSensorPreAction() {
   }
 
   for (auto &ue_sensor : _ue_sensors) {
-    if ( (ue_sensor.second.publisher != nullptr) ) {
+    if ((ue_sensor.second.publisher != nullptr)) {
       ue_sensor.second.publisher->UpdateSensorDataPreAction();
-    } 
+    }
   }
-
 
   if (_ue_sensors_changed) {
     _ue_sensors_changed = false;
@@ -388,10 +386,8 @@ void ROS2::ProcessDataFromUeSensorPreAction() {
     _carla_sensor_actor_list_publisher->Publish();
   }
 
-
   _world_publisher->UpdateSensorDataPreAction();
 }
-
 
 void ROS2::ProcessDataFromUeSensor(carla::streaming::detail::stream_id_type const stream_id,
                                    std::shared_ptr<const carla::streaming::detail::Message> message) {
@@ -409,7 +405,7 @@ void ROS2::ProcessDataFromUeSensor(carla::streaming::detail::stream_id_type cons
                                 sensor_header_view.get()->data()));
 
     if (ue_sensor->second.publisher) {
-      if ( ue_sensor->second.publisher->is_enabled_for_ros() ) {
+      if (ue_sensor->second.publisher->is_enabled_for_ros()) {
         auto data_view_iter = buffer_list_view.begin();
         data_view_iter++;
         if (data_view_iter != buffer_list_view.end()) {
@@ -418,11 +414,13 @@ void ROS2::ProcessDataFromUeSensor(carla::streaming::detail::stream_id_type cons
           ue_sensor->second.publisher->Publish();
         }
         log_info("Sensor Data to ROS data: frame.(", CurrentFrame(), ") stream.",
-                  std::to_string(*sensor_actor_definition), " Processed.");
+                 std::to_string(*sensor_actor_definition), " Processed.");
 
       } else {
         log_info("Sensor Data to ROS data: frame.(", CurrentFrame(), ") stream.",
-                  std::to_string(*sensor_actor_definition), std::to_string(*ue_sensor->second.publisher->_actor_name_definition), " not enabled for ROS. Dropping data.");
+                 std::to_string(*sensor_actor_definition),
+                 std::to_string(*ue_sensor->second.publisher->_actor_name_definition),
+                 " not enabled for ROS. Dropping data.");
       }
     } else {
       log_error("Sensor Data to ROS data: frame.(", CurrentFrame(), ") stream.",
@@ -437,20 +435,18 @@ void ROS2::ProcessDataFromUeSensor(carla::streaming::detail::stream_id_type cons
 
 void ROS2::ProcessDataFromUeSensorPostAction() {
   for (auto &ue_sensor : _ue_sensors) {
-    if ( (ue_sensor.second.publisher != nullptr) ) {
+    if ((ue_sensor.second.publisher != nullptr)) {
       ue_sensor.second.publisher->UpdateSensorDataPostAction();
-    } 
+    }
   }
   _world_publisher->UpdateSensorDataPostAction();
 }
 
-
 void ROS2::EnableForROS(carla::streaming::detail::stream_actor_id_type stream_actor_id) {
   auto ue_sensor = _ue_sensors.find(stream_actor_id.stream_id);
   if (ue_sensor != _ue_sensors.end()) {
-    if ( !ue_sensor->second.publisher->is_enabled_for_ros(stream_actor_id.actor_id) ) {
-      log_warning("Enable Sensor for ROS: ",
-                  std::to_string(*ue_sensor->second.publisher->_actor_name_definition));
+    if (!ue_sensor->second.publisher->is_enabled_for_ros(stream_actor_id.actor_id)) {
+      log_warning("Enable Sensor for ROS: ", std::to_string(*ue_sensor->second.publisher->_actor_name_definition));
       ue_sensor->second.publisher->enable_for_ros(stream_actor_id.actor_id);
     }
   }
@@ -459,9 +455,8 @@ void ROS2::EnableForROS(carla::streaming::detail::stream_actor_id_type stream_ac
 void ROS2::DisableForROS(carla::streaming::detail::stream_actor_id_type stream_actor_id) {
   auto ue_sensor = _ue_sensors.find(stream_actor_id.stream_id);
   if (ue_sensor != _ue_sensors.end()) {
-    if ( ue_sensor->second.publisher->is_enabled_for_ros(stream_actor_id.actor_id) ) {
-      log_warning("Disable Sensor for ROS: ",
-                  std::to_string(*ue_sensor->second.publisher->_actor_name_definition));
+    if (ue_sensor->second.publisher->is_enabled_for_ros(stream_actor_id.actor_id)) {
+      log_warning("Disable Sensor for ROS: ", std::to_string(*ue_sensor->second.publisher->_actor_name_definition));
       ue_sensor->second.publisher->disable_for_ros(stream_actor_id.actor_id);
     }
   }
@@ -474,7 +469,6 @@ bool ROS2::IsEnabledForROS(carla::streaming::detail::stream_actor_id_type stream
   }
   return false;
 }
-
 
 uint64_t ROS2::CurrentFrame() const {
   return (_world_publisher != nullptr) ? _world_publisher->CurrentFrame() : 0u;

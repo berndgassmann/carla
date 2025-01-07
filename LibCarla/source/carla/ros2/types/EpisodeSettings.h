@@ -19,7 +19,7 @@ public:
   explicit EpisodeSettings(carla::rpc::EpisodeSettings const& rpc_episode_settings = carla::rpc::EpisodeSettings()) {
     _ros_episode_settings.synchronous_mode(rpc_episode_settings.synchronous_mode);
     _ros_episode_settings.no_rendering_mode(rpc_episode_settings.no_rendering_mode);
-    if ( rpc_episode_settings.fixed_delta_seconds.has_value() ) {
+    if (rpc_episode_settings.fixed_delta_seconds.has_value()) {
       _ros_episode_settings.fixed_delta_seconds(rpc_episode_settings.fixed_delta_seconds.value());
     }
     _ros_episode_settings.substepping(rpc_episode_settings.substepping);
@@ -31,7 +31,7 @@ public:
     _ros_episode_settings.actor_active_distance(rpc_episode_settings.actor_active_distance);
     _ros_episode_settings.spectator_as_ego(rpc_episode_settings.spectator_as_ego);
   }
-  
+
   explicit EpisodeSettings(carla_msgs::msg::CarlaEpisodeSettings const& carla_episode_settings) {
     _ros_episode_settings = carla_episode_settings;
   }
@@ -54,7 +54,7 @@ public:
     episode_settings.no_rendering_mode = _ros_episode_settings.no_rendering_mode();
     episode_settings.fixed_delta_seconds = _ros_episode_settings.fixed_delta_seconds();
     episode_settings.substepping = _ros_episode_settings.substepping();
-    episode_settings.max_substep_delta_time =  _ros_episode_settings.max_substep_delta_time();
+    episode_settings.max_substep_delta_time = _ros_episode_settings.max_substep_delta_time();
     episode_settings.max_substeps = _ros_episode_settings.max_substeps();
     episode_settings.max_culling_distance = _ros_episode_settings.max_culling_distance();
     episode_settings.deterministic_ragdolls = _ros_episode_settings.deterministic_ragdolls();

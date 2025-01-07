@@ -26,14 +26,12 @@ void SetEpisodeSettingsService::CheckRequest() {
 
 carla_msgs::srv::SetEpisodeSettings_Response SetEpisodeSettingsService::SetEpisodeSettings(
     carla_msgs::srv::SetEpisodeSettings_Request const &request) {
-
   carla_msgs::srv::SetEpisodeSettings_Response response;
   carla::ros2::types::EpisodeSettings episode_settings(request.episode_settings());
   auto result = _carla_server.call_set_episode_settings(episode_settings.GetEpisodeSettings());
-  if ( result > 0 ) {
+  if (result > 0) {
     response.success(true);
-  }
-  else {
+  } else {
     response.success(false);
   }
 

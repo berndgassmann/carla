@@ -17,11 +17,10 @@ using LoadMapServiceImpl =
     DdsServiceImpl<carla_msgs::srv::LoadMap_Request, carla_msgs::srv::LoadMap_RequestPubSubType,
                    carla_msgs::srv::LoadMap_Response, carla_msgs::srv::LoadMap_ResponsePubSubType>;
 
-class LoadMapService
-  : public ServiceBase<carla_msgs::srv::LoadMap_Request, carla_msgs::srv::LoadMap_Response> {
+class LoadMapService : public ServiceBase<carla_msgs::srv::LoadMap_Request, carla_msgs::srv::LoadMap_Response> {
 public:
   LoadMapService(carla::rpc::RpcServerInterface &carla_server,
-                       std::shared_ptr<carla::ros2::types::ActorNameDefinition> actor_name_definition);
+                 std::shared_ptr<carla::ros2::types::ActorNameDefinition> actor_name_definition);
   virtual ~LoadMapService() = default;
 
   /**

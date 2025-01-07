@@ -86,7 +86,6 @@ public:
    */
   void UpdateSensorDataPostAction() override;
 
-
   void AddVehicleUe(std::shared_ptr<carla::ros2::types::VehicleActorDefinition> vehicle_actor_definition,
                     carla::ros2::types::VehicleControlCallback vehicle_control_callback,
                     carla::ros2::types::VehicleAckermannControlCallback vehicle_ackermann_control_callback,

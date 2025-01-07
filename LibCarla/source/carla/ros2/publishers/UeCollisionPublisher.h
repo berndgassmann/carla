@@ -41,9 +41,9 @@ public:
                         carla::SharedBufferView buffer_view) override;
 
 private:
-
   carla::sensor::s11n::CollisionEventSerializer::Data data(carla::SharedBufferView buffer_view) {
-    return MsgPack::UnPack<carla::sensor::s11n::CollisionEventSerializer::Data>(buffer_view->data(), buffer_view->size());
+    return MsgPack::UnPack<carla::sensor::s11n::CollisionEventSerializer::Data>(buffer_view->data(),
+                                                                                buffer_view->size());
   }
 
   std::shared_ptr<UeCollisionPublisherImpl> _impl;

@@ -4,8 +4,8 @@
 
 #include "UeWorldPublisher.h"
 
-#include "carla/sensor/data/RawEpisodeState.h"
 #include "carla/ros2/types/EpisodeSettings.h"
+#include "carla/sensor/data/RawEpisodeState.h"
 
 namespace carla {
 namespace ros2 {
@@ -24,17 +24,16 @@ UeWorldPublisher::UeWorldPublisher(carla::rpc::RpcServerInterface& carla_server,
     _objects_with_covariance_publisher(std::make_shared<ObjectsWithCovariancePublisher>()),
     _traffic_lights_publisher(std::make_shared<TrafficLightsPublisher>()),
     _carla_control_subscriber(std::make_shared<CarlaControlSubscriber>(*this, _carla_server)),
-    _sync_subscriber(std::make_shared<CarlaSynchronizationWindowSubscriber>(*this, _carla_server)) {
-}
+    _sync_subscriber(std::make_shared<CarlaSynchronizationWindowSubscriber>(*this, _carla_server)) {}
 
 bool UeWorldPublisher::Init(std::shared_ptr<DdsDomainParticipantImpl> domain_participant) {
   _domain_participant_impl = domain_participant;
-  _initialized = _carla_status_publisher->Init(domain_participant) &&
-                 _carla_actor_list_publisher->Init(domain_participant) && _clock_publisher->Init(domain_participant) &&
-                 _map_publisher->Init(domain_participant) && _objects_publisher->Init(domain_participant) &&
-                 _objects_with_covariance_publisher->Init(domain_participant) && _traffic_lights_publisher->Init(domain_participant) &&
-                 _transform_publisher->Init(domain_participant) &&
-                 _carla_control_subscriber->Init(domain_participant) && _sync_subscriber->Init(domain_participant);
+  _initialized =
+      _carla_status_publisher->Init(domain_participant) && _carla_actor_list_publisher->Init(domain_participant) &&
+      _clock_publisher->Init(domain_participant) && _map_publisher->Init(domain_participant) &&
+      _objects_publisher->Init(domain_participant) && _objects_with_covariance_publisher->Init(domain_participant) &&
+      _traffic_lights_publisher->Init(domain_participant) && _transform_publisher->Init(domain_participant) &&
+      _carla_control_subscriber->Init(domain_participant) && _sync_subscriber->Init(domain_participant);
   return _initialized;
 }
 
@@ -103,8 +102,8 @@ void UeWorldPublisher::AddVehicleUe(
   }
   _objects_changed = true;
 
-  auto vehicle_publisher =
-      std::make_shared<VehiclePublisher>(vehicle_actor_definition, _transform_publisher, _objects_publisher, _objects_with_covariance_publisher);
+  auto vehicle_publisher = std::make_shared<VehiclePublisher>(vehicle_actor_definition, _transform_publisher,
+                                                              _objects_publisher, _objects_with_covariance_publisher);
   UeVehicle ue_vehicle(vehicle_publisher);
   ue_vehicle._vehicle_controller =
       std::make_shared<VehicleControlSubscriber>(*vehicle_publisher, std::move(vehicle_control_callback));
@@ -120,9 +119,8 @@ void UeWorldPublisher::AddVehicleUe(
   vehicle_result.first->second.Init(_domain_participant_impl);
 }
 
-void UeWorldPublisher::UeVehicle::Init(std::shared_ptr<DdsDomainParticipantImpl> domain_participant)
-{
-  if ( _vehicle_publisher->is_enabled_for_ros() ) {
+void UeWorldPublisher::UeVehicle::Init(std::shared_ptr<DdsDomainParticipantImpl> domain_participant) {
+  if (_vehicle_publisher->is_enabled_for_ros()) {
     _vehicle_publisher->Init(domain_participant);
     _vehicle_controller->Init(domain_participant);
     _vehicle_ackermann_controller->Init(domain_participant);
@@ -142,8 +140,8 @@ void UeWorldPublisher::AddWalkerUe(std::shared_ptr<carla::ros2::types::WalkerAct
   }
   _objects_changed = true;
 
-  auto walker_publisher =
-      std::make_shared<WalkerPublisher>(walker_actor_definition, _transform_publisher, _objects_publisher, _objects_with_covariance_publisher);
+  auto walker_publisher = std::make_shared<WalkerPublisher>(walker_actor_definition, _transform_publisher,
+                                                            _objects_publisher, _objects_with_covariance_publisher);
   UeWalker ue_walker(walker_publisher);
   ue_walker._walker_controller =
       std::make_shared<WalkerControlSubscriber>(*walker_publisher, std::move(walker_control_callback));
@@ -156,9 +154,8 @@ void UeWorldPublisher::AddWalkerUe(std::shared_ptr<carla::ros2::types::WalkerAct
   walker_result.first->second.Init(_domain_participant_impl);
 }
 
-void UeWorldPublisher::UeWalker::Init(std::shared_ptr<DdsDomainParticipantImpl> domain_participant)
-{
-  if ( _walker_publisher->is_enabled_for_ros() ) {
+void UeWorldPublisher::UeWalker::Init(std::shared_ptr<DdsDomainParticipantImpl> domain_participant) {
+  if (_walker_publisher->is_enabled_for_ros()) {
     _walker_publisher->Init(domain_participant);
     _walker_controller->Init(domain_participant);
   }
@@ -176,8 +173,9 @@ void UeWorldPublisher::AddTrafficLightUe(
   }
   _objects_changed = true;
 
-  auto traffic_light_publisher = std::make_shared<TrafficLightPublisher>(traffic_light_actor_definition,
-                                                                         _objects_publisher, _objects_with_covariance_publisher, _traffic_lights_publisher);
+  auto traffic_light_publisher =
+      std::make_shared<TrafficLightPublisher>(traffic_light_actor_definition, _objects_publisher,
+                                              _objects_with_covariance_publisher, _traffic_lights_publisher);
   UeTrafficLight ue_traffic_light(traffic_light_publisher);
   auto traffic_light_result = _traffic_lights.insert({traffic_light_actor_definition->id, ue_traffic_light});
   if (!traffic_light_result.second) {
@@ -187,9 +185,8 @@ void UeWorldPublisher::AddTrafficLightUe(
   traffic_light_result.first->second.Init(_domain_participant_impl);
 }
 
-void UeWorldPublisher::UeTrafficLight::Init(std::shared_ptr<DdsDomainParticipantImpl> domain_participant)
-{
-  if ( _traffic_light_publisher->is_enabled_for_ros() ) {
+void UeWorldPublisher::UeTrafficLight::Init(std::shared_ptr<DdsDomainParticipantImpl> domain_participant) {
+  if (_traffic_light_publisher->is_enabled_for_ros()) {
     _traffic_light_publisher->Init(domain_participant);
   }
 }
@@ -206,8 +203,8 @@ void UeWorldPublisher::AddTrafficSignUe(
   }
   _objects_changed = true;
 
-  auto traffic_sign_publisher =
-      std::make_shared<TrafficSignPublisher>(traffic_sign_actor_definition, _objects_publisher, _objects_with_covariance_publisher);
+  auto traffic_sign_publisher = std::make_shared<TrafficSignPublisher>(
+      traffic_sign_actor_definition, _objects_publisher, _objects_with_covariance_publisher);
   UeTrafficSign ue_traffic_sign(traffic_sign_publisher);
   auto traffic_sign_result = _traffic_signs.insert({traffic_sign_actor_definition->id, ue_traffic_sign});
   if (!traffic_sign_result.second) {
@@ -217,9 +214,8 @@ void UeWorldPublisher::AddTrafficSignUe(
   traffic_sign_result.first->second.Init(_domain_participant_impl);
 }
 
-void UeWorldPublisher::UeTrafficSign::Init(std::shared_ptr<DdsDomainParticipantImpl> domain_participant)
-{
-  if ( _traffic_sign_publisher->is_enabled_for_ros() ) {
+void UeWorldPublisher::UeTrafficSign::Init(std::shared_ptr<DdsDomainParticipantImpl> domain_participant) {
+  if (_traffic_sign_publisher->is_enabled_for_ros()) {
     _traffic_sign_publisher->Init(domain_participant);
   }
 }
@@ -231,29 +227,37 @@ void UeWorldPublisher::RemoveActor(ActorId actor) {
   _objects.erase(actor);
   _objects_changed = true;
   auto vehicle_iter = _vehicles.find(actor);
-  if ( vehicle_iter != _vehicles.end() ) {
-    log_warning("ROS2::RemoveVehicleUe(", std::to_string(
-      *std::static_pointer_cast<carla::ros2::types::VehicleActorDefinition>(vehicle_iter->second._vehicle_publisher->_actor_name_definition)), ")");
+  if (vehicle_iter != _vehicles.end()) {
+    log_warning("ROS2::RemoveVehicleUe(",
+                std::to_string(*std::static_pointer_cast<carla::ros2::types::VehicleActorDefinition>(
+                    vehicle_iter->second._vehicle_publisher->_actor_name_definition)),
+                ")");
     _vehicles.erase(vehicle_iter);
   }
   auto walker_iter = _walkers.find(actor);
-  if ( walker_iter != _walkers.end() ) {
-    log_warning("ROS2::RemoveWalkerUe(", std::to_string(
-      *std::static_pointer_cast<carla::ros2::types::WalkerActorDefinition>(walker_iter->second._walker_publisher->_actor_name_definition)), ")");
+  if (walker_iter != _walkers.end()) {
+    log_warning("ROS2::RemoveWalkerUe(",
+                std::to_string(*std::static_pointer_cast<carla::ros2::types::WalkerActorDefinition>(
+                    walker_iter->second._walker_publisher->_actor_name_definition)),
+                ")");
     _walkers.erase(walker_iter);
   }
   auto traffic_light_iter = _traffic_lights.find(actor);
-  if ( traffic_light_iter != _traffic_lights.end() ) {
-    log_warning("ROS2::RemoveTrafficLightUe(", std::to_string(
-      *std::static_pointer_cast<carla::ros2::types::TrafficLightActorDefinition>(traffic_light_iter->second._traffic_light_publisher->_actor_name_definition)), ")");
+  if (traffic_light_iter != _traffic_lights.end()) {
+    log_warning("ROS2::RemoveTrafficLightUe(",
+                std::to_string(*std::static_pointer_cast<carla::ros2::types::TrafficLightActorDefinition>(
+                    traffic_light_iter->second._traffic_light_publisher->_actor_name_definition)),
+                ")");
     _traffic_lights.erase(traffic_light_iter);
   }
   _traffic_lights_publisher->RemoveTrafficLight(actor);
 
   auto traffic_sign_iter = _traffic_signs.find(actor);
-  if ( traffic_sign_iter != _traffic_signs.end() ) {
-    log_warning("ROS2::RemoveTrafficSignUe(", std::to_string(
-      *std::static_pointer_cast<carla::ros2::types::TrafficSignActorDefinition>(traffic_sign_iter->second._traffic_sign_publisher->_actor_name_definition)), ")");
+  if (traffic_sign_iter != _traffic_signs.end()) {
+    log_warning("ROS2::RemoveTrafficSignUe(",
+                std::to_string(*std::static_pointer_cast<carla::ros2::types::TrafficSignActorDefinition>(
+                    traffic_sign_iter->second._traffic_sign_publisher->_actor_name_definition)),
+                ")");
     _traffic_signs.erase(traffic_sign_iter);
   }
 }
@@ -265,23 +269,23 @@ void UeWorldPublisher::UpdateAndPublishStatus() {
     carla_msgs::msg::CarlaStatus status;
     status.frame(_frame);
     carla::ros2::types::EpisodeSettings carla_episode_settings(_carla_server.call_get_episode_settings().Get());
-    status.episode_settings( carla_episode_settings.episode_settings());
+    status.episode_settings(carla_episode_settings.episode_settings());
     status.header().stamp(_timestamp.time());
     status.header().frame_id("");
     status.synchronous_mode_participant_states().reserve(synchronization_window_status.Get().second.size());
     double synchronization_target_game_time_min = std::numeric_limits<double>::max();
-    for ( auto const &synchronization_window_participant_state: synchronization_window_status.Get().second) {
+    for (auto const& synchronization_window_participant_state : synchronization_window_status.Get().second) {
       carla_msgs::msg::CarlaSynchronizationWindowParticipantState participant_state;
       participant_state.client_id(synchronization_window_participant_state.client_id);
       participant_state.participant_id(synchronization_window_participant_state.participant_id);
       carla::ros2::types::Timestamp target_game_time(synchronization_window_participant_state.target_game_time);
       participant_state.target_game_time(target_game_time.Stamp());
       status.synchronous_mode_participant_states().push_back(participant_state);
-      if ( target_game_time.Stamp() > 0. ) {
+      if (target_game_time.Stamp() > 0.) {
         synchronization_target_game_time_min = std::min(synchronization_target_game_time_min, target_game_time.Stamp());
       }
     }
-    
+
     status.game_running(synchronization_target_game_time_min > _timestamp.Stamp());
     _carla_status_publisher->UpdateCarlaStatus(status);
 
@@ -324,7 +328,7 @@ void UeWorldPublisher::UpdateSensorData(
       if (vehicle_it != _vehicles.end()) {
         UeVehicle& ue_vehicle = vehicle_it->second;
         auto publisher = ue_vehicle._vehicle_publisher;
-        if ( publisher->is_enabled_for_ros() ) {
+        if (publisher->is_enabled_for_ros()) {
           object_enabled_for_ros = true;
           publisher->UpdateTransform(_timestamp, transform);
           publisher->UpdateVehicle(object, actor_dynamic_state);
@@ -338,7 +342,7 @@ void UeWorldPublisher::UpdateSensorData(
       if (walker_it != _walkers.end()) {
         UeWalker& ue_walker = walker_it->second;
         auto publisher = ue_walker._walker_publisher;
-        if ( publisher->is_enabled_for_ros() ) {
+        if (publisher->is_enabled_for_ros()) {
           object_enabled_for_ros = true;
           publisher->UpdateTransform(_timestamp, transform);
           publisher->UpdateWalker(object, actor_dynamic_state);
@@ -352,7 +356,7 @@ void UeWorldPublisher::UpdateSensorData(
       if (traffic_sign_it != _traffic_signs.end()) {
         UeTrafficSign& ue_traffic_sign = traffic_sign_it->second;
         auto publisher = ue_traffic_sign._traffic_sign_publisher;
-        if ( publisher->is_enabled_for_ros() ) {
+        if (publisher->is_enabled_for_ros()) {
           object_enabled_for_ros = true;
           publisher->UpdateTrafficSign(object, actor_dynamic_state);
           if (publisher->SubscribersConnected()) {
@@ -365,7 +369,7 @@ void UeWorldPublisher::UpdateSensorData(
       if (traffic_light_it != _traffic_lights.end()) {
         UeTrafficLight& ue_traffic_light = traffic_light_it->second;
         auto publisher = ue_traffic_light._traffic_light_publisher;
-        if ( publisher->is_enabled_for_ros() ) {
+        if (publisher->is_enabled_for_ros()) {
           object_enabled_for_ros = true;
           publisher->UpdateTrafficLight(object, actor_dynamic_state);
           if (publisher->SubscribersConnected()) {
@@ -375,7 +379,7 @@ void UeWorldPublisher::UpdateSensorData(
       }
     }
 
-    if ( object_enabled_for_ros ) {
+    if (object_enabled_for_ros) {
       object->UpdateObject(_timestamp, actor_dynamic_state);
     }
   }
@@ -391,7 +395,7 @@ void UeWorldPublisher::UpdateSensorData(
 }
 
 void UeWorldPublisher::enable_for_ros(carla::streaming::detail::actor_id_type actor_id) {
-  if ( actor_id == _actor_name_definition->id ) {
+  if (actor_id == _actor_name_definition->id) {
     // the world publisher itself always enabled
     return;
   }
@@ -414,7 +418,7 @@ void UeWorldPublisher::enable_for_ros(carla::streaming::detail::actor_id_type ac
 }
 
 void UeWorldPublisher::disable_for_ros(carla::streaming::detail::actor_id_type actor_id) {
-  if ( actor_id == _actor_name_definition->id ) {
+  if (actor_id == _actor_name_definition->id) {
     // the world publisher itself always enabled
     return;
   }
@@ -437,7 +441,7 @@ void UeWorldPublisher::disable_for_ros(carla::streaming::detail::actor_id_type a
 }
 
 bool UeWorldPublisher::is_enabled_for_ros(carla::streaming::detail::actor_id_type actor_id) const {
-  if ( actor_id == _actor_name_definition->id ) {
+  if (actor_id == _actor_name_definition->id) {
     // the world publisher itself always enabled
     return true;
   }

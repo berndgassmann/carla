@@ -14,13 +14,12 @@
 namespace carla {
 namespace ros2 {
 
-using ActorSetTransformSubscriberImpl =
-    DdsSubscriberImpl<geometry_msgs::msg::Pose, geometry_msgs::msg::PosePubSubType>;
+using ActorSetTransformSubscriberImpl = DdsSubscriberImpl<geometry_msgs::msg::Pose, geometry_msgs::msg::PosePubSubType>;
 
 class ActorSetTransformSubscriber : public SubscriberBase<geometry_msgs::msg::Pose> {
 public:
   explicit ActorSetTransformSubscriber(ROS2NameRecord& parent,
-                                    carla::ros2::types::ActorSetTransformCallback actor_set_transform_callback);
+                                       carla::ros2::types::ActorSetTransformCallback actor_set_transform_callback);
   virtual ~ActorSetTransformSubscriber() = default;
 
   /**

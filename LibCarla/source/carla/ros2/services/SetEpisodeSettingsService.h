@@ -15,13 +15,14 @@ namespace ros2 {
 
 using SetEpisodeSettingsServiceImpl =
     DdsServiceImpl<carla_msgs::srv::SetEpisodeSettings_Request, carla_msgs::srv::SetEpisodeSettings_RequestPubSubType,
-                   carla_msgs::srv::SetEpisodeSettings_Response, carla_msgs::srv::SetEpisodeSettings_ResponsePubSubType>;
+                   carla_msgs::srv::SetEpisodeSettings_Response,
+                   carla_msgs::srv::SetEpisodeSettings_ResponsePubSubType>;
 
 class SetEpisodeSettingsService
   : public ServiceBase<carla_msgs::srv::SetEpisodeSettings_Request, carla_msgs::srv::SetEpisodeSettings_Response> {
 public:
   SetEpisodeSettingsService(carla::rpc::RpcServerInterface &carla_server,
-                       std::shared_ptr<carla::ros2::types::ActorNameDefinition> actor_name_definition);
+                            std::shared_ptr<carla::ros2::types::ActorNameDefinition> actor_name_definition);
   virtual ~SetEpisodeSettingsService() = default;
 
   /**
@@ -35,7 +36,8 @@ public:
   bool Init(std::shared_ptr<DdsDomainParticipantImpl> domain_participant) override;
 
 private:
-  carla_msgs::srv::SetEpisodeSettings_Response SetEpisodeSettings(carla_msgs::srv::SetEpisodeSettings_Request const &request);
+  carla_msgs::srv::SetEpisodeSettings_Response SetEpisodeSettings(
+      carla_msgs::srv::SetEpisodeSettings_Request const &request);
 
   std::shared_ptr<SetEpisodeSettingsServiceImpl> _impl;
 };

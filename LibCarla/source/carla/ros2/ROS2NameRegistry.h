@@ -30,7 +30,8 @@ public:
   void UnregisterRecord(ROS2NameRecord const* record);
 
   // attaching actors to each other
-  void AttachActors(carla::streaming::detail::actor_id_type const child, carla::streaming::detail::actor_id_type const parent);
+  void AttachActors(carla::streaming::detail::actor_id_type const child,
+                    carla::streaming::detail::actor_id_type const parent);
 
   struct TopicAndFrame {
     TopicAndFrame(std::string topic_name = "", std::string frame_id = "")

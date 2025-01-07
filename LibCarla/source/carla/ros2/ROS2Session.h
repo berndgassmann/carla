@@ -28,7 +28,7 @@ public:
   }
 
   void EnableForROS(carla::streaming::detail::actor_id_type actor_id) override;
-  void DisableForROS(carla::streaming::detail::actor_id_type actor_id)override;  
+  void DisableForROS(carla::streaming::detail::actor_id_type actor_id) override;
   bool IsEnabledForROS(carla::streaming::detail::actor_id_type actor_id) override;
 };
 

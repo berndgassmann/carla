@@ -39,10 +39,10 @@ carla_msgs::srv::GetBlueprints_Response GetBlueprintsService::GetBlueprints(
   for (auto const &blueprint : *blueprints) {
     carla_msgs::msg::CarlaActorBlueprint ros_blueprint;
     ros_blueprint.id(blueprint.GetId());
-    for (auto const &tag: blueprint.GetTags()) {
+    for (auto const &tag : blueprint.GetTags()) {
       ros_blueprint.tags().push_back(tag);
     }
-    for (auto const &attribute: blueprint) {
+    for (auto const &attribute : blueprint) {
       diagnostic_msgs::msg::KeyValue key_value;
       key_value.key(attribute.GetId());
       key_value.value(attribute.GetValue());

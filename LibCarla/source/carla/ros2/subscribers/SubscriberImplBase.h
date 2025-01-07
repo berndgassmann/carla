@@ -47,7 +47,7 @@ public:
 
   struct MessageEntry {
     // a process local unique identification of the publisher that has sent the message
-    std::string  publisher{};
+    std::string publisher{};
     // the actual message
     MESSAGE_TYPE message{};
   };
@@ -120,7 +120,7 @@ protected:
     std::lock_guard<std::mutex> access_lock(_access_mutex);
     _messages.push_back({publisher_guid, message});
     carla::log_debug("SubscriberImplBase[", _parent.get_topic_name(), "]::AddMessage(", publisher_guid,
-                      ") number of messages: ", _messages.size());
+                     ") number of messages: ", _messages.size());
   }
 
   void AddPublisher(std::string const &publisher_guid) {
@@ -137,9 +137,8 @@ protected:
     _parent.PublisherDisconnected(publisher_guid);
     {
       std::lock_guard<std::mutex> access_lock(_access_mutex);
-      _connected_publishers.remove_if([publisher_guid](std::string const &element) -> bool {
-        return publisher_guid == element;
-      });
+      _connected_publishers.remove_if(
+          [publisher_guid](std::string const &element) -> bool { return publisher_guid == element; });
       carla::log_debug("SubscriberImplBase[", _parent.get_topic_name(), "]::RemovePublisher(", publisher_guid,
                        ") number of connected publisher: ", _connected_publishers.size());
     }
@@ -147,7 +146,7 @@ protected:
 
   void Clear() {
     std::lock_guard<std::mutex> access_lock(_access_mutex);
-    for (auto const &publisher_guid: _connected_publishers) {
+    for (auto const &publisher_guid : _connected_publishers) {
       _parent.PublisherDisconnected(publisher_guid);
     }
     _connected_publishers.clear();
@@ -158,7 +157,7 @@ private:
   // keep the data private to ensure access_mutex is hold while accessing
   mutable std::mutex _access_mutex{};
   SubscriberBase<MESSAGE_TYPE> &_parent;
-  std::list<std::string > _connected_publishers;
+  std::list<std::string> _connected_publishers;
   std::list<MessageEntry> _messages;
 };
 }  // namespace ros2

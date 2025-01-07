@@ -12,7 +12,8 @@ namespace carla {
 namespace ros2 {
 
 using ObjectsWithCovariancePublisherImpl =
-    DdsPublisherImpl<derived_object_msgs::msg::ObjectWithCovarianceArray, derived_object_msgs::msg::ObjectWithCovarianceArrayPubSubType>;
+    DdsPublisherImpl<derived_object_msgs::msg::ObjectWithCovarianceArray,
+                     derived_object_msgs::msg::ObjectWithCovarianceArrayPubSubType>;
 
 class ObjectsWithCovariancePublisher : public PublisherBaseSensor {
 public:

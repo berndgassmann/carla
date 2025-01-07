@@ -9,7 +9,8 @@
 namespace carla {
 namespace ros2 {
 
-ObjectWithCovariancePublisher::ObjectWithCovariancePublisher(ROS2NameRecord &parent_publisher, std::shared_ptr<ObjectsWithCovariancePublisher> objects_publisher)
+ObjectWithCovariancePublisher::ObjectWithCovariancePublisher(
+    ROS2NameRecord &parent_publisher, std::shared_ptr<ObjectsWithCovariancePublisher> objects_publisher)
   : _parent_publisher(parent_publisher),
     _impl(std::make_shared<ObjectWithCovariancePublisherImpl>()),
     _objects_publisher(objects_publisher) {}

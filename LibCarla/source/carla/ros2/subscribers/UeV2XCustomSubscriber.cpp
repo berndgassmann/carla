@@ -16,7 +16,7 @@ UeV2XCustomSubscriber::UeV2XCustomSubscriber(ROS2NameRecord& parent,
     _v2x_custom_send_callback(v2x_custom_send_callback) {}
 
 bool UeV2XCustomSubscriber::Init(std::shared_ptr<DdsDomainParticipantImpl> domain_participant) {
-  // need to ensure reliable v2x data receiption and allow larger data chuncks (up to 100byte * 1000 = 100 kB) 
+  // need to ensure reliable v2x data receiption and allow larger data chuncks (up to 100byte * 1000 = 100 kB)
   return _impl->Init(domain_participant, get_topic_name("send"), get_topic_qos().reliable().keep_last(1000));
 }
 

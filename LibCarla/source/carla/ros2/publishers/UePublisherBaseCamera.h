@@ -61,8 +61,8 @@ public:
                         const carla::SharedBufferView buffer_view) override;
 
 protected:
-  void UpdateCameraInfo(const builtin_interfaces::msg::Time &stamp, sensor_msgs::msg::CameraInfo const &camera_info);
-  void UpdateImageHeader(const builtin_interfaces::msg::Time &stamp, sensor_msgs::msg::CameraInfo const &camera_info);
+  void UpdateCameraInfo(const builtin_interfaces::msg::Time &stamp, uint32_t height, uint32_t width, double fov);
+  void UpdateImageHeader(const builtin_interfaces::msg::Time &stamp, uint32_t height, uint32_t width);
 
   virtual void SetImageDataFromBuffer(const carla::SharedBufferView buffer_view);
 
@@ -98,7 +98,7 @@ protected:
    * This function is called for sensor_msgs::msg::Image types
    */
   template <typename T, typename A = ALLOCATOR,
-            std::enable_if_t<std::is_same<sensor_msgs::msg::Image::allocator_type, A >::value, bool> = true >
+            std::enable_if_t<std::is_same<sensor_msgs::msg::Image::allocator_type, A>::value, bool> = true>
   std::vector<T> buffer_data_2_vector(const carla::SharedBufferView buffer_view) const {
     return carla::sensor::data::buffer_data_copy_to_std_vector<T>(buffer_view,
                                                                   carla::sensor::s11n::ImageSerializer::header_offset);
@@ -110,7 +110,7 @@ protected:
    * This function is called for sensor_msgs::msg::ImageFromBuffer types
    */
   template <typename T, typename A = ALLOCATOR,
-            std::enable_if_t<std::is_same<sensor_msgs::msg::ImageFromBuffer::allocator_type, A >::value, bool> = true >
+            std::enable_if_t<std::is_same<sensor_msgs::msg::ImageFromBuffer::allocator_type, A>::value, bool> = true>
   std::vector<T, carla::sensor::data::SerializerVectorAllocator<T>> buffer_data_2_vector(
       const carla::SharedBufferView buffer_view) const {
     return carla::sensor::data::buffer_data_accessed_by_vector<T>(buffer_view,

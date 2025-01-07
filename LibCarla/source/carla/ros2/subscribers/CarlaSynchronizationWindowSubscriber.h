@@ -19,7 +19,8 @@ using CarlaSynchronizationWindowSubscriberImpl =
     DdsSubscriberImpl<carla_msgs::msg::CarlaSynchronizationWindow,
                       carla_msgs::msg::CarlaSynchronizationWindowPubSubType>;
 
-class CarlaSynchronizationWindowSubscriber : public SubscriberBaseSynchronizationClient<carla_msgs::msg::CarlaSynchronizationWindow> {
+class CarlaSynchronizationWindowSubscriber
+  : public SubscriberBaseSynchronizationClient<carla_msgs::msg::CarlaSynchronizationWindow> {
 public:
   explicit CarlaSynchronizationWindowSubscriber(ROS2NameRecord &parent, carla::rpc::RpcServerInterface &carla_server);
   virtual ~CarlaSynchronizationWindowSubscriber();
@@ -35,7 +36,6 @@ public:
   bool Init(std::shared_ptr<DdsDomainParticipantImpl> domain_participant) override;
 
 private:
-
   /**
    * Implements SubscriberBaseSynchronizationClient::ThisAsSynchronizationClient() interface
    */

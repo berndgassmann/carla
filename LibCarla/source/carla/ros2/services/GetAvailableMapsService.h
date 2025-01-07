@@ -21,7 +21,7 @@ class GetAvailableMapsService
   : public ServiceBase<carla_msgs::srv::GetAvailableMaps_Request, carla_msgs::srv::GetAvailableMaps_Response> {
 public:
   GetAvailableMapsService(carla::rpc::RpcServerInterface &carla_server,
-                       std::shared_ptr<carla::ros2::types::ActorNameDefinition> actor_name_definition);
+                          std::shared_ptr<carla::ros2::types::ActorNameDefinition> actor_name_definition);
   virtual ~GetAvailableMapsService() = default;
 
   /**

@@ -13,12 +13,13 @@
 namespace carla {
 namespace ros2 {
 
-using UeV2XPublisherImpl = DdsPublisherImpl<carla_msgs::msg::CarlaV2XDataList, carla_msgs::msg::CarlaV2XDataListPubSubType>;
+using UeV2XPublisherImpl =
+    DdsPublisherImpl<carla_msgs::msg::CarlaV2XDataList, carla_msgs::msg::CarlaV2XDataListPubSubType>;
 
 class UeV2XPublisher : public UePublisherBaseSensor {
 public:
   UeV2XPublisher(std::shared_ptr<carla::ros2::types::SensorActorDefinition> sensor_actor_definition,
-                  std::shared_ptr<TransformPublisher> transform_publisher);
+                 std::shared_ptr<TransformPublisher> transform_publisher);
   virtual ~UeV2XPublisher() = default;
 
   /**
@@ -46,10 +47,8 @@ private:
   using CAMDataVectorAllocator = carla::sensor::data::SerializerVectorAllocator<CAMData>;
 
   std::vector<CAMData, CAMDataVectorAllocator> vector_view(const carla::SharedBufferView buffer_view) {
-    return carla::sensor::data::buffer_data_accessed_by_vector<CAMData>(
-        buffer_view, 0);
+    return carla::sensor::data::buffer_data_accessed_by_vector<CAMData>(buffer_view, 0);
   }
-
 
   bool _initialized{false};
   std::shared_ptr<UeV2XPublisherImpl> _impl;

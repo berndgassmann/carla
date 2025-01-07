@@ -72,7 +72,6 @@ public:
     return _parent.get_topic_name(postfix);
   }
 
-
 protected:
   ROS2NameRecord &_parent;
 };

@@ -176,7 +176,7 @@ public:
       object.shape().type(shape_msgs::msg::SolidPrimitive_Constants::BOX);
       auto const ros_extent = _bounding_box.extent * 2.f;
       object.shape().dimensions({ros_extent.x, ros_extent.y, ros_extent.z});
-      //object.shape().polygon().points(*Polygon(_bounding_box.GetLocalVertices()).polygon());
+      // object.shape().polygon().points(*Polygon(_bounding_box.GetLocalVertices()).polygon());
     } else {
       object.shape().type(shape_msgs::msg::SolidPrimitive_Constants::BOX_X);
     }
