@@ -164,14 +164,11 @@ void MotionPlanStage::Update(const unsigned long index) {
       auto right_vector = target_waypoint->GetTransform().GetRightVector();
       auto offset_location = cg::Location(cg::Vector3D(offset*right_vector.x, offset*right_vector.y, 0.0f));
       target_location = target_location + offset_location;
+      auto towards_target_vector = target_location - vehicle_location;
+      towards_target_vector.z = 0.;
+      auto angle_delta_rad = cg::Math::GetVectorAngle(vehicle_heading, towards_target_vector);
 
-      float dot_product = DeviationDotProduct(vehicle_location, vehicle_heading, target_location);
-      float cross_product = DeviationCrossProduct(vehicle_location, vehicle_heading, target_location);
-      dot_product = acos(dot_product) / PI;
-      if (cross_product < 0.0f) {
-        dot_product *= -1.0f;
-      }
-      const float angular_deviation = dot_product;
+      const float angular_deviation = angle_delta_rad / PI;
       const float velocity_deviation = (dynamic_target_velocity - vehicle_speed) / dynamic_target_velocity;
       // If previous state for vehicle not found, initialize state entry.
       if (pid_state_map.find(actor_id) == pid_state_map.end()) {

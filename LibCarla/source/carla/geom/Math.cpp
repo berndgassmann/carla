@@ -12,8 +12,33 @@
 namespace carla {
 namespace geom {
 
-  double Math::GetVectorAngle(const Vector3D &a, const Vector3D &b) {
-    return std::acos(Math::CosineVectorAngle(a, b));
+  float Math::SineVectorAngleFromUnitVectors(Vector3D const &a_unit, Vector3D const &b_unit)
+  {
+    auto const cross = Math::Cross(a_unit, b_unit);
+    Vector3D const to_up(0.f, 0.f, 1.f);
+    auto const sine_angle_abs = Math::Length(cross);
+    if ( std::signbit(Math::Dot(cross, to_up) ) )
+    {
+      return -sine_angle_abs;
+    }
+    else
+    {
+      return sine_angle_abs;
+    }
+  }
+
+  float Math::GetVectorAngleAbs(const Vector3D &a, const Vector3D &b) {
+    float cosine_vector_angle = Math::CosineVectorAngle(a, b);
+    return std::acos(cosine_vector_angle);
+  }
+
+  float Math::GetVectorAngle(const Vector3D &a, const Vector3D &b) {
+    auto const a_unit = a.MakeUnitVector();
+    auto const b_unit = b.MakeUnitVector();
+    auto const cosine_vector_angle = Math::CosineVectorAngleFromUnitVectors(a, b);
+    auto const sine_vector_angle = Math::SineVectorAngleFromUnitVectors(a, b);
+    auto const angle = std::atan2(sine_vector_angle, cosine_vector_angle);
+    return angle;
   }
 
   std::pair<float, float> Math::DistanceSegmentToPoint(
