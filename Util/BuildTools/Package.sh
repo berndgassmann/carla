@@ -198,6 +198,11 @@ if ${DO_CARLA_RELEASE} ; then
 
   sed -i "s/CarlaUE4 /CarlaUE4 ${EDITOR_ROS2_FLAGS} /g" "${DESTINATION}/CarlaUE4.sh"
 
+  copy_if_changed "./CarlaUE4NoGui.sh" "${DESTINATION}/CarlaUE4NoGui.sh"
+  sed -i "s/CarlaUE4 /CarlaUE4 ${EDITOR_ROS2_FLAGS} /g" "${DESTINATION}/CarlaUE4NoGui.sh"
+
+  copy_if_changed "./run_carla_python_prefix_path.sh" "${DESTINATION}/run_carla_python_prefix_path.sh"
+
   popd >/dev/null
 
 fi
