@@ -80,6 +80,7 @@ public:
   UFUNCTION(Category = "Carla Util", BlueprintCallable)
   static TArray<FBoundingBox> GetBoundingBoxOfActors(
     const TArray<AActor*>& Actors,
+    const UCarlaEpisode* Episode,
     uint8 InTagQueried = 0xFF);
 
   UFUNCTION(Category = "Carla Util", BlueprintCallable)

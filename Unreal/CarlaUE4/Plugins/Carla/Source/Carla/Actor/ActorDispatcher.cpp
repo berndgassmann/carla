@@ -104,7 +104,7 @@ TPair<EActorSpawnResultStatus, FCarlaActor*> UActorDispatcher::SpawnActor(
   }
   else
   {
-    ATagger::TagActor(*View->GetActor(), true);
+    ATagger::TagActor(*View->GetActor(), true, View->GetActorId());
   }
 
   return MakeTuple(Result.Status, View);
