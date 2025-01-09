@@ -30,6 +30,7 @@
  * Introduced fine grained ServerSynchronization mechanism: each client decides for its own if it requires synchronization or not and provides its own synchronization window.
    Be aware: some existing code using master/slave sync mechanism might need rework. See also generate_traffic.py.
  
+ * Fixed segfault in traffic manager when trying to access not available vehicles
 
 ## CARLA 0.9.15
 
