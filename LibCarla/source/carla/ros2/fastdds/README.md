@@ -23,12 +23,13 @@ To update the types within this folder one has to:
     systemProp.http.proxyPort=8181
     systemProp.https.nonProxyHosts=*.company.com|localhost
     ```
-  * Call fastddsgen outside the carla_msgs folder e.g.
-    ```fastddsgen -d code -I . -I /opt/ros/humble/share/ -typeros2 carla_msgs/msg/*.idl```
-    In case you get errors in standard idl files: add "#pragma once" directive those idls
-  * Then copy all required code into the respecitve subfolders in here and put rework include directives where necessary 
-    as the fastddsgen generator is unfortunately not supporting to replicate the correct subdirectory structure in all cases yet.
-
+  * To have all relevant files beeing placed in the correct subfolders by the code generator it is best practice to copy the carla_msgs folder in parallel to the other folders of your ROS2 system first and execute the generator from the respective ROS2 folder e.g.
+    ```
+    sudo cp -r carla_msgs /opt/ros/jazzy/share
+    Fast-DDS-GEN/scripts/fastddsgen -d <home>/output-code -I /opt/ros/jazzy/share/ -typeros2 carla_msgs/msg/*.idl
+    ```
+    In case you get errors in some of the idl files: add "#pragma once" directive to those idls to ensure they are only included once by the generator.
+    In some cases you will have to rename variables because of name clashes within different sub-namespaces which the fastddsgen generator is not able to distiguish. Easiest workaround for variables is placing a "_" in front of the name, so the output will be the same as expected. On class files append e.g. "BLABLA" and later perform a search and replace. Alternatively wait until the generator is fixed and works properly.
 
 If the FastDDS Version is updated. The types in this folder have to be updated as above discribed. In addition, if one wants to keep the copyless operation on Image data, the header in fastcrd/Cdr.h has to be updated with the new version delivered by eProsima and the allocator extensions on the templates have to be applied there, too. Similarly, the (newly generated) sensor_msgs/msg/Image files have to be updated accordingly with ImageT<ALLOCATOR> type definitions for the same. In the end, quite some typing effort, otherwhise the data has to be copied into the standard allocated vector upfront passing to the deserialization of DDS (which again copies the data).
 
