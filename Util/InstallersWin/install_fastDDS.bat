@@ -81,7 +81,7 @@ if exist "%FASTDDS_INSTALL_DIR%" (
 if not exist "%FASTDDS_SRC_DIR%" (
     echo %FILE_N% Cloning "Fast-DDS"
 
-    git clone --depth 1 --branch 2.11.3 https://github.com/eProsima/Fast-DDS.git "%FASTDDS_SRC_DIR:~0,-1%"
+    git clone --depth 1 --branch 2.14.4 https://github.com/eProsima/Fast-DDS.git "%FASTDDS_SRC_DIR:~0,-1%"
     if %errorlevel% neq 0 goto error_git
     git submodule init
     if %errorlevel% neq 0 goto error_git
@@ -105,7 +105,6 @@ cmake -G %GENERATOR% %PLATFORM%^
     -DCMAKE_INSTALL_PREFIX="%FASTDDS_INSTALL_DIR:\=/%"^
     -DBUILD_STATIC_LIBS=ON^
     -DBUILD_SHARED_LIBS=OFF^
-    -DCMAKE_CXX_FLAGS="/DBOOST_NO_EXCEPTIONS /DASIO_NO_EXCEPTIONS"^
     "%FOONATHAN_MEMORY_VENDOR_SOURCE_DIR%"
 if %errorlevel%  neq 0 goto error_cmake
 
@@ -116,9 +115,6 @@ if exist "%FASTDDS_SRC_DIR%\thirdparty\boost\include\boost" (
     echo %FILE_N% Preparing fastdds boost ... 
     @REM remove their boost includes, but keep their entry point
     rd /s /q "%FASTDDS_SRC_DIR%\thirdparty\boost\include\boost"
-    @REM  ensure the find boost compiles without exceptions
-    sed -i s/"CXX_STANDARD 11"/"CXX_STANDARD 11\n         COMPILE_DEFINITIONS \"-DBOOST_NO_EXCEPTIONS\""/ "%FASTDDS_SRC_DIR%\cmake\modules\FindThirdpartyBoost.cmake"
-    sed -i s/"class ThirdpartyBoostCompileTest"/"#ifdef BOOST_NO_EXCEPTIONS\nnamespace boost {void throw_exception(std::exception const \& e) {}}\n#endif\nclass ThirdpartyBoostCompileTest"/ "%FASTDDS_SRC_DIR%\thirdparty\boost\test\ThirdpartyBoostCompile_test.cpp"
 )
 
 if exist "%FASTDDS_SRC_DIR%\src\cpp\utils\StringMatching.cpp" (
@@ -148,7 +144,7 @@ cmake -G %GENERATOR% %PLATFORM%^
     -DTHIRDPARTY_fastcdr=FORCE^
     -DTHIRDPARTY_TinyXML2=FORCE^
     -DTHIRDPARTY_BOOST_INCLUDE_DIR="%BUILD_DIR%boost-%BOOST_VERSION%-install\include;%FASTDDS_SRC_DIR%\thirdparty\boost\include"^
-    -DCMAKE_CXX_FLAGS="/D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING /DBOOST_NO_EXCEPTIONS /DASIO_NO_EXCEPTIONS"^
+    -DCMAKE_CXX_FLAGS="/D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING"^
     "%FASTDDS_SRC_DIR%"
 if %errorlevel%  neq 0 goto error_cmake
 

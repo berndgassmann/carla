@@ -24,7 +24,7 @@ DdsDomainParticipantImpl::DdsDomainParticipantImpl() {
 
   const char *ros_domain_id_env = std::getenv("ROS_DOMAIN_ID");
   unsigned int ros_domain_id = 0;
-  if ( ros_domain_id_env != nullptr ) {
+  if (ros_domain_id_env != nullptr) {
     try {
       ros_domain_id = (unsigned int)(std::atoi(ros_domain_id_env));
     } catch (...) {
@@ -43,7 +43,7 @@ DdsDomainParticipantImpl::~DdsDomainParticipantImpl() {
   carla::log_warning("DdsDomainParticipantImpl::Destructor()");
   if ((_participant != nullptr) && (_factory != nullptr)) {
     _factory->delete_participant(_participant);
-    _participant=nullptr;
+    _participant = nullptr;
   }
 }
 

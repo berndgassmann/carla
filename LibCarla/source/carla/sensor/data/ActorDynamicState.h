@@ -107,6 +107,7 @@ namespace detail {
     }
 
     float speed_limit;
+    float steering_angle_degree;
     rpc::TrafficLightState traffic_light_state;
     bool has_traffic_light;
     rpc::ActorId traffic_light_id;

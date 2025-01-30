@@ -47,6 +47,8 @@ static auto FWorldObserver_GetActorState(const FCarlaActor &View, const FActorRe
         state.vehicle_data.control_data.vehicle_control = carla::rpc::VehicleControl{Vehicle->GetVehicleControl()};
       }
 
+      state.vehicle_data.steering_angle_degree = Vehicle->GetVehicleControl().Steer * Vehicle->GetMaximumSteerAngle();
+
       auto Controller = Cast<AWheeledVehicleAIController>(Vehicle->GetController());
       if (Controller != nullptr)
       {

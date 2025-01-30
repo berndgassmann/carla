@@ -22,6 +22,7 @@
 #include "carla/client/detail/Episode.h"
 #include "carla/client/detail/EpisodeProxy.h"
 #include "carla/profiler/LifetimeProfiled.h"
+#include "carla/rpc/CustomV2XBytes.h"
 #include "carla/rpc/TrafficLightState.h"
 #include "carla/rpc/VehicleLightStateList.h"
 #include "carla/rpc/LabelledPoint.h"
@@ -379,6 +380,12 @@ namespace detail {
       return _client.DestroyActor(actor_id);
     }
 
+    void EnableForROS(const Actor &actor);
+
+    void DisableForROS(const Actor &actor);
+
+    bool IsEnabledForROS(const Actor &actor);
+
     ActorSnapshot GetActorSnapshot(ActorId actor_id) const {
       DEBUG_ASSERT(_episode != nullptr);
       return _episode->GetState()->GetActorSnapshot(actor_id);
@@ -692,12 +699,6 @@ namespace detail {
 
     void UnSubscribeFromSensor(Actor &sensor);
 
-    void EnableForROS(const Sensor &sensor);
-
-    void DisableForROS(const Sensor &sensor);
-
-    bool IsEnabledForROS(const Sensor &sensor);
-
     void SubscribeToGBuffer(
         Actor & sensor,
         uint32_t gbuffer_id,
@@ -707,7 +708,7 @@ namespace detail {
         Actor & sensor,
         uint32_t gbuffer_id);
 
-    void Send(const Sensor &sensor, std::string message);        
+    void Send(const Sensor &sensor, const rpc::CustomV2XBytes &data);
 
     /// @}
     // =========================================================================
